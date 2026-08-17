@@ -1,7 +1,7 @@
-import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import ActionButton from '../components/ui/ActionButton.jsx'
+import PhotoPickerButton from '../components/photos/PhotoPickerButton.jsx'
 import usePhotoSelection from '../hooks/usePhotoSelection.js'
+import { getPhotoStatus } from '../utils/photoStatus.js'
 
 function BackIcon() {
   return (
@@ -13,9 +13,7 @@ function BackIcon() {
 
 function PhotoYearsPage() {
   const navigate = useNavigate()
-  const fileInputRef = useRef(null)
-  const isProcessingRef = useRef(false)
-  const { analyzedPhotos, queueSelectedPhotos } = usePhotoSelection()
+  const { analyzedPhotos } = usePhotoSelection()
   const currentYear = new Date().getFullYear()
   const defaultYears = Array.from({ length: 8 }, (_, index) => currentYear - index)
   const analyzedYears = analyzedPhotos
@@ -29,32 +27,6 @@ function PhotoYearsPage() {
     return counts
   }, new Map())
   const unknownYearCount = analyzedPhotos.filter(({ takenYear }) => takenYear === null).length
-
-  const getYearStatus = (count) => {
-    if (count === 0) return { label: '아직 없음', modifier: 'empty' }
-    if (count < 5) return { label: '사진 적음', modifier: 'low' }
-    return { label: '사진 충분', modifier: 'enough' }
-  }
-
-  const handlePhotoSelection = (event) => {
-    const input = event.currentTarget
-
-    if (isProcessingRef.current || !input.files?.length) return
-
-    try {
-      const imageFiles = Array.from(input.files).filter((file) =>
-        file.type.startsWith('image/'),
-      )
-
-      isProcessingRef.current = true
-      const queuedCount = queueSelectedPhotos(imageFiles)
-
-      if (queuedCount > 0) navigate('/photos/analyzing')
-    } finally {
-      input.value = ''
-      isProcessingRef.current = false
-    }
-  }
 
   return (
     <section className="photo-years-page">
@@ -71,17 +43,19 @@ function PhotoYearsPage() {
       <ul className="photo-years-page__list" aria-label="연도별 사진 현황">
         {years.map((year) => {
           const count = photoCountByYear.get(year) ?? 0
-          const status = getYearStatus(count)
+          const status = getPhotoStatus(count)
 
           return (
             <li key={year}>
-              <span>{year}</span>
-              <span className="photo-years-page__summary">
-                <span className="photo-years-page__count">{count}장</span>
-                <span className={`photo-years-page__status photo-years-page__status--${status.modifier}`}>
-                  {status.label}
+              <button type="button" onClick={() => navigate(`/photos/years/${year}`)}>
+                <span>{year}</span>
+                <span className="photo-years-page__summary">
+                  <span className="photo-years-page__count">{count}장</span>
+                  <span className={`photo-years-page__status photo-years-page__status--${status.modifier}`}>
+                    {status.label}
+                  </span>
                 </span>
-              </span>
+              </button>
             </li>
           )
         })}
@@ -99,19 +73,7 @@ function PhotoYearsPage() {
         </div>
       )}
 
-      <div className="photo-years-page__cta">
-        <input
-          ref={fileInputRef}
-          className="photo-years-page__file-input"
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handlePhotoSelection}
-        />
-        <ActionButton fullWidth onClick={() => fileInputRef.current?.click()}>
-          사진 선택하기
-        </ActionButton>
-      </div>
+      <PhotoPickerButton className="photo-years-page__cta" />
     </section>
   )
 }

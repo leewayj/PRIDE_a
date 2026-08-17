@@ -10,11 +10,18 @@ function readStoredAnalysis() {
 
     if (!Array.isArray(storedValue)) return []
 
-    return storedValue.filter(
-      (photo) =>
+    return storedValue
+      .filter(
+        (photo) =>
         typeof photo?.id === 'string' &&
         (photo.takenYear === null || Number.isInteger(photo.takenYear)),
-    )
+      )
+      .map((photo) => ({
+        id: photo.id,
+        name: typeof photo.name === 'string' ? photo.name : '',
+        takenAt: typeof photo.takenAt === 'string' ? photo.takenAt : null,
+        takenYear: photo.takenYear,
+      }))
   } catch {
     return []
   }
@@ -22,6 +29,7 @@ function readStoredAnalysis() {
 
 function PhotoSelectionProvider({ children }) {
   const [selectedPhotos, setSelectedPhotos] = useState([])
+  const [photoFiles, setPhotoFiles] = useState([])
   const [analyzedPhotos, setAnalyzedPhotos] = useState(readStoredAnalysis)
 
   useEffect(() => {
@@ -46,6 +54,10 @@ function PhotoSelectionProvider({ children }) {
     ].filter(({ id }) => !analyzedIds.has(id))
 
     setSelectedPhotos(queuedPhotos)
+    setPhotoFiles((currentPhotos) => {
+      const knownIds = new Set(currentPhotos.map(({ id }) => id))
+      return [...currentPhotos, ...queuedPhotos.filter(({ id }) => !knownIds.has(id))]
+    })
     return queuedPhotos.length
   }, [analyzedPhotos])
 
@@ -56,6 +68,7 @@ function PhotoSelectionProvider({ children }) {
         .map(({ file, takenAt }) => ({
           id: getPhotoIdentity(file),
           name: file.name,
+          takenAt: takenAt?.toISOString() ?? null,
           takenYear: takenAt?.getFullYear() ?? null,
         }))
         .filter(({ id }) => !knownIds.has(id))
@@ -67,12 +80,13 @@ function PhotoSelectionProvider({ children }) {
   const value = useMemo(
     () => ({
       analyzedPhotos,
+      photoFiles,
       queueSelectedPhotos,
       saveAnalysisResults,
       selectedPhotos,
       selectedPhotoCount: selectedPhotos.length,
     }),
-    [analyzedPhotos, queueSelectedPhotos, saveAnalysisResults, selectedPhotos],
+    [analyzedPhotos, photoFiles, queueSelectedPhotos, saveAnalysisResults, selectedPhotos],
   )
 
   return (
