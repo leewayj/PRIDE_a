@@ -1,5 +1,8 @@
+import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ActionButton from '../components/ui/ActionButton.jsx'
+import usePhotoSelection from '../hooks/usePhotoSelection.js'
+import { getPhotoTakenAt } from '../utils/photoDate.js'
 
 function BackIcon() {
   return (
@@ -11,8 +14,36 @@ function BackIcon() {
 
 function PhotoYearsPage() {
   const navigate = useNavigate()
+  const fileInputRef = useRef(null)
+  const isProcessingRef = useRef(false)
+  const { setSelectedPhotos } = usePhotoSelection()
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 8 }, (_, index) => currentYear - index)
+
+  const handlePhotoSelection = async (event) => {
+    const input = event.currentTarget
+
+    if (isProcessingRef.current || !input.files?.length) return
+
+    isProcessingRef.current = true
+
+    try {
+      const imageFiles = Array.from(input.files).filter((file) =>
+        file.type.startsWith('image/'),
+      )
+      const photos = await Promise.all(
+        imageFiles.map(async (file) => ({
+          file,
+          takenAt: await getPhotoTakenAt(file),
+        })),
+      )
+
+      setSelectedPhotos(photos)
+    } finally {
+      input.value = ''
+      isProcessingRef.current = false
+    }
+  }
 
   return (
     <section className="photo-years-page">
@@ -36,7 +67,17 @@ function PhotoYearsPage() {
       </ul>
 
       <div className="photo-years-page__cta">
-        <ActionButton fullWidth>사진 선택하기</ActionButton>
+        <input
+          ref={fileInputRef}
+          className="photo-years-page__file-input"
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handlePhotoSelection}
+        />
+        <ActionButton fullWidth onClick={() => fileInputRef.current?.click()}>
+          사진 선택하기
+        </ActionButton>
       </div>
     </section>
   )

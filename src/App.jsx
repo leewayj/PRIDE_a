@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import PhotoSelectionProvider from './context/PhotoSelectionProvider.jsx'
 import OnboardingLayout from './layouts/OnboardingLayout.jsx'
 import PhotosLayout from './layouts/PhotosLayout.jsx'
 import ChangesPage from './pages/ChangesPage.jsx'
@@ -15,26 +16,28 @@ import OnboardingPhotoSelectPage from './pages/onboarding/OnboardingPhotoSelectP
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/check-in" element={<CheckInPage />} />
-        <Route path="/photos" element={<PhotosLayout />}>
-          <Route index element={<PhotosPage />} />
-          <Route path="years" element={<PhotoYearsPage />} />
-        </Route>
-        <Route path="/changes" element={<ChangesPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/onboarding" element={<OnboardingLayout />}>
-          <Route index element={<OnboardingIntroPage />} />
-          <Route path="guide" element={<OnboardingGuidePage />} />
-          <Route path="photos" element={<OnboardingPhotoGuidePage />} />
-          <Route path="photos/select" element={<OnboardingPhotoSelectPage />} />
-          <Route path="result" element={<OnboardingCompletePage />} />
-          <Route path="complete" element={<OnboardingCompletePage completion />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <PhotoSelectionProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/check-in" element={<CheckInPage />} />
+          <Route path="/photos" element={<PhotosLayout />}>
+            <Route index element={<PhotosPage />} />
+            <Route path="years" element={<PhotoYearsPage />} />
+          </Route>
+          <Route path="/changes" element={<ChangesPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/onboarding" element={<OnboardingLayout />}>
+            <Route index element={<OnboardingIntroPage />} />
+            <Route path="guide" element={<OnboardingGuidePage />} />
+            <Route path="photos" element={<OnboardingPhotoGuidePage />} />
+            <Route path="photos/select" element={<OnboardingPhotoSelectPage />} />
+            <Route path="result" element={<OnboardingCompletePage />} />
+            <Route path="complete" element={<OnboardingCompletePage completion />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </PhotoSelectionProvider>
   )
 }
 
