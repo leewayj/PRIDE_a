@@ -125,16 +125,60 @@
   font-weight: 650;
 }
 
-.photo-years-page__empty {
+.photo-years-page__summary {
+  display: flex;
+  min-width: 0;
   flex-shrink: 0;
-  color: #9a918c;
+  align-items: center;
+  gap: 10px;
+}
+
+.photo-years-page__count {
+  color: #6f6660;
   font-size: 13px;
   font-weight: 500;
+}
+
+.photo-years-page__status {
+  flex-shrink: 0;
+  min-width: 64px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 650;
+  text-align: center;
+}
+
+.photo-years-page__status--empty {
+  color: #817873;
+  background: var(--background-sub);
+}
+
+.photo-years-page__status--low {
+  color: #91501f;
+  background: #f6e3cb;
+}
+
+.photo-years-page__status--enough {
+  color: #ffffff;
+  background: var(--rose-900);
+}
+
+.photo-years-page__unknown {
+  margin: 16px 0 0;
+  padding: 13px 14px;
+  border-radius: 12px;
+  color: #756965;
+  background: var(--background-sub);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
 }
 
 .photo-years-page__cta {
   margin-top: auto;
   padding-top: 24px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
 }
 
 .photo-years-page__file-input {

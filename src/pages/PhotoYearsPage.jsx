@@ -16,9 +16,26 @@ function PhotoYearsPage() {
   const navigate = useNavigate()
   const fileInputRef = useRef(null)
   const isProcessingRef = useRef(false)
-  const { setSelectedPhotos } = usePhotoSelection()
+  const { addAnalyzedPhotos, analyzedPhotos } = usePhotoSelection()
   const currentYear = new Date().getFullYear()
-  const years = Array.from({ length: 8 }, (_, index) => currentYear - index)
+  const defaultYears = Array.from({ length: 8 }, (_, index) => currentYear - index)
+  const analyzedYears = analyzedPhotos
+    .map(({ takenYear }) => takenYear)
+    .filter((year) => Number.isInteger(year))
+  const years = [...new Set([...defaultYears, ...analyzedYears])].sort((a, b) => b - a)
+  const photoCountByYear = analyzedPhotos.reduce((counts, { takenYear }) => {
+    if (Number.isInteger(takenYear)) {
+      counts.set(takenYear, (counts.get(takenYear) ?? 0) + 1)
+    }
+    return counts
+  }, new Map())
+  const unknownYearCount = analyzedPhotos.filter(({ takenYear }) => takenYear === null).length
+
+  const getYearStatus = (count) => {
+    if (count === 0) return { label: '아직 없음', modifier: 'empty' }
+    if (count < 5) return { label: '사진 적음', modifier: 'low' }
+    return { label: '사진 충분', modifier: 'enough' }
+  }
 
   const handlePhotoSelection = async (event) => {
     const input = event.currentTarget
@@ -38,7 +55,7 @@ function PhotoYearsPage() {
         })),
       )
 
-      setSelectedPhotos(photos)
+      addAnalyzedPhotos(photos)
     } finally {
       input.value = ''
       isProcessingRef.current = false
@@ -58,13 +75,29 @@ function PhotoYearsPage() {
       </div>
 
       <ul className="photo-years-page__list" aria-label="연도별 사진 현황">
-        {years.map((year) => (
-          <li key={year}>
-            <span>{year}</span>
-            <span className="photo-years-page__empty">아직 없음</span>
-          </li>
-        ))}
+        {years.map((year) => {
+          const count = photoCountByYear.get(year) ?? 0
+          const status = getYearStatus(count)
+
+          return (
+            <li key={year}>
+              <span>{year}</span>
+              <span className="photo-years-page__summary">
+                <span className="photo-years-page__count">{count}장</span>
+                <span className={`photo-years-page__status photo-years-page__status--${status.modifier}`}>
+                  {status.label}
+                </span>
+              </span>
+            </li>
+          )
+        })}
       </ul>
+
+      {unknownYearCount > 0 && (
+        <p className="photo-years-page__unknown" role="status">
+          촬영 연도 확인 불가 {unknownYearCount}장
+        </p>
+      )}
 
       <div className="photo-years-page__cta">
         <input
