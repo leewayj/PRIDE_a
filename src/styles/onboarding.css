@@ -4,6 +4,7 @@
   --onboarding-bottom-safe: max(24px, env(safe-area-inset-bottom));
   --onboarding-radius-card: 16px;
   --onboarding-radius-button: 14px;
+  --onboarding-content-height: calc(100dvh - 72px - env(safe-area-inset-bottom));
   width: 100%;
   min-width: 0;
   min-height: 100dvh;
@@ -743,6 +744,7 @@
 .photo-result {
   width: 100%;
   min-width: 0;
+  min-height: var(--onboarding-content-height);
 }
 
 .onboarding-intro__header,
