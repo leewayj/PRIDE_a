@@ -1,0 +1,154 @@
+.photos-layout {
+  --photos-gutter: clamp(20px, 6.15vw, 24px);
+  width: 100%;
+  min-width: 0;
+  min-height: 100dvh;
+  overflow-x: clip;
+}
+
+.photos-upload-page,
+.photo-years-page {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: calc(100dvh - 72px - env(safe-area-inset-bottom));
+  padding: max(18px, env(safe-area-inset-top)) var(--photos-gutter) 24px;
+  flex-direction: column;
+}
+
+.photos-upload-page__content {
+  display: flex;
+  flex: 1;
+  padding-bottom: 36px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.photos-upload-page__icon {
+  display: grid;
+  width: min(54vw, 190px);
+  aspect-ratio: 1;
+  margin-bottom: 38px;
+  border-radius: 50%;
+  color: var(--rose-900);
+  background: var(--background-sub);
+  place-items: center;
+}
+
+.photos-upload-page__icon svg {
+  width: 46%;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.2;
+}
+
+.photos-upload-page h1,
+.photo-years-page h1 {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: 26px;
+  line-height: 1.4;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.photos-upload-page p {
+  margin: 16px 0 0;
+  color: #746b66;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.photos-upload-page__cta,
+.photo-years-page__cta {
+  flex: 0 0 auto;
+}
+
+.photos-upload-page__cta .action-button,
+.photo-years-page__cta .action-button {
+  min-height: 54px;
+  border-radius: 14px;
+  font-size: 16px;
+}
+
+.photo-years-page__header {
+  min-height: 44px;
+}
+
+.photo-years-page__header button {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  margin-left: -10px;
+  padding: 10px;
+  border: 0;
+  color: var(--ink-900);
+  background: transparent;
+  place-items: center;
+}
+
+.photo-years-page__header svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.photo-years-page__intro {
+  padding: 30px 0 22px;
+}
+
+.photo-years-page__list {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.photo-years-page__list li {
+  display: flex;
+  min-width: 0;
+  min-height: 54px;
+  padding: 14px 2px;
+  border-bottom: 1px solid var(--border-soft);
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.photo-years-page__empty {
+  flex-shrink: 0;
+  color: #9a918c;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.photo-years-page__cta {
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+@media (max-height: 700px) {
+  .photos-upload-page__icon {
+    width: min(40vw, 150px);
+    margin-bottom: 24px;
+  }
+
+  .photo-years-page__intro {
+    padding: 18px 0 12px;
+  }
+
+  .photo-years-page__list li {
+    min-height: 48px;
+    padding-block: 10px;
+  }
+}

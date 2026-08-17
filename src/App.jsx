@@ -1,9 +1,11 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import OnboardingLayout from './layouts/OnboardingLayout.jsx'
+import PhotosLayout from './layouts/PhotosLayout.jsx'
 import ChangesPage from './pages/ChangesPage.jsx'
 import CheckInPage from './pages/CheckInPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import PhotosPage from './pages/PhotosPage.jsx'
+import PhotoYearsPage from './pages/PhotoYearsPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import OnboardingCompletePage from './pages/onboarding/OnboardingCompletePage.jsx'
 import OnboardingGuidePage from './pages/onboarding/OnboardingGuidePage.jsx'
@@ -17,7 +19,10 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/check-in" element={<CheckInPage />} />
-        <Route path="/photos" element={<PhotosPage />} />
+        <Route path="/photos" element={<PhotosLayout />}>
+          <Route index element={<PhotosPage />} />
+          <Route path="years" element={<PhotoYearsPage />} />
+        </Route>
         <Route path="/changes" element={<ChangesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/onboarding" element={<OnboardingLayout />}>
