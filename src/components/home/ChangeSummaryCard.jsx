@@ -13,8 +13,8 @@ function ChangeSummaryCard() {
         <p>8주 전 130.2° → 오늘 131.7°</p>
       </div>
 
-      <div className="change-summary-card__chart" aria-hidden="true">
-        <svg viewBox="0 0 320 116" role="presentation">
+      <div className="change-summary-card__chart">
+        <svg viewBox="0 0 320 116" aria-hidden="true">
           <line
             className="change-summary-card__start-line"
             x1="76"

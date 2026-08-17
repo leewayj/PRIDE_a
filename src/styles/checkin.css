@@ -1,6 +1,6 @@
 .check-in-page {
+  min-width: 0;
   padding: 0 18px 32px;
-  background: var(--background-main);
 }
 
 .check-in-header {
@@ -18,7 +18,6 @@
   background: transparent;
   font-size: 25px;
   line-height: 1;
-  cursor: pointer;
 }
 
 .check-in-header__eyebrow {
@@ -45,6 +44,7 @@
 }
 
 .timeline-card {
+  min-width: 0;
   margin-top: 30px;
   padding: 20px 18px 16px;
 }
@@ -94,6 +94,10 @@
   font-size: 10px;
 }
 
+.timeline-card__dates > * {
+  min-width: 0;
+}
+
 .timeline-card__dates span:nth-child(2) {
   text-align: center;
 }
@@ -137,7 +141,9 @@
 }
 
 .check-in-info__row dt {
+  min-width: 0;
   color: #6f6660;
+  overflow-wrap: break-word;
 }
 
 .check-in-info__row dd {
@@ -180,6 +186,10 @@
   flex-direction: column;
   gap: 10px;
   padding: 22px 0 max(10px, env(safe-area-inset-bottom));
+}
+
+.check-in-actions > * {
+  min-width: 0;
 }
 
 .check-in-actions .action-button {

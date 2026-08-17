@@ -1,8 +1,8 @@
 function HomeHeader() {
   return (
     <header className="home-header">
-      <span className="home-header__logo">RETRACE</span>
-      <div className="home-header__profile" aria-label="프로필" />
+      <h1 className="home-header__logo">RETRACE</h1>
+      <div className="home-header__profile" aria-hidden="true" />
     </header>
   )
 }

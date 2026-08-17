@@ -3,8 +3,8 @@ import BaseCard from '../ui/BaseCard.jsx'
 function TimelineCard() {
   return (
     <BaseCard className="timeline-card">
-      <div className="timeline-card__graphic" aria-hidden="true">
-        <svg viewBox="0 0 320 94" role="presentation">
+      <div className="timeline-card__graphic">
+        <svg viewBox="0 0 320 94" aria-hidden="true">
           <path
             className="timeline-card__ticks"
             d="M14 28v10 M36 31v7 M58 28v10 M80 31v7 M102 28v10 M124 31v7 M146 28v10 M168 31v7 M190 28v10 M212 31v7 M234 28v10 M256 31v7 M278 28v10 M306 25v13"
