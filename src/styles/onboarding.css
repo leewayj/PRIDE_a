@@ -1,12 +1,20 @@
 .onboarding-layout {
+  --onboarding-gutter: clamp(20px, 6.15vw, 24px);
+  --onboarding-top-safe: max(18px, env(safe-area-inset-top));
+  --onboarding-bottom-safe: max(24px, env(safe-area-inset-bottom));
+  --onboarding-radius-card: 16px;
+  --onboarding-radius-button: 14px;
+  width: 100%;
+  min-width: 0;
   min-height: 100dvh;
+  overflow-x: clip;
 }
 
 .onboarding-intro {
   display: flex;
   min-height: 100dvh;
   flex-direction: column;
-  padding: max(18px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+  padding: var(--onboarding-top-safe) var(--onboarding-gutter) var(--onboarding-bottom-safe);
 }
 
 .onboarding-intro__header {
@@ -78,7 +86,7 @@
 
 .onboarding-intro__button {
   min-height: 56px;
-  border-radius: 14px;
+  border-radius: var(--onboarding-radius-button);
   font-size: 16px;
 }
 
@@ -101,7 +109,7 @@
   display: flex;
   min-height: 100dvh;
   flex-direction: column;
-  padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+  padding: var(--onboarding-top-safe) var(--onboarding-gutter) var(--onboarding-bottom-safe);
 }
 
 .photo-result--success {
@@ -253,7 +261,7 @@
 
 .photo-result__actions .action-button {
   min-height: 56px;
-  border-radius: 14px;
+  border-radius: var(--onboarding-radius-button);
   font-size: 16px;
 }
 
@@ -279,7 +287,7 @@
   display: flex;
   min-height: 100dvh;
   flex-direction: column;
-  padding: max(18px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+  padding: var(--onboarding-top-safe) var(--onboarding-gutter) var(--onboarding-bottom-safe);
 }
 
 .photo-select-page__header {
@@ -341,7 +349,7 @@
   aspect-ratio: 0.72;
   padding: 12px 6px;
   border: 1.5px dashed #cba9a0;
-  border-radius: 14px;
+  border-radius: var(--onboarding-radius-card);
   color: #8c665e;
   background: #f3e4de;
   align-items: center;
@@ -386,13 +394,13 @@
   top: 7px;
   right: 7px;
   display: grid;
-  width: 26px;
-  height: 26px;
+  width: 44px;
+  height: 44px;
   padding: 0;
-  border: 2px solid rgb(255 255 255 / 75%);
+  border: 8px solid transparent;
   border-radius: 50%;
   color: #fff;
-  background: rgb(26 24 22 / 68%);
+  background: rgb(26 24 22 / 68%) padding-box;
   font-size: 19px;
   line-height: 1;
   place-items: center;
@@ -447,7 +455,7 @@
 }
 
 .photo-select-page__picker {
-  min-height: 42px;
+  min-height: 44px;
   margin-top: 12px;
   border: 1px solid #d9bcb4;
   border-radius: 11px;
@@ -543,7 +551,7 @@
 
 .photo-select-page__button {
   min-height: 56px;
-  border-radius: 14px;
+  border-radius: var(--onboarding-radius-button);
   font-size: 16px;
 }
 
@@ -577,7 +585,7 @@
   display: flex;
   min-height: 100dvh;
   flex-direction: column;
-  padding: max(18px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+  padding: var(--onboarding-top-safe) var(--onboarding-gutter) var(--onboarding-bottom-safe);
 }
 
 .photo-compare-guide__header {
@@ -723,8 +731,110 @@
 
 .photo-compare-guide__button {
   min-height: 56px;
-  border-radius: 14px;
+  border-radius: var(--onboarding-radius-button);
   font-size: 16px;
+}
+
+/* Shared onboarding interaction and narrow-screen refinements */
+.onboarding-intro,
+.photo-compare-guide,
+.photo-select-page,
+.photo-result {
+  width: 100%;
+  min-width: 0;
+}
+
+.onboarding-intro__header,
+.photo-compare-guide__header,
+.photo-select-page__header {
+  min-height: 44px;
+}
+
+.onboarding-intro__back,
+.photo-compare-guide__back,
+.photo-select-page__back {
+  flex: 0 0 auto;
+  border-radius: 10px;
+}
+
+.onboarding-intro__cta,
+.photo-compare-guide__cta,
+.photo-select-page__cta,
+.photo-result__actions {
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.onboarding-layout button:focus-visible,
+.onboarding-layout input:focus-visible {
+  outline: 3px solid rgb(168 112 106 / 48%);
+  outline-offset: 2px;
+}
+
+.onboarding-layout .action-button:disabled {
+  color: #8f837d;
+  background: #ddd3cd;
+  opacity: 1;
+}
+
+.photo-slot,
+.compare-card,
+.photo-result__notice,
+.photo-select-page__notice {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 350px) {
+  .onboarding-layout {
+    --onboarding-gutter: 18px;
+  }
+
+  .onboarding-intro__title,
+  .photo-compare-guide__intro h1,
+  .photo-select-page__intro h1,
+  .photo-result h1 {
+    font-size: 24px;
+  }
+
+  .onboarding-intro__description,
+  .photo-compare-guide__intro p,
+  .photo-select-page__intro p,
+  .photo-result__success-content p,
+  .photo-result__error-header p {
+    font-size: 13px;
+  }
+
+  .photo-slot-grid,
+  .photo-result__previews {
+    gap: 7px;
+  }
+
+  .photo-slot {
+    border-radius: 12px;
+  }
+
+  .photo-slot__icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .photo-slot__remove {
+    top: 2px;
+    right: 2px;
+  }
+
+  .compare-card {
+    grid-template-columns: minmax(0, 1.08fr) 22px minmax(0, 0.92fr);
+    padding: 11px;
+  }
+
+  .compare-card__portrait {
+    height: 158px;
+  }
+
+  .photo-result__error-header {
+    gap: 9px;
+  }
 }
 
 @media (max-height: 700px) {
