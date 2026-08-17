@@ -125,7 +125,9 @@ function OnboardingPhotoSelectPage() {
           fullWidth
           className="photo-select-page__button"
           disabled={selectedPhotos.length !== 3}
-          onClick={() => navigate('/onboarding/complete')}
+          onClick={() => navigate('/onboarding/complete', {
+            state: { photos: selectedPhotos.map(({ file }) => file) },
+          })}
         >
           다음
         </ActionButton>
