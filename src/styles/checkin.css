@@ -149,3 +149,45 @@
   color: #9a918c;
   font-weight: 500;
 }
+
+.check-in-notice {
+  margin-top: 24px;
+  padding: 20px 16px;
+  border-radius: 14px;
+  background: #f0dfdc;
+  text-align: center;
+}
+
+.check-in-notice__title,
+.check-in-notice__description {
+  margin: 0;
+}
+
+.check-in-notice__title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.check-in-notice__description {
+  margin-top: 7px;
+  color: #756965;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.check-in-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 0 max(10px, env(safe-area-inset-bottom));
+}
+
+.check-in-actions .action-button {
+  min-height: 50px;
+}
+
+.check-in-actions .action-button--secondary {
+  border-color: var(--rose-900);
+  color: var(--rose-900);
+  background: transparent;
+}
