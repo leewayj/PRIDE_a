@@ -1,0 +1,45 @@
+.check-in-page {
+  padding: 0 18px 32px;
+  background: var(--background-main);
+}
+
+.check-in-header {
+  padding-top: 14px;
+}
+
+.check-in-header__back {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 0;
+  place-items: center;
+  color: var(--ink-900);
+  background: transparent;
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.check-in-header__eyebrow {
+  margin: 38px 0 0;
+  color: var(--rose-900);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.check-in-header__title {
+  margin: 14px 0 0;
+  font-size: 25px;
+  line-height: 1.45;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+}
+
+.check-in-header__description {
+  margin: 16px 0 0;
+  color: #817873;
+  font-size: 13px;
+  line-height: 1.6;
+}

@@ -38,7 +38,7 @@ const steps = [
   },
 ]
 
-function HowItWorks() {
+function HowItWorks({ onUpload }) {
   return (
     <section className="how-it-works">
       <SectionTitle>How It Works</SectionTitle>
@@ -53,6 +53,7 @@ function HowItWorks() {
         className="how-it-works__upload"
         variant="outline"
         fullWidth
+        onClick={onUpload}
       >
         사진 업로드하기 →
       </ActionButton>
