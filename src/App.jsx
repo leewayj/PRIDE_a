@@ -1,9 +1,7 @@
+import HomePage from './pages/HomePage.jsx'
+
 function App() {
-  return (
-    <main className="app-shell">
-      <span>RETRACE</span>
-    </main>
-  )
+  return <HomePage />
 }
 
 export default App
