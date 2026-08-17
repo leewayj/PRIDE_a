@@ -219,3 +219,60 @@
 .management-card__add::before {
   content: '+ ';
 }
+
+.how-it-works {
+  margin-top: 34px;
+}
+
+.how-it-works__steps {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.how-it-works__steps::-webkit-scrollbar {
+  display: none;
+}
+
+.step-card {
+  width: 140px;
+  min-width: 140px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.step-card__image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(145deg, #373230, #181615);
+}
+
+.step-card__number {
+  display: block;
+  margin: 14px 14px 0;
+  color: var(--rose-900);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.step-card__title {
+  margin: 5px 14px 0;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.step-card__description {
+  margin: 7px 14px 16px;
+  color: #6f6660;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.how-it-works__upload {
+  margin-top: 16px;
+}
