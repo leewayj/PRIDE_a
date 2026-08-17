@@ -65,3 +65,7 @@ svg {
   overflow-x: clip;
   background: var(--background-main);
 }
+
+.app-shell:has(> .bottom-navigation) {
+  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+}
