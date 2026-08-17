@@ -43,3 +43,109 @@
   font-size: 13px;
   line-height: 1.6;
 }
+
+.timeline-card {
+  margin-top: 30px;
+  padding: 20px 18px 16px;
+}
+
+.timeline-card__graphic svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.timeline-card__axis,
+.timeline-card__ticks {
+  fill: none;
+  stroke: var(--border-soft);
+  stroke-width: 1.5;
+}
+
+.timeline-card__care-line {
+  stroke: var(--rose-900);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.timeline-card__care-point {
+  fill: var(--surface);
+  stroke: var(--rose-900);
+  stroke-width: 2.5;
+}
+
+.timeline-card__today-point {
+  fill: var(--rose-900);
+  stroke: var(--surface);
+  stroke-width: 3;
+}
+
+.timeline-card__care-label {
+  fill: var(--rose-900);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.timeline-card__dates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: -16px;
+  color: #756c67;
+  font-size: 10px;
+}
+
+.timeline-card__dates span:nth-child(2) {
+  text-align: center;
+}
+
+.timeline-card__dates span:last-child {
+  color: var(--ink-900);
+  font-weight: 700;
+  text-align: right;
+}
+
+.timeline-card__prompt {
+  margin: 22px 0 0;
+  color: var(--rose-900);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.check-in-info {
+  margin-top: 18px;
+}
+
+.check-in-info dl {
+  margin: 0;
+}
+
+.check-in-info__row {
+  display: flex;
+  min-width: 0;
+  padding: 15px 2px;
+  border-bottom: 1px solid var(--border-soft);
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 13px;
+}
+
+.check-in-info__row dt,
+.check-in-info__row dd {
+  margin: 0;
+}
+
+.check-in-info__row dt {
+  color: #6f6660;
+}
+
+.check-in-info__row dd {
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+.check-in-info__row dd.is-muted {
+  color: #9a918c;
+  font-weight: 500;
+}
