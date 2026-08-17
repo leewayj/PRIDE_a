@@ -23,6 +23,7 @@
   background: transparent;
   font-size: 11px;
   line-height: 1.2;
+  text-decoration: none;
 }
 
 .bottom-navigation__item svg {
