@@ -1,0 +1,47 @@
+.base-card {
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.action-button {
+  min-height: 48px;
+  padding: 12px 18px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--ink-900);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.action-button--primary {
+  color: #ffffff;
+  background: var(--rose-900);
+}
+
+.action-button--secondary {
+  color: var(--ink-900);
+  background: #f0dfdc;
+}
+
+.action-button--outline {
+  border-color: var(--border-soft);
+  background: transparent;
+}
+
+.action-button--full-width {
+  width: 100%;
+}
+
+.action-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.section-title {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 700;
+}
