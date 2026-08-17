@@ -21,6 +21,18 @@ function BottomNavigation() {
         className={({ isActive }) =>
           `bottom-navigation__item${isActive ? ' is-active' : ''}`
         }
+        to="/onboarding"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4.5 5.5c2.8-.7 5.3-.1 7.5 1.7v12c-2.2-1.8-4.7-2.4-7.5-1.7zM19.5 5.5c-2.8-.7-5.3-.1-7.5 1.7v12c2.2-1.8 4.7-2.4 7.5-1.7z" />
+        </svg>
+        <span>온보딩</span>
+      </NavLink>
+
+      <NavLink
+        className={({ isActive }) =>
+          `bottom-navigation__item${isActive ? ' is-active' : ''}`
+        }
         to="/photos"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -47,18 +59,6 @@ function BottomNavigation() {
         <span>변화</span>
       </NavLink>
 
-      <NavLink
-        className={({ isActive }) =>
-          `bottom-navigation__item${isActive ? ' is-active' : ''}`
-        }
-        to="/profile"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="8" r="3.5" />
-          <path d="M5.5 20c.5-4 2.8-6.2 6.5-6.2s6 2.2 6.5 6.2" />
-        </svg>
-        <span>나</span>
-      </NavLink>
     </nav>
   )
 }
