@@ -43,8 +43,10 @@ function PhotoAnalyzingPage() {
 
       setStatus('연도별로 정리하고 있어요')
       await nextFrame()
+      await nextFrame()
       saveAnalysisResults(results)
       setStatus('분석이 완료되었습니다')
+      await nextFrame()
       await nextFrame()
       navigate('/photos/years', { replace: true })
     }
