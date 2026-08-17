@@ -32,35 +32,33 @@ function PhotoSelectionProvider({ children }) {
     }
   }, [analyzedPhotos])
 
-  const addAnalyzedPhotos = useCallback((photos) => {
-    const normalizedPhotos = [
+  const queueSelectedPhotos = useCallback((files) => {
+    const analyzedIds = new Set(analyzedPhotos.map(({ id }) => id))
+    const queuedPhotos = [
       ...new Map(
-        photos.map(({ file, takenAt }) => {
-          const id = getPhotoIdentity(file)
-          return [
-            id,
-            {
-              id,
-              file,
-              takenAt,
-              takenYear: takenAt?.getFullYear() ?? null,
-            },
-          ]
-        }),
+        files
+          .filter((file) => file.type.startsWith('image/'))
+          .map((file) => {
+            const id = getPhotoIdentity(file)
+            return [id, { id, file }]
+          }),
       ).values(),
-    ]
+    ].filter(({ id }) => !analyzedIds.has(id))
 
-    setSelectedPhotos((currentPhotos) => {
-      const knownIds = new Set(currentPhotos.map(({ id }) => id))
-      const uniquePhotos = normalizedPhotos.filter(({ id }) => !knownIds.has(id))
-      return [...currentPhotos, ...uniquePhotos]
-    })
+    setSelectedPhotos(queuedPhotos)
+    return queuedPhotos.length
+  }, [analyzedPhotos])
 
+  const saveAnalysisResults = useCallback((photos) => {
     setAnalyzedPhotos((currentPhotos) => {
       const knownIds = new Set(currentPhotos.map(({ id }) => id))
-      const uniqueMetadata = normalizedPhotos
+      const uniqueMetadata = photos
+        .map(({ file, takenAt }) => ({
+          id: getPhotoIdentity(file),
+          name: file.name,
+          takenYear: takenAt?.getFullYear() ?? null,
+        }))
         .filter(({ id }) => !knownIds.has(id))
-        .map(({ id, takenYear }) => ({ id, takenYear }))
 
       return [...currentPhotos, ...uniqueMetadata]
     })
@@ -69,11 +67,12 @@ function PhotoSelectionProvider({ children }) {
   const value = useMemo(
     () => ({
       analyzedPhotos,
-      addAnalyzedPhotos,
+      queueSelectedPhotos,
+      saveAnalysisResults,
       selectedPhotos,
       selectedPhotoCount: selectedPhotos.length,
     }),
-    [addAnalyzedPhotos, analyzedPhotos, selectedPhotos],
+    [analyzedPhotos, queueSelectedPhotos, saveAnalysisResults, selectedPhotos],
   )
 
   return (

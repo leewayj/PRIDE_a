@@ -7,7 +7,8 @@
 }
 
 .photos-upload-page,
-.photo-years-page {
+.photo-years-page,
+.photo-analyzing-page {
   display: flex;
   width: 100%;
   min-width: 0;
@@ -47,7 +48,8 @@
 }
 
 .photos-upload-page h1,
-.photo-years-page h1 {
+.photo-years-page h1,
+.photo-analyzing-page h1 {
   margin: 0;
   color: var(--ink-900);
   font-size: 26px;
@@ -164,15 +166,22 @@
   background: var(--rose-900);
 }
 
-.photo-years-page__unknown {
-  margin: 16px 0 0;
-  padding: 13px 14px;
-  border-radius: 12px;
-  color: #756965;
-  background: var(--background-sub);
-  font-size: 13px;
-  line-height: 1.5;
-  text-align: center;
+.photo-years-page__status--unknown {
+  color: #8a5144;
+  background: #f0dfdc;
+}
+
+.photo-years-page__other {
+  display: flex;
+  min-width: 0;
+  min-height: 54px;
+  padding: 14px 2px;
+  border-bottom: 1px solid var(--border-soft);
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 15px;
+  font-weight: 650;
 }
 
 .photo-years-page__cta {
@@ -190,6 +199,86 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.photo-analyzing-page {
+  justify-content: center;
+}
+
+.photo-analyzing-page__content {
+  width: 100%;
+  text-align: center;
+}
+
+.photo-analyzing-page__spinner {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 34px;
+  border: 7px solid var(--background-sub);
+  border-top-color: var(--rose-900);
+  border-radius: 50%;
+  animation: photo-analyzing-spin 1s linear infinite;
+}
+
+.photo-analyzing-page__description {
+  margin: 15px 0 42px;
+  color: #746b66;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.photo-analyzing-page__progress-summary {
+  display: flex;
+  margin-bottom: 10px;
+  justify-content: space-between;
+  color: #6f6660;
+  font-size: 13px;
+}
+
+.photo-analyzing-page__progress {
+  width: 100%;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--background-sub);
+}
+
+.photo-analyzing-page__progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--rose-900);
+  transition: width 180ms ease;
+}
+
+.photo-analyzing-page__percentage {
+  display: block;
+  margin-top: 14px;
+  color: var(--rose-900);
+  font-size: 22px;
+}
+
+.photo-analyzing-page__status {
+  min-height: 24px;
+  margin: 18px 0 0;
+  color: #756965;
+  font-size: 14px;
+}
+
+@keyframes photo-analyzing-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-analyzing-page__spinner {
+    animation: none;
+  }
+
+  .photo-analyzing-page__progress span {
+    transition: none;
+  }
 }
 
 @media (max-height: 700px) {
