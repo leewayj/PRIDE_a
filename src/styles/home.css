@@ -1,5 +1,5 @@
 .home-page {
-  padding: 0 18px 32px;
+  padding: 0 18px;
 }
 
 .home-header {
@@ -222,6 +222,7 @@
 
 .how-it-works {
   margin-top: 34px;
+  padding-bottom: 28px;
 }
 
 .how-it-works__steps {
