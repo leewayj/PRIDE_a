@@ -8,16 +8,33 @@ function PhotoPlaceholderIcon() {
   )
 }
 
-function PhotoSlot({ number }) {
+function PhotoSlot({ number, previewUrl, fileName, onSelect, onRemove }) {
+  if (previewUrl) {
+    return (
+      <div className="photo-slot photo-slot--selected">
+        <img src={previewUrl} alt={`${number}번째 선택 사진 미리보기`} />
+        <span className="photo-slot__number">{number}</span>
+        <button
+          className="photo-slot__remove"
+          type="button"
+          onClick={onRemove}
+          aria-label={`${fileName} 제거`}
+        >
+          ×
+        </button>
+      </div>
+    )
+  }
+
   return (
-    <div className="photo-slot" aria-label={`${number}번째 사진 선택 영역`}>
+    <button className="photo-slot" type="button" onClick={onSelect} aria-label={`${number}번째 사진 선택`}>
       <div className="photo-slot__icon">
         <PhotoPlaceholderIcon />
         <span aria-hidden="true">+</span>
       </div>
       <strong>사진 {number}</strong>
       <span className="photo-slot__hint">선택하기</span>
-    </div>
+    </button>
   )
 }
 
