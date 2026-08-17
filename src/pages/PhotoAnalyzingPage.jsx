@@ -3,7 +3,19 @@ import { useNavigate } from 'react-router-dom'
 import usePhotoSelection from '../hooks/usePhotoSelection.js'
 import { getPhotoTakenAt } from '../utils/photoDate.js'
 
-const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve))
+const MINIMUM_DISPLAY_TIME = 1000
+
+function waitForNextPaint() {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resolve)
+    })
+  })
+}
+
+function wait(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds))
+}
 
 function PhotoAnalyzingPage() {
   const navigate = useNavigate()
@@ -26,9 +38,10 @@ function PhotoAnalyzingPage() {
 
     const analyzePhotos = async () => {
       const results = []
+      const displayStartedAt = performance.now()
 
       setStatus('사진 정보를 불러오는 중이에요')
-      await nextFrame()
+      await waitForNextPaint()
 
       for (let index = 0; index < selectedPhotos.length; index += 1) {
         const { file } = selectedPhotos[index]
@@ -38,14 +51,20 @@ function PhotoAnalyzingPage() {
 
         results.push({ file, takenAt })
         setCompletedCount(index + 1)
-        await nextFrame()
+        await waitForNextPaint()
       }
 
       setStatus('연도별로 정리하고 있어요')
-      await nextFrame()
+      await waitForNextPaint()
       saveAnalysisResults(results)
       setStatus('분석이 완료되었습니다')
-      await nextFrame()
+      await waitForNextPaint()
+
+      const elapsedTime = performance.now() - displayStartedAt
+      const remainingTime = Math.max(0, MINIMUM_DISPLAY_TIME - elapsedTime)
+
+      if (remainingTime > 0) await wait(remainingTime)
+
       navigate('/photos/years', { replace: true })
     }
 
