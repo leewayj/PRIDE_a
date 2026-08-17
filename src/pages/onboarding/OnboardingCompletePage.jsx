@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import ActionButton from '../../components/ui/ActionButton.jsx'
 import '../../styles/onboarding.css'
 
@@ -74,26 +74,31 @@ function ErrorResult({ result, previewUrls, onRetry, onContinue }) {
   )
 }
 
-function OnboardingCompletePage() {
+function OnboardingCompletePage({ completion = false }) {
   const navigate = useNavigate()
   const location = useLocation()
+  const photos = location.state?.photos ?? []
   const [previewUrls] = useState(() => (
-    (location.state?.photos ?? []).slice(0, 3).map((file) => URL.createObjectURL(file))
+    photos.slice(0, 3).map((file) => URL.createObjectURL(file))
   ))
 
   useEffect(() => () => {
     previewUrls.forEach((previewUrl) => URL.revokeObjectURL(previewUrl))
   }, [previewUrls])
 
-  if (MOCK_RESULT !== 'success') {
+  if (!completion && MOCK_RESULT !== 'success') {
     return (
       <ErrorResult
         result={MOCK_RESULT}
         previewUrls={previewUrls}
-        onRetry={() => navigate('/onboarding/photos/select')}
-        onContinue={() => navigate('/')}
+        onRetry={() => navigate('/onboarding/photos/select', { state: { photos } })}
+        onContinue={() => navigate('/onboarding/complete', { state: { photos } })}
       />
     )
+  }
+
+  if (!completion) {
+    return <Navigate to="/onboarding/complete" replace state={{ photos }} />
   }
 
   return (

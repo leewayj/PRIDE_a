@@ -25,7 +25,8 @@ function App() {
           <Route path="guide" element={<OnboardingGuidePage />} />
           <Route path="photos" element={<OnboardingPhotoGuidePage />} />
           <Route path="photos/select" element={<OnboardingPhotoSelectPage />} />
-          <Route path="complete" element={<OnboardingCompletePage />} />
+          <Route path="result" element={<OnboardingCompletePage />} />
+          <Route path="complete" element={<OnboardingCompletePage completion />} />
         </Route>
       </Routes>
     </BrowserRouter>

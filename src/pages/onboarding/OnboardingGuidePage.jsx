@@ -60,7 +60,7 @@ function OnboardingGuidePage() {
         <button
           className="photo-compare-guide__back"
           type="button"
-          onClick={() => navigate('/onboarding')}
+          onClick={() => navigate(-1)}
           aria-label="이전 화면으로 돌아가기"
         >
           <BackIcon />

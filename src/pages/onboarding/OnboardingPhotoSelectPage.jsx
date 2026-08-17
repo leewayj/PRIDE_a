@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import PhotoRequirements from '../../components/onboarding/PhotoRequirements.jsx'
 import PhotoSlot from '../../components/onboarding/PhotoSlot.jsx'
 import ActionButton from '../../components/ui/ActionButton.jsx'
@@ -15,12 +15,21 @@ function BackIcon() {
 
 function OnboardingPhotoSelectPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const fileInputRef = useRef(null)
   const selectedPhotosRef = useRef([])
-  const [selectedPhotos, setSelectedPhotos] = useState([])
+  const [selectedPhotos, setSelectedPhotos] = useState(() => (
+    (location.state?.photos ?? []).slice(0, 3).map((file) => ({
+      file,
+      previewUrl: URL.createObjectURL(file),
+      id: `${file.name}-${file.lastModified}-${crypto.randomUUID()}`,
+    }))
+  ))
   const [fileError, setFileError] = useState('')
 
-  selectedPhotosRef.current = selectedPhotos
+  useEffect(() => {
+    selectedPhotosRef.current = selectedPhotos
+  }, [selectedPhotos])
 
   useEffect(() => () => {
     selectedPhotosRef.current.forEach(({ previewUrl }) => URL.revokeObjectURL(previewUrl))
@@ -71,7 +80,7 @@ function OnboardingPhotoSelectPage() {
         <button
           className="photo-select-page__back"
           type="button"
-          onClick={() => navigate('/onboarding/photos')}
+          onClick={() => navigate(-1)}
           aria-label="이전 화면으로 돌아가기"
         >
           <BackIcon />
@@ -125,7 +134,7 @@ function OnboardingPhotoSelectPage() {
           fullWidth
           className="photo-select-page__button"
           disabled={selectedPhotos.length !== 3}
-          onClick={() => navigate('/onboarding/complete', {
+          onClick={() => navigate('/onboarding/result', {
             state: { photos: selectedPhotos.map(({ file }) => file) },
           })}
         >
