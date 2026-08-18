@@ -21,7 +21,7 @@ function formatPhotoDate(value) {
   return `${date.getFullYear()}. ${month}. ${day}.`
 }
 
-function PhotoPreview({ file, name }) {
+function PhotoPreview({ file, fileName }) {
   const imageRef = useRef(null)
 
   useEffect(() => {
@@ -32,7 +32,7 @@ function PhotoPreview({ file, name }) {
     return () => URL.revokeObjectURL(previewUrl)
   }, [file])
 
-  if (file) return <img ref={imageRef} alt={name || '등록한 사진'} />
+  if (file) return <img ref={imageRef} alt={fileName || '등록한 사진'} />
 
   return (
     <div className="photo-card__placeholder">
@@ -46,7 +46,7 @@ function PhotoCard({ photo, file, deleting = false, onDelete }) {
   return (
     <article className="photo-card">
       <div className="photo-card__thumbnail">
-        <PhotoPreview file={file} name={photo.name} />
+        <PhotoPreview file={file} fileName={photo.fileName} />
         <button
           className="photo-card__delete"
           type="button"
@@ -62,7 +62,9 @@ function PhotoCard({ photo, file, deleting = false, onDelete }) {
           </svg>
         </button>
       </div>
-      <time dateTime={photo.takenAt ?? undefined}>{formatPhotoDate(photo.takenAt)}</time>
+      <time dateTime={photo.capturedAt ?? undefined}>
+        {photo.failureReason ?? formatPhotoDate(photo.capturedAt)}
+      </time>
     </article>
   )
 }

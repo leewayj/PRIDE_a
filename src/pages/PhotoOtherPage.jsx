@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import DeletePhotoDialog from '../components/photos/DeletePhotoDialog.jsx'
 import PhotoCard, { PhotoPlaceholderIcon } from '../components/photos/PhotoCard.jsx'
 import ActionButton from '../components/ui/ActionButton.jsx'
+import { PHOTO_ANALYSIS_STATUS } from '../constants/photo.js'
 import usePhotoSelection from '../hooks/usePhotoSelection.js'
 
 function BackIcon() {
@@ -15,11 +16,12 @@ function BackIcon() {
 
 function PhotoOtherPage() {
   const navigate = useNavigate()
-  const { analyzedPhotos, photoFiles, removePhoto } = usePhotoSelection()
+  const { photos, removePhoto } = usePhotoSelection()
   const [pendingPhoto, setPendingPhoto] = useState(null)
   const [deleting, setDeleting] = useState(false)
-  const filesById = new Map(photoFiles.map(({ id, file }) => [id, file]))
-  const failedPhotos = analyzedPhotos.filter(({ takenYear }) => takenYear === null)
+  const failedPhotos = photos.filter(
+    ({ analysisStatus }) => analysisStatus === PHOTO_ANALYSIS_STATUS.FAILED,
+  )
 
   const confirmDelete = async () => {
     if (!pendingPhoto || deleting) return
@@ -55,7 +57,7 @@ function PhotoOtherPage() {
             <li key={photo.id}>
               <PhotoCard
                 photo={photo}
-                file={filesById.get(photo.id)}
+                file={photo.file}
                 deleting={pendingPhoto?.id === photo.id}
                 onDelete={setPendingPhoto}
               />

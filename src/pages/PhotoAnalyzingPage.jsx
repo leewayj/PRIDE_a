@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import usePhotoSelection from '../hooks/usePhotoSelection.js'
-import { getPhotoTakenAt } from '../utils/photoDate.js'
+import { analyzePhotos } from '../services/photoAnalysis.js'
 
 const MINIMUM_DISPLAY_TIME = 1000
 
@@ -20,7 +20,7 @@ function wait(milliseconds) {
 function PhotoAnalyzingPage() {
   const navigate = useNavigate()
   const startedRef = useRef(false)
-  const { selectedPhotos, selectedPhotoCount, saveAnalysisResults } = usePhotoSelection()
+  const { photos, selectedFiles, selectedPhotoCount, saveAnalysisResults } = usePhotoSelection()
   const [completedCount, setCompletedCount] = useState(0)
   const [status, setStatus] = useState('사진 정보를 불러오는 중이에요')
   const progress = selectedPhotoCount === 0
@@ -36,27 +36,24 @@ function PhotoAnalyzingPage() {
       return
     }
 
-    const analyzePhotos = async () => {
-      const results = []
+    const runAnalysis = async () => {
       const displayStartedAt = performance.now()
 
       setStatus('사진 정보를 불러오는 중이에요')
       await waitForNextPaint()
 
-      for (let index = 0; index < selectedPhotos.length; index += 1) {
-        const { file } = selectedPhotos[index]
-
-        setStatus('촬영 날짜를 확인하고 있어요')
-        const takenAt = await getPhotoTakenAt(file).catch(() => null)
-
-        results.push({ file, takenAt })
-        setCompletedCount(index + 1)
-        await waitForNextPaint()
-      }
+      setStatus('촬영 날짜를 확인하고 있어요')
+      const result = await analyzePhotos(selectedFiles, {
+        existingPhotoIds: photos.map(({ id }) => id),
+        onProgress: async ({ completed }) => {
+          setCompletedCount(completed)
+          await waitForNextPaint()
+        },
+      })
 
       setStatus('연도별로 정리하고 있어요')
       await waitForNextPaint()
-      saveAnalysisResults(results)
+      saveAnalysisResults([...result.successfulPhotos, ...result.failedPhotos])
       setStatus('분석이 완료되었습니다')
       await waitForNextPaint()
 
@@ -68,8 +65,8 @@ function PhotoAnalyzingPage() {
       navigate('/photos/years', { replace: true })
     }
 
-    analyzePhotos()
-  }, [navigate, saveAnalysisResults, selectedPhotoCount, selectedPhotos])
+    runAnalysis()
+  }, [navigate, photos, saveAnalysisResults, selectedFiles, selectedPhotoCount])
 
   return (
     <section className="photo-analyzing-page" aria-live="polite">

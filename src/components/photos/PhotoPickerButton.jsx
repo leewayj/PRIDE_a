@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import usePhotoSelection from '../../hooks/usePhotoSelection.js'
+import { validatePhotoFile } from '../../services/photoAnalysis.js'
 import ActionButton from '../ui/ActionButton.jsx'
 
 function PhotoPickerButton({ children = '사진 선택하기', className = '' }) {
@@ -16,7 +17,7 @@ function PhotoPickerButton({ children = '사진 선택하기', className = '' })
 
     try {
       const imageFiles = Array.from(input.files).filter((file) =>
-        file.type.startsWith('image/'),
+        validatePhotoFile(file).valid,
       )
 
       isProcessingRef.current = true

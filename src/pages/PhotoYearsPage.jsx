@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import PhotoPickerButton from '../components/photos/PhotoPickerButton.jsx'
+import { PHOTO_ANALYSIS_STATUS } from '../constants/photo.js'
 import usePhotoSelection from '../hooks/usePhotoSelection.js'
-import { getPhotoStatus } from '../utils/photoStatus.js'
+import { groupPhotosByYear } from '../utils/photoGrouping.js'
+import { getYearPhotoStatus, getYearPhotoStatusLabel } from '../utils/photoStatus.js'
 
 function BackIcon() {
   return (
@@ -13,20 +15,16 @@ function BackIcon() {
 
 function PhotoYearsPage() {
   const navigate = useNavigate()
-  const { analyzedPhotos } = usePhotoSelection()
+  const { photos } = usePhotoSelection()
   const currentYear = new Date().getFullYear()
   const defaultYears = Array.from({ length: 8 }, (_, index) => currentYear - index)
-  const analyzedYears = analyzedPhotos
-    .map(({ takenYear }) => takenYear)
-    .filter((year) => Number.isInteger(year))
-  const years = [...new Set([...defaultYears, ...analyzedYears])].sort((a, b) => b - a)
-  const photoCountByYear = analyzedPhotos.reduce((counts, { takenYear }) => {
-    if (Number.isInteger(takenYear)) {
-      counts.set(takenYear, (counts.get(takenYear) ?? 0) + 1)
-    }
-    return counts
-  }, new Map())
-  const unknownYearCount = analyzedPhotos.filter(({ takenYear }) => takenYear === null).length
+  const groupedPhotos = groupPhotosByYear(photos)
+  const photosByYear = new Map(groupedPhotos.map((group) => [group.year, group.photos]))
+  const years = [...new Set([...defaultYears, ...groupedPhotos.map(({ year }) => year)])]
+    .sort((a, b) => b - a)
+  const failedPhotoCount = photos.filter(
+    ({ analysisStatus }) => analysisStatus === PHOTO_ANALYSIS_STATUS.FAILED,
+  ).length
 
   return (
     <section className="photo-years-page">
@@ -42,8 +40,8 @@ function PhotoYearsPage() {
 
       <ul className="photo-years-page__list" aria-label="연도별 사진 현황">
         {years.map((year) => {
-          const count = photoCountByYear.get(year) ?? 0
-          const status = getPhotoStatus(count)
+          const count = photosByYear.get(year)?.length ?? 0
+          const status = getYearPhotoStatus(count)
 
           return (
             <li key={year}>
@@ -51,8 +49,8 @@ function PhotoYearsPage() {
                 <span>{year}</span>
                 <span className="photo-years-page__summary">
                   <span className="photo-years-page__count">{count}장</span>
-                  <span className={`photo-years-page__status photo-years-page__status--${status.modifier}`}>
-                    {status.label}
+                  <span className={`photo-years-page__status photo-years-page__status--${status}`}>
+                    {getYearPhotoStatusLabel(status)}
                   </span>
                 </span>
               </button>
@@ -67,8 +65,8 @@ function PhotoYearsPage() {
         onClick={() => navigate('/photos/other')}
       >
           <span>기타</span>
-          <span className={`photo-years-page__other-status${unknownYearCount > 0 ? ' is-needed' : ''}`}>
-            {unknownYearCount > 0 ? `${unknownYearCount}장 · 확인 필요` : '아직 없음'}
+          <span className={`photo-years-page__other-status${failedPhotoCount > 0 ? ' is-needed' : ''}`}>
+            {failedPhotoCount > 0 ? `${failedPhotoCount}장 · 확인 필요` : '아직 없음'}
           </span>
       </button>
 

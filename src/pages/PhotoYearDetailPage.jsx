@@ -4,7 +4,8 @@ import DeletePhotoDialog from '../components/photos/DeletePhotoDialog.jsx'
 import PhotoCard, { PhotoPlaceholderIcon } from '../components/photos/PhotoCard.jsx'
 import PhotoPickerButton from '../components/photos/PhotoPickerButton.jsx'
 import usePhotoSelection from '../hooks/usePhotoSelection.js'
-import { getPhotoStatus } from '../utils/photoStatus.js'
+import { groupPhotosByYear } from '../utils/photoGrouping.js'
+import { getYearPhotoStatus, getYearPhotoStatusLabel } from '../utils/photoStatus.js'
 
 function BackIcon() {
   return (
@@ -17,7 +18,7 @@ function BackIcon() {
 function PhotoYearDetailPage() {
   const navigate = useNavigate()
   const { year: yearParam } = useParams()
-  const { analyzedPhotos, photoFiles, removePhoto } = usePhotoSelection()
+  const { photos: allPhotos, removePhoto } = usePhotoSelection()
   const [pendingPhoto, setPendingPhoto] = useState(null)
   const [deleting, setDeleting] = useState(false)
   const year = Number(yearParam)
@@ -25,15 +26,8 @@ function PhotoYearDetailPage() {
 
   if (!isValidYear) return <Navigate to="/photos/years" replace />
 
-  const filesById = new Map(photoFiles.map(({ id, file }) => [id, file]))
-  const photos = analyzedPhotos
-    .filter(({ takenYear }) => takenYear === year)
-    .sort((a, b) => {
-      const firstDate = new Date(a.takenAt ?? 0).getTime()
-      const secondDate = new Date(b.takenAt ?? 0).getTime()
-      return secondDate - firstDate
-    })
-  const status = getPhotoStatus(photos.length)
+  const photos = groupPhotosByYear(allPhotos).find((group) => group.year === year)?.photos ?? []
+  const status = getYearPhotoStatus(photos.length)
 
   const confirmDelete = async () => {
     if (!pendingPhoto || deleting) return
@@ -57,8 +51,8 @@ function PhotoYearDetailPage() {
         <h1>{year}</h1>
         <div>
           <span>{photos.length}장</span>
-          <span className={`photo-years-page__status photo-years-page__status--${status.modifier}`}>
-            {status.label}
+          <span className={`photo-years-page__status photo-years-page__status--${status}`}>
+            {getYearPhotoStatusLabel(status)}
           </span>
         </div>
       </div>
@@ -69,7 +63,7 @@ function PhotoYearDetailPage() {
             <li key={photo.id}>
               <PhotoCard
                 photo={photo}
-                file={filesById.get(photo.id)}
+                file={photo.file}
                 deleting={pendingPhoto?.id === photo.id}
                 onDelete={setPendingPhoto}
               />

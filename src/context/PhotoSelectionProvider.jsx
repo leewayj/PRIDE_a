@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import PhotoSelectionContext from './PhotoSelectionContext.js'
-import { getPhotoIdentity } from '../utils/photoIdentity.js'
+import { restorePhotoModel, serializePhotoMetadata } from '../models/photo.js'
+import { createPhotoId, validatePhotoFile } from '../services/photoAnalysis.js'
 
 const STORAGE_KEY = 'retrace.photo-analysis.v1'
 
@@ -11,89 +12,64 @@ function readStoredAnalysis() {
     if (!Array.isArray(storedValue)) return []
 
     return storedValue
-      .filter(
-        (photo) =>
-        typeof photo?.id === 'string' &&
-        (photo.takenYear === null || Number.isInteger(photo.takenYear)),
-      )
-      .map((photo) => ({
-        id: photo.id,
-        name: typeof photo.name === 'string' ? photo.name : '',
-        takenAt: typeof photo.takenAt === 'string' ? photo.takenAt : null,
-        takenYear: photo.takenYear,
-      }))
+      .filter((photo) => typeof photo?.id === 'string')
+      .map(restorePhotoModel)
   } catch {
     return []
   }
 }
 
 function PhotoSelectionProvider({ children }) {
-  const [selectedPhotos, setSelectedPhotos] = useState([])
-  const [photoFiles, setPhotoFiles] = useState([])
-  const [analyzedPhotos, setAnalyzedPhotos] = useState(readStoredAnalysis)
+  const [selectedFiles, setSelectedFiles] = useState([])
+  const [photos, setPhotos] = useState(readStoredAnalysis)
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(analyzedPhotos))
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(photos.map(serializePhotoMetadata)))
     } catch {
       // The in-memory result remains usable when browser storage is unavailable.
     }
-  }, [analyzedPhotos])
+  }, [photos])
 
   const queueSelectedPhotos = useCallback((files) => {
-    const analyzedIds = new Set(analyzedPhotos.map(({ id }) => id))
-    const queuedPhotos = [
+    const analyzedIds = new Set(photos.map(({ id }) => id))
+    const queuedFiles = [
       ...new Map(
         files
-          .filter((file) => file.type.startsWith('image/'))
-          .map((file) => {
-            const id = getPhotoIdentity(file)
-            return [id, { id, file }]
-          }),
+          .filter((file) => validatePhotoFile(file).valid)
+          .map((file) => [createPhotoId(file), file]),
       ).values(),
-    ].filter(({ id }) => !analyzedIds.has(id))
+    ].filter((file) => !analyzedIds.has(createPhotoId(file)))
 
-    setSelectedPhotos(queuedPhotos)
-    setPhotoFiles((currentPhotos) => {
-      const knownIds = new Set(currentPhotos.map(({ id }) => id))
-      return [...currentPhotos, ...queuedPhotos.filter(({ id }) => !knownIds.has(id))]
-    })
-    return queuedPhotos.length
-  }, [analyzedPhotos])
+    setSelectedFiles(queuedFiles)
+    return queuedFiles.length
+  }, [photos])
 
-  const saveAnalysisResults = useCallback((photos) => {
-    setAnalyzedPhotos((currentPhotos) => {
+  const saveAnalysisResults = useCallback((analysisResults) => {
+    setPhotos((currentPhotos) => {
       const knownIds = new Set(currentPhotos.map(({ id }) => id))
-      const uniqueMetadata = photos
-        .map(({ file, takenAt }) => ({
-          id: getPhotoIdentity(file),
-          name: file.name,
-          takenAt: takenAt?.toISOString() ?? null,
-          takenYear: takenAt?.getFullYear() ?? null,
-        }))
+      const uniquePhotos = analysisResults
         .filter(({ id }) => !knownIds.has(id))
 
-      return [...currentPhotos, ...uniqueMetadata]
+      return [...currentPhotos, ...uniquePhotos]
     })
   }, [])
 
   const removePhoto = useCallback((photoId) => {
-    setAnalyzedPhotos((photos) => photos.filter(({ id }) => id !== photoId))
-    setPhotoFiles((photos) => photos.filter(({ id }) => id !== photoId))
-    setSelectedPhotos((photos) => photos.filter(({ id }) => id !== photoId))
+    setPhotos((currentPhotos) => currentPhotos.filter(({ id }) => id !== photoId))
+    setSelectedFiles((files) => files.filter((file) => createPhotoId(file) !== photoId))
   }, [])
 
   const value = useMemo(
     () => ({
-      analyzedPhotos,
-      photoFiles,
+      photos,
       queueSelectedPhotos,
       removePhoto,
       saveAnalysisResults,
-      selectedPhotos,
-      selectedPhotoCount: selectedPhotos.length,
+      selectedFiles,
+      selectedPhotoCount: selectedFiles.length,
     }),
-    [analyzedPhotos, photoFiles, queueSelectedPhotos, removePhoto, saveAnalysisResults, selectedPhotos],
+    [photos, queueSelectedPhotos, removePhoto, saveAnalysisResults, selectedFiles],
   )
 
   return (
