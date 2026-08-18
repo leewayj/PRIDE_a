@@ -16,6 +16,7 @@ import OnboardingGuidePage from './pages/onboarding/OnboardingGuidePage.jsx'
 import OnboardingIntroPage from './pages/onboarding/OnboardingIntroPage.jsx'
 import OnboardingPhotoGuidePage from './pages/onboarding/OnboardingPhotoGuidePage.jsx'
 import OnboardingPhotoSelectPage from './pages/onboarding/OnboardingPhotoSelectPage.jsx'
+import retraceRoutes from './routes/retraceRoutes.jsx'
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
             <Route path="result" element={<OnboardingCompletePage />} />
             <Route path="complete" element={<OnboardingCompletePage completion />} />
           </Route>
+          {retraceRoutes}
         </Routes>
       </BrowserRouter>
     </PhotoSelectionProvider>
