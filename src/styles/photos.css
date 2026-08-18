@@ -184,14 +184,30 @@
 
 .photo-years-page__other {
   display: flex;
+  width: 100%;
   min-width: 0;
   min-height: 54px;
   padding: 14px 2px;
+  border: 0;
   border-bottom: 1px solid var(--border-soft);
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  color: var(--ink-900);
+  background: transparent;
   font-size: 15px;
+  font-weight: 650;
+  text-align: left;
+}
+
+.photo-years-page__other-status {
+  color: #817873;
+  font-size: 13px;
+  font-weight: 550;
+}
+
+.photo-years-page__other-status.is-needed {
+  color: #8a5144;
   font-weight: 650;
 }
 
@@ -273,7 +289,8 @@
   min-width: 0;
 }
 
-.photo-year-detail__thumbnail {
+.photo-card__thumbnail {
+  position: relative;
   width: 100%;
   aspect-ratio: 1;
   overflow: hidden;
@@ -281,14 +298,14 @@
   background: var(--background-sub);
 }
 
-.photo-year-detail__thumbnail img {
+.photo-card__thumbnail img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.photo-year-detail__placeholder {
+.photo-card__placeholder {
   display: flex;
   width: 100%;
   height: 100%;
@@ -300,7 +317,7 @@
   text-align: center;
 }
 
-.photo-year-detail__placeholder svg {
+.photo-card__placeholder svg {
   width: 34px;
   fill: none;
   stroke: currentColor;
@@ -309,13 +326,13 @@
   stroke-width: 1.7;
 }
 
-.photo-year-detail__placeholder span {
+.photo-card__placeholder span {
   margin-top: 5px;
   font-size: 8px;
   line-height: 1.35;
 }
 
-.photo-year-detail__grid time {
+.photo-card time {
   display: block;
   margin-top: 7px;
   color: #756c67;
@@ -323,6 +340,36 @@
   line-height: 1.35;
   text-align: center;
   white-space: nowrap;
+}
+
+.photo-card__delete {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  width: 27px;
+  height: 27px;
+  padding: 5px;
+  border: 0;
+  border-radius: 50%;
+  color: #ffffff;
+  background: rgb(26 24 22 / 72%);
+  box-shadow: 0 2px 7px rgb(26 24 22 / 20%);
+  place-items: center;
+}
+
+.photo-card__delete svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 2;
+}
+
+.photo-card__delete:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .photo-year-detail__empty {
@@ -364,10 +411,55 @@
   margin-top: 34px;
 }
 
+.photo-year-detail__empty-cta.action-button,
 .photo-year-detail__empty-cta .action-button {
   min-height: 54px;
   border-radius: 14px;
   font-size: 16px;
+}
+
+.delete-photo-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  padding: 20px;
+  background: rgb(26 24 22 / 42%);
+  place-items: center;
+}
+
+.delete-photo-dialog {
+  width: min(100%, 342px);
+  padding: 25px 20px 20px;
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 16px 42px rgb(26 24 22 / 24%);
+  text-align: center;
+}
+
+.delete-photo-dialog h2 {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.delete-photo-dialog p {
+  margin: 12px 0 0;
+  color: #746b66;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.delete-photo-dialog__actions {
+  display: grid;
+  margin-top: 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.delete-photo-dialog__actions .action-button {
+  width: 100%;
 }
 
 .photo-analyzing-page {

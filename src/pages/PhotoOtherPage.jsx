@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import DeletePhotoDialog from '../components/photos/DeletePhotoDialog.jsx'
 import PhotoCard, { PhotoPlaceholderIcon } from '../components/photos/PhotoCard.jsx'
-import PhotoPickerButton from '../components/photos/PhotoPickerButton.jsx'
+import ActionButton from '../components/ui/ActionButton.jsx'
 import usePhotoSelection from '../hooks/usePhotoSelection.js'
-import { getPhotoStatus } from '../utils/photoStatus.js'
 
 function BackIcon() {
   return (
@@ -14,26 +13,13 @@ function BackIcon() {
   )
 }
 
-function PhotoYearDetailPage() {
+function PhotoOtherPage() {
   const navigate = useNavigate()
-  const { year: yearParam } = useParams()
   const { analyzedPhotos, photoFiles, removePhoto } = usePhotoSelection()
   const [pendingPhoto, setPendingPhoto] = useState(null)
   const [deleting, setDeleting] = useState(false)
-  const year = Number(yearParam)
-  const isValidYear = /^\d{1,4}$/.test(yearParam ?? '') && year >= 1 && year <= 9999
-
-  if (!isValidYear) return <Navigate to="/photos/years" replace />
-
   const filesById = new Map(photoFiles.map(({ id, file }) => [id, file]))
-  const photos = analyzedPhotos
-    .filter(({ takenYear }) => takenYear === year)
-    .sort((a, b) => {
-      const firstDate = new Date(a.takenAt ?? 0).getTime()
-      const secondDate = new Date(b.takenAt ?? 0).getTime()
-      return secondDate - firstDate
-    })
-  const status = getPhotoStatus(photos.length)
+  const failedPhotos = analyzedPhotos.filter(({ takenYear }) => takenYear === null)
 
   const confirmDelete = async () => {
     if (!pendingPhoto || deleting) return
@@ -46,7 +32,7 @@ function PhotoYearDetailPage() {
   }
 
   return (
-    <section className="photo-year-detail">
+    <section className="photo-year-detail photo-other-page">
       <header className="photo-year-detail__header">
         <button type="button" onClick={() => navigate(-1)} aria-label="이전 화면으로 돌아가기">
           <BackIcon />
@@ -54,18 +40,18 @@ function PhotoYearDetailPage() {
       </header>
 
       <div className="photo-year-detail__summary">
-        <h1>{year}</h1>
+        <h1>기타</h1>
         <div>
-          <span>{photos.length}장</span>
-          <span className={`photo-years-page__status photo-years-page__status--${status.modifier}`}>
-            {status.label}
+          <span>{failedPhotos.length}장</span>
+          <span className="photo-years-page__status photo-years-page__status--unknown">
+            {failedPhotos.length > 0 ? '확인 필요' : '아직 없음'}
           </span>
         </div>
       </div>
 
-      {photos.length > 0 ? (
-        <ul className="photo-year-detail__grid" aria-label={`${year}년 사진 목록`}>
-          {photos.map((photo) => (
+      {failedPhotos.length > 0 ? (
+        <ul className="photo-year-detail__grid" aria-label="촬영 연도 확인이 필요한 사진 목록">
+          {failedPhotos.map((photo) => (
             <li key={photo.id}>
               <PhotoCard
                 photo={photo}
@@ -79,9 +65,15 @@ function PhotoYearDetailPage() {
       ) : (
         <div className="photo-year-detail__empty">
           <PhotoPlaceholderIcon />
-          <h2>아직 등록된 사진이 없어요</h2>
-          <p>사진을 추가하면 촬영 날짜에 따라 자동으로 분류됩니다.</p>
-          <PhotoPickerButton className="photo-year-detail__empty-cta" />
+          <h2>확인이 필요한 사진이 없어요</h2>
+          <p>분석하지 못한 사진이 생기면 이곳에서 확인할 수 있습니다.</p>
+          <ActionButton
+            fullWidth
+            className="photo-year-detail__empty-cta"
+            onClick={() => navigate('/photos/years')}
+          >
+            연도별 현황으로 돌아가기
+          </ActionButton>
         </div>
       )}
 
@@ -96,4 +88,4 @@ function PhotoYearDetailPage() {
   )
 }
 
-export default PhotoYearDetailPage
+export default PhotoOtherPage

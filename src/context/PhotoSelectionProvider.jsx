@@ -77,16 +77,23 @@ function PhotoSelectionProvider({ children }) {
     })
   }, [])
 
+  const removePhoto = useCallback((photoId) => {
+    setAnalyzedPhotos((photos) => photos.filter(({ id }) => id !== photoId))
+    setPhotoFiles((photos) => photos.filter(({ id }) => id !== photoId))
+    setSelectedPhotos((photos) => photos.filter(({ id }) => id !== photoId))
+  }, [])
+
   const value = useMemo(
     () => ({
       analyzedPhotos,
       photoFiles,
       queueSelectedPhotos,
+      removePhoto,
       saveAnalysisResults,
       selectedPhotos,
       selectedPhotoCount: selectedPhotos.length,
     }),
-    [analyzedPhotos, photoFiles, queueSelectedPhotos, saveAnalysisResults, selectedPhotos],
+    [analyzedPhotos, photoFiles, queueSelectedPhotos, removePhoto, saveAnalysisResults, selectedPhotos],
   )
 
   return (

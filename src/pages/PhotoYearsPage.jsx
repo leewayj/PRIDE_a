@@ -61,17 +61,16 @@ function PhotoYearsPage() {
         })}
       </ul>
 
-      {unknownYearCount > 0 && (
-        <div className="photo-years-page__other" role="status">
+      <button
+        className="photo-years-page__other"
+        type="button"
+        onClick={() => navigate('/photos/other')}
+      >
           <span>기타</span>
-          <span className="photo-years-page__summary">
-            <span className="photo-years-page__count">{unknownYearCount}장</span>
-            <span className="photo-years-page__status photo-years-page__status--unknown">
-              연도 미확인
-            </span>
+          <span className={`photo-years-page__other-status${unknownYearCount > 0 ? ' is-needed' : ''}`}>
+            {unknownYearCount > 0 ? `${unknownYearCount}장 · 확인 필요` : '아직 없음'}
           </span>
-        </div>
-      )}
+      </button>
 
       <PhotoPickerButton className="photo-years-page__cta" />
     </section>

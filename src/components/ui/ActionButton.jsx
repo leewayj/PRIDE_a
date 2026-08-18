@@ -1,4 +1,6 @@
-function ActionButton({
+import { forwardRef } from 'react'
+
+const ActionButton = forwardRef(function ActionButton({
   children,
   variant = 'primary',
   fullWidth = false,
@@ -6,7 +8,7 @@ function ActionButton({
   className = '',
   disabled = false,
   ...props
-}) {
+}, ref) {
   const classes = [
     'action-button',
     `action-button--${variant}`,
@@ -18,6 +20,7 @@ function ActionButton({
 
   return (
     <button
+      ref={ref}
       className={classes}
       type={type}
       disabled={disabled}
@@ -26,6 +29,6 @@ function ActionButton({
       {children}
     </button>
   )
-}
+})
 
 export default ActionButton
