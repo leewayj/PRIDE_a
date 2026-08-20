@@ -69,6 +69,24 @@ function MetricCurveChart({
     onSelectMarker(marker)
   }
   const changeMarkerXs = changePoints.map(({ date }) => xForDate(date))
+  const visibleCareMarkers = careMarkers.filter(({ date }) => {
+    const timestamp = new Date(date).getTime()
+    return !Number.isNaN(timestamp) && timestamp >= minTime && timestamp <= maxTime
+  })
+  const careMarkerPositions = visibleCareMarkers.reduce((positions, careMarker) => {
+    const originalX = xForDate(careMarker.date)
+    const overlapsChangePoint = changeMarkerXs.some((x) => Math.abs(x - originalX) < 12)
+    const offset = originalX > VIEW_WIDTH / 2 ? -16 : 16
+    const x = overlapsChangePoint
+      ? Math.min(VIEW_WIDTH - PADDING.right, Math.max(PADDING.left, originalX + offset))
+      : originalX
+    const occupiedLanes = positions
+      .filter((position) => Math.abs(position.x - x) < 22)
+      .map(({ lane }) => lane)
+    const lane = [0, 1, 2].find((candidate) => !occupiedLanes.includes(candidate)) ?? positions.length % 3
+
+    return [...positions, { careMarker, x, lane }]
+  }, [])
 
   return (
     <div className="metric-curve-chart">
@@ -117,15 +135,9 @@ function MetricCurveChart({
           )
         })}
 
-        {careMarkers.map((careMarker, index) => {
+        {careMarkerPositions.map(({ careMarker, x, lane }) => {
           const key = `care-${careMarker.id}`
-          const originalX = xForDate(careMarker.date)
-          const overlapsChangePoint = changeMarkerXs.some((x) => Math.abs(x - originalX) < 12)
-          const offset = originalX > VIEW_WIDTH / 2 ? -16 : 16
-          const x = overlapsChangePoint
-            ? Math.min(VIEW_WIDTH - PADDING.right, Math.max(PADDING.left, originalX + offset))
-            : originalX
-          const y = PADDING.top + 9 + (index % 2) * 18
+          const y = PADDING.top + 9 + lane * 18
           const marker = { type: 'careMarker', key, item: careMarker }
           const isSelected = selectedMarker?.key === key
 

@@ -116,8 +116,12 @@ function ChangesPage() {
               <BaseCard className="changes-page__record-list">
                 <ul>
                   {orderedCareMarkers.map((marker) => (
-                    <li key={marker.id}>
-                      <button type="button" onClick={() => setSelectedMarker({ type: 'careMarker', key: `care-${marker.id}`, item: marker })}>
+                    <li className={selectedMarker?.key === `care-${marker.id}` ? 'is-selected' : ''} key={marker.id}>
+                      <button
+                        type="button"
+                        aria-pressed={selectedMarker?.key === `care-${marker.id}`}
+                        onClick={() => setSelectedMarker((current) => current?.key === `care-${marker.id}` ? null : { type: 'careMarker', key: `care-${marker.id}`, item: marker })}
+                      >
                         <span className="changes-page__record-dot" aria-hidden="true" />
                         <span><strong>{marker.kind}</strong><small>{marker.rawText}</small></span>
                         <time dateTime={marker.date}>{formatPhotoDate(marker.date)}</time>
@@ -128,6 +132,13 @@ function ChangesPage() {
               </BaseCard>
             ) : (
               <BaseCard className="changes-page__records-empty"><strong>아직 추가된 관리 기록이 없어요.</strong><p>관리를 기록하면 변화곡선과 함께 확인할 수 있어요.</p></BaseCard>
+            )}
+            {selectedMarker?.type === 'careMarker' && (
+              <BaseCard className="changes-page__selected-record" aria-live="polite">
+                <div><span>선택한 관리 기록</span><time dateTime={selectedMarker.item.date}>{formatPhotoDate(selectedMarker.item.date)}</time></div>
+                <strong>{selectedMarker.item.kind}</strong>
+                <p>{selectedMarker.item.rawText}</p>
+              </BaseCard>
             )}
             <ActionButton fullWidth variant="outline" onClick={() => setIsAddSheetOpen(true)}>+ 기록 추가하기</ActionButton>
           </section>
