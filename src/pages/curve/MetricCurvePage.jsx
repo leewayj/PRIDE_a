@@ -6,8 +6,9 @@ import BottomNavigation from '../../components/navigation/BottomNavigation.jsx'
 import MetricCurveChart from '../../components/curve/MetricCurveChart.jsx'
 import { formatPhotoDate } from '../../utils/dateFormat.js'
 import { getIndicatorCurve } from '../../api/indicatorApi.js'
-import { fetchCareMarkers } from '../../services/retraceApi'
+import { getMarkerList } from '../../api/markerApi.js'
 import { INDICATOR_OPTIONS, mapIndicatorCurveToChartData } from '../../domain/indicatorCurve.js'
+import { mapMarkerListToCareMarkers } from '../../domain/marker.js'
 import { getOrCreateUserId } from '../../utils/userSession.js'
 import { validateInterpretationCardText } from '../../domain/interpretationCardValidation'
 import '../../styles/curve.css'
@@ -31,7 +32,10 @@ function MetricCurvePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
   const [totalCount, setTotalCount] = useState(0)
+  const [areMarkersLoading, setAreMarkersLoading] = useState(true)
+  const [hasMarkersError, setHasMarkersError] = useState(false)
   const curveRequestIdRef = useRef(0)
+  const markerRequestIdRef = useRef(0)
 
   const loadCurve = useCallback(async () => {
     const requestId = curveRequestIdRef.current + 1
@@ -59,22 +63,41 @@ function MetricCurvePage() {
     }
   }, [])
 
+  const loadMarkers = useCallback(async () => {
+    const requestId = markerRequestIdRef.current + 1
+    markerRequestIdRef.current = requestId
+    setAreMarkersLoading(true)
+    setHasMarkersError(false)
+
+    try {
+      const userId = await getOrCreateUserId()
+      const response = await getMarkerList(userId)
+      const markers = mapMarkerListToCareMarkers(response)
+      if (markerRequestIdRef.current === requestId) setCareMarkers(markers)
+    } catch (error) {
+      console.error('관리 기록을 불러오지 못했습니다.', error)
+      if (markerRequestIdRef.current === requestId) setHasMarkersError(true)
+    } finally {
+      if (markerRequestIdRef.current === requestId) setAreMarkersLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
     let isActive = true
 
-    fetchCareMarkers().then((markers) => {
-      if (isActive) setCareMarkers(Array.isArray(markers) ? markers : [])
-    }).catch((error) => console.error('관리 기록을 불러오지 못했습니다.', error))
-
     queueMicrotask(() => {
-      if (isActive) loadCurve()
+      if (isActive) {
+        loadCurve()
+        loadMarkers()
+      }
     })
 
     return () => {
       isActive = false
       curveRequestIdRef.current += 1
+      markerRequestIdRef.current += 1
     }
-  }, [loadCurve])
+  }, [loadCurve, loadMarkers])
 
   const visiblePoints = useMemo(() => (
     metricPoints
@@ -116,6 +139,12 @@ function MetricCurvePage() {
           </div>
         )}
       </BaseCard>
+
+      {areMarkersLoading ? (
+        <BaseCard className="metric-curve-page__marker-card" aria-live="polite">관리 기록을 불러오고 있어요.</BaseCard>
+      ) : hasMarkersError ? (
+        <BaseCard className="metric-curve-page__marker-card" role="alert"><strong>관리 기록을 불러오지 못했어요.</strong><p>잠시 후 다시 시도해 주세요.</p><ActionButton onClick={loadMarkers}>다시 시도</ActionButton></BaseCard>
+      ) : null}
 
       <BaseCard className="metric-curve-page__chart-card">
         <div className="metric-curve-page__chart-header">
@@ -163,8 +192,7 @@ function MetricCurvePage() {
             </>
           ) : (
             <>
-              <strong>{selectedMarker.item.kind}</strong>
-              <p>{selectedMarker.item.rawText}</p>
+              <strong>{selectedMarker.item.rawText}</strong>
               <section className="metric-curve-page__comparison" aria-label="실제값과 예측값 비교">
                 <h3>예측과 실제 비교</h3>
                 <div className="metric-curve-page__comparison-empty">

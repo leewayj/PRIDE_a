@@ -7,14 +7,14 @@ function todayForInput() {
   return new Date(today.getTime() - offset).toISOString().slice(0, 10)
 }
 
-function CareMarkerBottomSheet({ careMarker = null, onClose, onSave }) {
-  const isEditing = careMarker !== null
-  const [date, setDate] = useState(() => careMarker?.date?.slice(0, 10) ?? todayForInput())
-  const [kind, setKind] = useState(() => careMarker?.kind ?? '')
-  const [rawText, setRawText] = useState(() => careMarker?.rawText ?? '')
+function CareMarkerBottomSheet({ onClose, onSave }) {
+  const [date, setDate] = useState(todayForInput)
+  const [note, setNote] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState(false)
   const kindInputRef = useRef(null)
   const isSubmittingRef = useRef(false)
-  const canSave = date !== '' && kind.trim() !== ''
+  const canSave = date !== '' && note.trim() !== '' && !isSubmitting
 
   useEffect(() => {
     kindInputRef.current?.focus()
@@ -33,19 +33,21 @@ function CareMarkerBottomSheet({ careMarker = null, onClose, onSave }) {
     }
   }, [onClose])
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    const trimmedKind = kind.trim()
-    if (!date || !trimmedKind || isSubmittingRef.current) return
+    const trimmedNote = note.trim()
+    if (!date || !trimmedNote || isSubmittingRef.current) return
     isSubmittingRef.current = true
+    setIsSubmitting(true)
+    setSubmitError(false)
 
-    onSave({
-      id: careMarker?.id ?? `marker-${crypto.randomUUID()}`,
-      kind: trimmedKind,
-      date: new Date(`${date}T00:00:00.000Z`).toISOString(),
-      rawText: rawText.trim() || trimmedKind,
-      registrationPath: careMarker?.registrationPath ?? 'manual',
-    })
+    try {
+      await onSave({ date, note: trimmedNote })
+    } catch {
+      setSubmitError(true)
+      isSubmittingRef.current = false
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -58,8 +60,8 @@ function CareMarkerBottomSheet({ careMarker = null, onClose, onSave }) {
       >
         <div className="care-marker-sheet__handle" aria-hidden="true" />
         <header className="care-marker-sheet__header">
-          <h2 id="care-marker-sheet-title">{isEditing ? '기록 수정' : '기록 추가'}</h2>
-          <button type="button" aria-label={`${isEditing ? '기록 수정' : '기록 추가'} 닫기`} onClick={onClose}>×</button>
+          <h2 id="care-marker-sheet-title">기록 추가</h2>
+          <button type="button" aria-label="기록 추가 닫기" onClick={onClose} disabled={isSubmitting}>×</button>
         </header>
 
         <form onSubmit={handleSubmit}>
@@ -73,25 +75,15 @@ function CareMarkerBottomSheet({ careMarker = null, onClose, onSave }) {
             <input
               ref={kindInputRef}
               type="text"
-              value={kind}
+              value={note}
               placeholder="어떤 관리를 했나요?"
               maxLength="80"
-              onChange={(event) => setKind(event.target.value)}
+              onChange={(event) => setNote(event.target.value)}
               required
             />
           </label>
-
-          <label className="care-marker-sheet__field">
-            <span>메모 <small>선택</small></span>
-            <textarea
-              value={rawText}
-              placeholder="관리에 대해 기억할 내용을 남겨보세요."
-              maxLength="500"
-              onChange={(event) => setRawText(event.target.value)}
-            />
-          </label>
-
-          <ActionButton fullWidth type="submit" disabled={!canSave}>{isEditing ? '수정 저장' : '저장'}</ActionButton>
+          {submitError && <p className="care-marker-sheet__error" role="alert">관리를 저장하지 못했어요. 잠시 후 다시 시도해 주세요.</p>}
+          <ActionButton fullWidth type="submit" disabled={!canSave}>{isSubmitting ? '저장 중...' : '저장'}</ActionButton>
         </form>
       </section>
     </div>

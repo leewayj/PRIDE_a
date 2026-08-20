@@ -2,15 +2,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { getPhotos } from '../api/photoApi.js'
 import { getIndicatorCurve } from '../api/indicatorApi.js'
+import { getMarkerList, registerMarker } from '../api/markerApi.js'
 import MetricCurveChart from '../components/curve/MetricCurveChart.jsx'
 import CareMarkerBottomSheet from '../components/careMarkers/CareMarkerBottomSheet.jsx'
-import DeleteCareMarkerDialog from '../components/careMarkers/DeleteCareMarkerDialog.jsx'
 import BottomNavigation from '../components/navigation/BottomNavigation.jsx'
 import ActionButton from '../components/ui/ActionButton.jsx'
 import BaseCard from '../components/ui/BaseCard.jsx'
 import PhotoTimeline from '../components/changes/PhotoTimeline.jsx'
-import { fetchCareMarkers } from '../services/retraceApi'
 import { INDICATOR_OPTIONS, mapIndicatorCurveToChartData } from '../domain/indicatorCurve.js'
+import { mapMarkerListToCareMarkers } from '../domain/marker.js'
 import { formatPhotoDate } from '../utils/dateFormat.js'
 import { getOrCreateUserId } from '../utils/userSession.js'
 import '../styles/changes.css'
@@ -28,15 +28,15 @@ function ChangesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
   const [isAddSheetOpen, setIsAddSheetOpen] = useState(false)
-  const [editingCareMarker, setEditingCareMarker] = useState(null)
-  const [deletingCareMarker, setDeletingCareMarker] = useState(null)
-  const [openRecordMenuId, setOpenRecordMenuId] = useState(null)
+  const [areMarkersLoading, setAreMarkersLoading] = useState(true)
+  const [hasMarkersError, setHasMarkersError] = useState(false)
   const [storedPhotos, setStoredPhotos] = useState([])
   const [arePhotosLoading, setArePhotosLoading] = useState(true)
   const [hasPhotosError, setHasPhotosError] = useState(false)
   const photoRequestIdRef = useRef(0)
   const isPhotoRequestingRef = useRef(false)
   const curveRequestIdRef = useRef(0)
+  const markerRequestIdRef = useRef(0)
 
   const selectedIndicator = INDICATOR_OPTIONS.find(({ metricType }) => metricType === selectedMetric)
 
@@ -89,17 +89,44 @@ function ChangesPage() {
     }
   }, [])
 
+  const loadMarkers = useCallback(async () => {
+    const requestId = markerRequestIdRef.current + 1
+    markerRequestIdRef.current = requestId
+    setAreMarkersLoading(true)
+    setHasMarkersError(false)
+
+    try {
+      const userId = await getOrCreateUserId()
+      const response = await getMarkerList(userId)
+      const markers = mapMarkerListToCareMarkers(response)
+      if (markerRequestIdRef.current === requestId) setCareMarkers(markers)
+    } catch (error) {
+      console.error('관리 기록을 불러오지 못했습니다.', error)
+      if (markerRequestIdRef.current === requestId) setHasMarkersError(true)
+    } finally {
+      if (markerRequestIdRef.current === requestId) setAreMarkersLoading(false)
+    }
+  }, [])
+
+  const saveMarker = useCallback(async ({ date, note }) => {
+    const userId = await getOrCreateUserId()
+    await registerMarker(userId, date, note)
+    await loadMarkers()
+    setIsAddSheetOpen(false)
+  }, [loadMarkers])
+
   useEffect(() => {
     let isActive = true
 
-    fetchCareMarkers().then((markers) => {
-      if (isActive) setCareMarkers(Array.isArray(markers) ? markers : [])
-    }).catch((error) => console.error('관리 기록을 불러오지 못했습니다.', error))
+    queueMicrotask(() => {
+      if (isActive) loadMarkers()
+    })
 
     return () => {
       isActive = false
+      markerRequestIdRef.current += 1
     }
-  }, [])
+  }, [loadMarkers])
 
   useEffect(() => {
     let isActive = true
@@ -197,8 +224,10 @@ function ChangesPage() {
 
           <section className="changes-page__records" aria-labelledby="care-records-title">
             <div className="changes-page__section-heading"><h2 id="care-records-title">관리 기록</h2><span>{careMarkers.length}</span></div>
-            {isLoading ? (
+            {areMarkersLoading ? (
               <BaseCard className="changes-page__records-empty" aria-live="polite">관리 기록을 불러오고 있어요.</BaseCard>
+            ) : hasMarkersError ? (
+              <BaseCard className="changes-page__records-empty" role="alert"><strong>관리 기록을 불러오지 못했어요.</strong><p>잠시 후 다시 시도해 주세요.</p><ActionButton onClick={loadMarkers}>다시 시도</ActionButton></BaseCard>
             ) : orderedCareMarkers.length > 0 ? (
               <BaseCard className="changes-page__record-list">
                 <ul>
@@ -212,16 +241,9 @@ function ChangesPage() {
                         onClick={() => setSelectedMarker((current) => current?.key === `care-${marker.id}` ? null : { type: 'careMarker', key: `care-${marker.id}`, item: marker })}
                       >
                         <span className="changes-page__record-dot" aria-hidden="true" />
-                        <span><strong>{marker.kind}</strong><small>{marker.rawText}</small></span>
+                        <span><strong>{marker.rawText}</strong></span>
                         <time dateTime={marker.date}>{formatPhotoDate(marker.date)}</time>
                       </button>
-                      <RecordMenu
-                        marker={marker}
-                        isOpen={openRecordMenuId === marker.id}
-                        onToggle={() => setOpenRecordMenuId((current) => current === marker.id ? null : marker.id)}
-                        onEdit={() => { setEditingCareMarker(marker); setIsAddSheetOpen(true); setOpenRecordMenuId(null) }}
-                        onDelete={() => { setDeletingCareMarker(marker); setOpenRecordMenuId(null) }}
-                      />
                       </div>
                     </li>
                   ))}
@@ -233,11 +255,10 @@ function ChangesPage() {
             {selectedCareMarker && (
               <BaseCard className="changes-page__selected-record" aria-live="polite">
                 <div><span>선택한 관리 기록</span><time dateTime={selectedCareMarker.date}>{formatPhotoDate(selectedCareMarker.date)}</time></div>
-                <strong>{selectedCareMarker.kind}</strong>
-                <p>{selectedCareMarker.rawText}</p>
+                <strong>{selectedCareMarker.rawText}</strong>
               </BaseCard>
             )}
-            <ActionButton fullWidth variant="outline" onClick={() => { setEditingCareMarker(null); setIsAddSheetOpen(true) }}>+ 기록 추가하기</ActionButton>
+            <ActionButton fullWidth variant="outline" onClick={() => setIsAddSheetOpen(true)}>+ 기록 추가하기</ActionButton>
           </section>
         </section>
       ) : (
@@ -272,12 +293,10 @@ function ChangesPage() {
             orderedCareMarkers={orderedCareMarkers}
             selectedMarker={selectedMarker}
             onSelectMarker={setSelectedMarker}
-            openRecordMenuId={openRecordMenuId}
-            onToggleMenu={(markerId) => setOpenRecordMenuId((current) => current === markerId ? null : markerId)}
-            onEdit={(marker) => { setEditingCareMarker(marker); setIsAddSheetOpen(true); setOpenRecordMenuId(null) }}
-            onDelete={(marker) => { setDeletingCareMarker(marker); setOpenRecordMenuId(null) }}
-            onAdd={() => { setEditingCareMarker(null); setIsAddSheetOpen(true) }}
-            isLoading={isLoading}
+            onAdd={() => setIsAddSheetOpen(true)}
+            isLoading={areMarkersLoading}
+            hasError={hasMarkersError}
+            onRetry={loadMarkers}
           />
         </section>
       )}
@@ -285,59 +304,28 @@ function ChangesPage() {
       <BottomNavigation />
       {isAddSheetOpen && (
         <CareMarkerBottomSheet
-          careMarker={editingCareMarker}
-          onClose={() => { setIsAddSheetOpen(false); setEditingCareMarker(null) }}
-          onSave={(marker) => {
-            setCareMarkers((current) => editingCareMarker
-              ? current.map((existingMarker) => existingMarker.id === marker.id ? marker : existingMarker)
-              : [...current, marker])
-            setIsAddSheetOpen(false)
-            setEditingCareMarker(null)
-          }}
-        />
-      )}
-      {deletingCareMarker && (
-        <DeleteCareMarkerDialog
-          careMarker={deletingCareMarker}
-          onCancel={() => setDeletingCareMarker(null)}
-          onConfirm={() => {
-            const targetId = deletingCareMarker.id
-            setCareMarkers((current) => current.filter(({ id }) => id !== targetId))
-            setSelectedMarker((current) => current?.key === `care-${targetId}` ? null : current)
-            setDeletingCareMarker(null)
-          }}
+          onClose={() => setIsAddSheetOpen(false)}
+          onSave={saveMarker}
         />
       )}
     </main>
   )
 }
 
-function RecordMenu({ marker, isOpen, onToggle, onEdit, onDelete }) {
-  return (
-    <div className="changes-page__record-menu">
-      <button className="changes-page__record-menu-trigger" type="button" aria-label={`${marker.kind} 메뉴`} aria-expanded={isOpen} onClick={onToggle}>⋯</button>
-      {isOpen && (
-        <div className="changes-page__record-menu-popover">
-          <button type="button" onClick={onEdit}>수정</button>
-          <button className="is-destructive" type="button" onClick={onDelete}>삭제</button>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function CareRecords({ careMarkers, orderedCareMarkers, selectedMarker, onSelectMarker, openRecordMenuId, onToggleMenu, onEdit, onDelete, onAdd, isLoading }) {
+function CareRecords({ careMarkers, orderedCareMarkers, selectedMarker, onSelectMarker, onAdd, isLoading, hasError, onRetry }) {
   return (
     <section className="changes-page__records" aria-labelledby="timeline-care-records-title">
       <div className="changes-page__section-heading"><h2 id="timeline-care-records-title">관리 기록</h2><span>{careMarkers.length}</span></div>
       {isLoading ? (
         <BaseCard className="changes-page__records-empty" aria-live="polite">관리 기록을 불러오고 있어요.</BaseCard>
+      ) : hasError ? (
+        <BaseCard className="changes-page__records-empty" role="alert"><strong>관리 기록을 불러오지 못했어요.</strong><p>잠시 후 다시 시도해 주세요.</p><ActionButton onClick={onRetry}>다시 시도</ActionButton></BaseCard>
       ) : orderedCareMarkers.length > 0 ? (
         <BaseCard className="changes-page__record-list"><ul>{orderedCareMarkers.map((marker) => (
           <li className={selectedMarker?.key === `care-${marker.id}` ? 'is-selected' : ''} key={marker.id}>
             <div className="changes-page__record-row"><button className="changes-page__record-select" type="button" aria-pressed={selectedMarker?.key === `care-${marker.id}`} onClick={() => onSelectMarker((current) => current?.key === `care-${marker.id}` ? null : { type: 'careMarker', key: `care-${marker.id}`, item: marker })}>
-              <span className="changes-page__record-dot" aria-hidden="true" /><span><strong>{marker.kind}</strong><small>{marker.rawText}</small></span><time dateTime={marker.date}>{formatPhotoDate(marker.date)}</time>
-            </button><RecordMenu marker={marker} isOpen={openRecordMenuId === marker.id} onToggle={() => onToggleMenu(marker.id)} onEdit={() => onEdit(marker)} onDelete={() => onDelete(marker)} /></div>
+              <span className="changes-page__record-dot" aria-hidden="true" /><span><strong>{marker.rawText}</strong></span><time dateTime={marker.date}>{formatPhotoDate(marker.date)}</time>
+            </button></div>
           </li>
         ))}</ul></BaseCard>
       ) : (
