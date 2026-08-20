@@ -4,6 +4,7 @@ import { getPhotoUploadSummary } from '../api/photoApi.js'
 import ActionButton from '../components/ui/ActionButton.jsx'
 import BaseCard from '../components/ui/BaseCard.jsx'
 import SectionTitle from '../components/ui/SectionTitle.jsx'
+import { mapYearCounts } from '../domain/photoUploadSummary.js'
 import { getOrCreateUserId } from '../utils/userSession.js'
 
 function assertCount(value, fieldName) {
@@ -68,6 +69,7 @@ function PhotoStatusPage() {
     requestIdRef.current = requestId
     setIsLoading(true)
     setHasError(false)
+    setSummary(null)
 
     try {
       const userId = await getOrCreateUserId()
@@ -127,13 +129,13 @@ function PhotoStatusPage() {
   const totalUploaded = summary.totalEvaluatedCount
   const succeededCount = summary.succeededCount
   const totalJudged = pass + conditional + exclude || 1
-  const yearlyCounts = Object.entries(summary.yearCounts).map(([year, count]) => ({ year, count }))
+  const yearlyCounts = mapYearCounts(summary.yearCounts)
   const maxYearlyCount = Math.max(...yearlyCounts.map(({ count }) => count), 1)
   const minimumYear = findMinimumYear(yearlyCounts)
   const noticeText = buildNoticeText(minimumYear)
   const yearRange = yearlyCounts.length > 0
     ? `${yearlyCounts[0].year} – ${yearlyCounts[yearlyCounts.length - 1].year}`
-    : String(new Date().getFullYear())
+    : '연도 기록 없음'
 
   if (totalUploaded === 0) {
     return (
@@ -221,7 +223,7 @@ function PhotoStatusPage() {
         <SectionTitle>연도별 사진</SectionTitle>
 
         {yearlyCounts.length === 0 ? (
-          <p className="photo-status-page__empty">아직 표시할 연도별 데이터가 없어요.</p>
+          <div className="photo-status-page__empty" role="status"><strong>연도별 사진 0장</strong><p>서버에 집계된 연도별 사진이 없어요.</p></div>
         ) : (
           <div className="photo-status-page__chart" aria-label="연도별 사진 장수">
             {yearlyCounts.map(({ year, count }) => {

@@ -1122,6 +1122,9 @@
   line-height: 1.6;
 }
 
+.photo-status-page__empty strong { color: var(--ink-900); }
+.photo-status-page__empty p { margin: 4px 0 0; }
+
 .photo-status-page__notice {
   margin: 0;
   padding: 14px 16px;
