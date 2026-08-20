@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { getPhotos } from '../api/photoApi.js'
 import MetricCurveChart from '../components/curve/MetricCurveChart.jsx'
 import CareMarkerBottomSheet from '../components/careMarkers/CareMarkerBottomSheet.jsx'
 import DeleteCareMarkerDialog from '../components/careMarkers/DeleteCareMarkerDialog.jsx'
@@ -8,9 +9,8 @@ import ActionButton from '../components/ui/ActionButton.jsx'
 import BaseCard from '../components/ui/BaseCard.jsx'
 import PhotoTimeline from '../components/changes/PhotoTimeline.jsx'
 import { fetchCareMarkers, fetchMetricCurve } from '../services/retraceApi'
-import usePhotoSelection from '../hooks/usePhotoSelection.js'
 import { formatPhotoDate } from '../utils/dateFormat.js'
-import { groupPhotosByYear } from '../utils/photoGrouping.js'
+import { getOrCreateUserId } from '../utils/userSession.js'
 import '../styles/changes.css'
 
 const METRICS = [
@@ -23,7 +23,6 @@ const METRICS = [
 function ChangesPage() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { photos } = usePhotoSelection()
   const requestedTab = new URLSearchParams(location.search).get('tab')
   const [activeTab, setActiveTab] = useState(requestedTab === 'timeline' ? 'timeline' : 'curve')
   const [selectedMetric, setSelectedMetric] = useState('jaw-angle')
@@ -37,7 +36,36 @@ function ChangesPage() {
   const [editingCareMarker, setEditingCareMarker] = useState(null)
   const [deletingCareMarker, setDeletingCareMarker] = useState(null)
   const [openRecordMenuId, setOpenRecordMenuId] = useState(null)
-  const [selectedPhotoId, setSelectedPhotoId] = useState(location.state?.selectedPhotoId ?? null)
+  const [storedPhotos, setStoredPhotos] = useState([])
+  const [arePhotosLoading, setArePhotosLoading] = useState(true)
+  const [hasPhotosError, setHasPhotosError] = useState(false)
+  const photoRequestIdRef = useRef(0)
+  const isPhotoRequestingRef = useRef(false)
+
+  const loadStoredPhotos = useCallback(async () => {
+    if (isPhotoRequestingRef.current) return
+
+    isPhotoRequestingRef.current = true
+    const requestId = photoRequestIdRef.current + 1
+    photoRequestIdRef.current = requestId
+    setArePhotosLoading(true)
+    setHasPhotosError(false)
+
+    try {
+      const userId = await getOrCreateUserId()
+      const result = await getPhotos(userId)
+      if (!Array.isArray(result)) throw new Error('photos response must be an array')
+      if (photoRequestIdRef.current === requestId) setStoredPhotos(result)
+    } catch (error) {
+      console.error('저장된 사진 목록을 불러오지 못했습니다.', error)
+      if (photoRequestIdRef.current === requestId) setHasPhotosError(true)
+    } finally {
+      if (photoRequestIdRef.current === requestId) {
+        isPhotoRequestingRef.current = false
+        setArePhotosLoading(false)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     let isActive = true
@@ -68,6 +96,19 @@ function ChangesPage() {
     }
   }, [])
 
+  useEffect(() => {
+    let isActive = true
+    queueMicrotask(() => {
+      if (isActive) loadStoredPhotos()
+    })
+
+    return () => {
+      isActive = false
+      photoRequestIdRef.current += 1
+      isPhotoRequestingRef.current = false
+    }
+  }, [loadStoredPhotos])
+
   const visiblePoints = useMemo(() => (
     metricPoints
       .filter(({ metricType }) => metricType === selectedMetric)
@@ -92,20 +133,13 @@ function ChangesPage() {
   const interpretationPoint = selectedMarker?.type === 'changePoint'
     ? selectedMarker.item
     : visibleChangePoints[0]
-  const timelinePhotos = useMemo(() => (
-    groupPhotosByYear(photos).flatMap(({ photos: yearPhotos }) => yearPhotos).reverse()
-  ), [photos])
-  const activeTimelinePhotoId = timelinePhotos.some(({ id }) => id === selectedPhotoId)
-    ? selectedPhotoId
-    : timelinePhotos[timelinePhotos.length - 1]?.id ?? null
-
   return (
     <main className="app-shell changes-page">
       <header className="changes-page__header"><h1>기록</h1></header>
 
       <div className="changes-page__tabs" role="tablist" aria-label="기록 보기 방식">
         <button type="button" role="tab" aria-selected={activeTab === 'curve'} className={activeTab === 'curve' ? 'is-active' : ''} onClick={() => { setActiveTab('curve'); navigate('/changes', { replace: true }) }}>곡선</button>
-        <button type="button" role="tab" aria-selected={activeTab === 'timeline'} className={activeTab === 'timeline' ? 'is-active' : ''} onClick={() => { setActiveTab('timeline'); navigate('/changes?tab=timeline', { replace: true, state: { selectedPhotoId: activeTimelinePhotoId } }) }}>타임라인</button>
+        <button type="button" role="tab" aria-selected={activeTab === 'timeline'} className={activeTab === 'timeline' ? 'is-active' : ''} onClick={() => { setActiveTab('timeline'); navigate('/changes?tab=timeline', { replace: true }) }}>타임라인</button>
       </div>
 
       {activeTab === 'curve' ? (
@@ -189,17 +223,31 @@ function ChangesPage() {
         </section>
       ) : (
         <section className="changes-page__timeline" role="tabpanel">
-          <PhotoTimeline
-            photos={timelinePhotos}
-            careMarkers={careMarkers}
-            selectedPhotoId={activeTimelinePhotoId}
-            onSelectPhoto={(photoId) => {
-              setSelectedPhotoId(photoId)
-              navigate('/changes?tab=timeline', { replace: true, state: { selectedPhotoId: photoId } })
-            }}
-            onCompare={(timelinePhotoId) => navigate('/curve/compare', { state: { timelinePhotoId } })}
-            onUpload={() => navigate('/photos/upload')}
-          />
+          {arePhotosLoading ? (
+            <BaseCard className="photo-timeline__empty" aria-live="polite">
+              <strong>사진 기록을 불러오고 있어요.</strong>
+            </BaseCard>
+          ) : hasPhotosError ? (
+            <BaseCard className="photo-timeline__empty" role="alert">
+              <strong>사진 기록을 불러오지 못했어요.</strong>
+              <p>잠시 후 다시 시도해 주세요.</p>
+              <ActionButton onClick={loadStoredPhotos}>다시 시도</ActionButton>
+            </BaseCard>
+          ) : storedPhotos.length === 0 ? (
+            <PhotoTimeline
+              photos={[]}
+              careMarkers={careMarkers}
+              selectedPhotoId={null}
+              onSelectPhoto={() => {}}
+              onCompare={() => {}}
+              onUpload={() => navigate('/photos/upload')}
+            />
+          ) : (
+            <BaseCard className="photo-timeline__empty">
+              <strong>저장된 사진 {storedPhotos.length}장을 불러왔어요.</strong>
+              <p>사진 항목의 표시 필드가 확인되면 타임라인에서 볼 수 있어요.</p>
+            </BaseCard>
+          )}
           <CareRecords
             careMarkers={careMarkers}
             orderedCareMarkers={orderedCareMarkers}
