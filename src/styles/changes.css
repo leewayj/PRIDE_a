@@ -77,7 +77,7 @@
 .photo-timeline__track-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .photo-timeline__track-heading strong { font-size: 14px; }
 .photo-timeline__track-heading span { color: var(--rose-900); font-size: 11px; font-weight: 700; }
-.photo-timeline__track { position: relative; height: 54px; margin: 20px 8px 0; }
+.photo-timeline__track { position: relative; height: 62px; margin: 20px 8px 0; }
 .photo-timeline__rail { position: absolute; top: 25px; right: 0; left: 0; height: 2px; border-radius: 999px; background: var(--border-soft); }
 .photo-timeline__track button { position: absolute; top: 10px; z-index: 2; width: 30px; height: 30px; padding: 0; border: 0; transform: translateX(-50%); background: transparent; }
 .photo-timeline__track button > span { display: block; width: 4px; height: 17px; margin: auto; border-radius: 999px; background: #c9bbb4; transition: height .15s ease, background .15s ease; }

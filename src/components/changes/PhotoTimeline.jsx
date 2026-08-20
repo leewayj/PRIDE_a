@@ -50,6 +50,7 @@ function PhotoTimeline({ photos, careMarkers, selectedPhotoId, onSelectPhoto, on
     const timestamp = new Date(date).getTime()
     return !Number.isNaN(timestamp) && timestamp >= startTime && timestamp <= endTime
   })
+  const markerLaneCounts = new Map()
 
   return (
     <section className="photo-timeline">
@@ -83,9 +84,18 @@ function PhotoTimeline({ photos, careMarkers, selectedPhotoId, onSelectPhoto, on
               ><span /></button>
             )
           })}
-          {visibleMarkers.map((marker) => (
-            <span className="photo-timeline__care-marker" style={{ left: `${timelinePosition(marker.date, startTime, timeRange)}%` }} title={`${marker.kind} · ${formatPhotoDate(marker.date)}`} key={marker.id} />
-          ))}
+          {visibleMarkers.map((marker) => {
+            const lane = markerLaneCounts.get(marker.date) ?? 0
+            markerLaneCounts.set(marker.date, lane + 1)
+            return (
+              <span
+                className="photo-timeline__care-marker"
+                style={{ left: `${timelinePosition(marker.date, startTime, timeRange)}%`, top: `${39 + Math.min(lane, 2) * 7}px` }}
+                title={`${marker.kind} · ${formatPhotoDate(marker.date)}`}
+                key={marker.id}
+              />
+            )
+          })}
         </div>
         <div className="photo-timeline__range"><time>{formatPhotoDate(photos[0].capturedAt)}</time><time>{formatPhotoDate(photos[photos.length - 1].capturedAt)}</time></div>
         <div className="photo-timeline__controls">

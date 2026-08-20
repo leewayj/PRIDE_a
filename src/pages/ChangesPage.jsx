@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import MetricCurveChart from '../components/curve/MetricCurveChart.jsx'
 import CareMarkerBottomSheet from '../components/careMarkers/CareMarkerBottomSheet.jsx'
 import BottomNavigation from '../components/navigation/BottomNavigation.jsx'
@@ -20,9 +20,11 @@ const METRICS = [
 ]
 
 function ChangesPage() {
+  const location = useLocation()
   const navigate = useNavigate()
   const { photos } = usePhotoSelection()
-  const [activeTab, setActiveTab] = useState('curve')
+  const requestedTab = new URLSearchParams(location.search).get('tab')
+  const [activeTab, setActiveTab] = useState(requestedTab === 'timeline' ? 'timeline' : 'curve')
   const [selectedMetric, setSelectedMetric] = useState('jaw-angle')
   const [metricPoints, setMetricPoints] = useState([])
   const [changePoints, setChangePoints] = useState([])
@@ -31,7 +33,7 @@ function ChangesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
   const [isAddSheetOpen, setIsAddSheetOpen] = useState(false)
-  const [selectedPhotoId, setSelectedPhotoId] = useState(null)
+  const [selectedPhotoId, setSelectedPhotoId] = useState(location.state?.selectedPhotoId ?? null)
 
   useEffect(() => {
     let isActive = true
@@ -95,8 +97,8 @@ function ChangesPage() {
       <header className="changes-page__header"><h1>기록</h1></header>
 
       <div className="changes-page__tabs" role="tablist" aria-label="기록 보기 방식">
-        <button type="button" role="tab" aria-selected={activeTab === 'curve'} className={activeTab === 'curve' ? 'is-active' : ''} onClick={() => setActiveTab('curve')}>곡선</button>
-        <button type="button" role="tab" aria-selected={activeTab === 'timeline'} className={activeTab === 'timeline' ? 'is-active' : ''} onClick={() => setActiveTab('timeline')}>타임라인</button>
+        <button type="button" role="tab" aria-selected={activeTab === 'curve'} className={activeTab === 'curve' ? 'is-active' : ''} onClick={() => { setActiveTab('curve'); navigate('/changes', { replace: true }) }}>곡선</button>
+        <button type="button" role="tab" aria-selected={activeTab === 'timeline'} className={activeTab === 'timeline' ? 'is-active' : ''} onClick={() => { setActiveTab('timeline'); navigate('/changes?tab=timeline', { replace: true, state: { selectedPhotoId: activeTimelinePhotoId } }) }}>타임라인</button>
       </div>
 
       {activeTab === 'curve' ? (
@@ -174,7 +176,10 @@ function ChangesPage() {
             photos={timelinePhotos}
             careMarkers={careMarkers}
             selectedPhotoId={activeTimelinePhotoId}
-            onSelectPhoto={setSelectedPhotoId}
+            onSelectPhoto={(photoId) => {
+              setSelectedPhotoId(photoId)
+              navigate('/changes?tab=timeline', { replace: true, state: { selectedPhotoId: photoId } })
+            }}
             onCompare={(timelinePhotoId) => navigate('/curve/compare', { state: { timelinePhotoId } })}
             onUpload={() => navigate('/photos/upload')}
           />

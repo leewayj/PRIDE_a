@@ -12,6 +12,7 @@ function CareMarkerBottomSheet({ onClose, onSave }) {
   const [kind, setKind] = useState('')
   const [rawText, setRawText] = useState('')
   const kindInputRef = useRef(null)
+  const isSubmittingRef = useRef(false)
   const canSave = date !== '' && kind.trim() !== ''
 
   useEffect(() => {
@@ -34,7 +35,8 @@ function CareMarkerBottomSheet({ onClose, onSave }) {
   const handleSubmit = (event) => {
     event.preventDefault()
     const trimmedKind = kind.trim()
-    if (!date || !trimmedKind) return
+    if (!date || !trimmedKind || isSubmittingRef.current) return
+    isSubmittingRef.current = true
 
     onSave({
       id: `marker-${crypto.randomUUID()}`,
