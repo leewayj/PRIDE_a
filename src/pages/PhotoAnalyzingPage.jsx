@@ -104,6 +104,13 @@ function PhotoAnalyzingPage() {
         </div>
         <strong className="photo-analyzing-page__percentage">{progress}%</strong>
         <p className="photo-analyzing-page__status">{status}</p>
+
+        <ol className="photo-analyzing-page__steps">
+          <li className={completedCount > 0 ? 'is-complete' : 'is-active'}><span />촬영일 읽기</li>
+          <li className={progress >= 35 ? 'is-complete' : ''}><span />얼굴 검출 · 본인 확인</li>
+          <li className={progress >= 65 ? 'is-complete' : ''}><span />각도 · 표정</li>
+          <li className={progress === 100 ? 'is-complete' : ''}><span />선명도 · 얼굴 크기</li>
+        </ol>
       </div>
     </section>
   )

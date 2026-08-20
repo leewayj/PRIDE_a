@@ -6,6 +6,7 @@ import PhotoPickerButton from '../components/photos/PhotoPickerButton.jsx'
 import usePhotoSelection from '../hooks/usePhotoSelection.js'
 import { groupPhotosByYear } from '../utils/photoGrouping.js'
 import { getYearPhotoStatus, getYearPhotoStatusLabel } from '../utils/photoStatus.js'
+import { YEAR_UPLOAD_MAX_COUNT, YEAR_UPLOAD_MIN_COUNT } from '../utils/uploadConstraints.js'
 
 function BackIcon() {
   return (
@@ -45,10 +46,14 @@ function PhotoYearDetailPage() {
         <button type="button" onClick={() => navigate(-1)} aria-label="이전 화면으로 돌아가기">
           <BackIcon />
         </button>
+        <strong>{year}</strong>
       </header>
 
       <div className="photo-year-detail__summary">
-        <h1>{year}</h1>
+        <div className="photo-year-detail__range">
+          <span>최소 {YEAR_UPLOAD_MIN_COUNT}장</span>
+          <span>최대 {YEAR_UPLOAD_MAX_COUNT}장</span>
+        </div>
         <div>
           <span>{photos.length}장</span>
           <span className={`photo-years-page__status photo-years-page__status--${status}`}>
@@ -85,6 +90,10 @@ function PhotoYearDetailPage() {
           onCancel={() => setPendingPhoto(null)}
           onConfirm={confirmDelete}
         />
+      )}
+
+      {photos.length > 0 && (
+        <PhotoPickerButton className="photo-year-detail__cta">사진 더 선택하기</PhotoPickerButton>
       )}
     </section>
   )

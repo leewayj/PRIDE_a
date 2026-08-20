@@ -31,11 +31,12 @@ function PhotoStatusPage() {
   return (
     <section className="photo-status-page">
       <header className="photo-status-page__header">
-        <h1>사진 현황</h1>
+        <h1>Photo</h1>
+        <span>2019 – {new Date().getFullYear()}</span>
       </header>
 
       <BaseCard className="photo-status-page__total">
-        <p className="photo-status-page__total-label">총 통과 장수</p>
+        <p className="photo-status-page__total-label">그래프에 들어간 사진</p>
         <strong className="photo-status-page__total-value">{pass}장</strong>
       </BaseCard>
 

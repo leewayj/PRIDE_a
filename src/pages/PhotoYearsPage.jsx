@@ -32,10 +32,12 @@ function PhotoYearsPage() {
         <button type="button" onClick={() => navigate(-1)} aria-label="이전 화면으로 돌아가기">
           <BackIcon />
         </button>
+        <span>연도별로 넣기</span>
       </header>
 
       <div className="photo-years-page__intro">
         <h1>한 해씩 골라 넣으세요.</h1>
+        <p>한 해에 사진 5장쯤이면 그 해의 그래프가 확실히 생깁니다.</p>
       </div>
 
       <ul className="photo-years-page__list" aria-label="연도별 사진 현황">
