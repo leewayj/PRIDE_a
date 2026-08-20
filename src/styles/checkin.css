@@ -49,6 +49,41 @@
   padding: 20px 18px 16px;
 }
 
+.timeline-card__status {
+  color: var(--rose-900);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.timeline-card__dday {
+  display: block;
+  margin-top: 10px;
+  font-size: 36px;
+  line-height: 1.2;
+  letter-spacing: -.04em;
+}
+
+.timeline-card__marker-date {
+  margin: 12px 0 0;
+  color: #756c67;
+  font-size: 12px;
+}
+
+.check-in-page__state {
+  margin-top: 30px;
+  color: #6f6660;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.check-in-page__state p {
+  margin: 0;
+}
+
+.check-in-page__state .action-button {
+  margin-top: 16px;
+}
+
 .timeline-card__graphic svg {
   display: block;
   width: 100%;
