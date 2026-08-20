@@ -1,0 +1,37 @@
+.care-effectiveness-page { min-width: 0; padding: max(14px, env(safe-area-inset-top)) 18px 32px; overflow-x: clip; background: var(--background-main); }
+.care-effectiveness-page__header { position: relative; display: flex; min-height: 52px; align-items: center; justify-content: center; }
+.care-effectiveness-page__header button { position: absolute; left: -7px; display: grid; width: 42px; height: 42px; padding: 0; border: 0; place-items: center; color: var(--ink-900); background: transparent; }
+.care-effectiveness-page__header svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.care-effectiveness-page__header span { font-size: 15px; font-weight: 700; }
+.care-effectiveness-page__intro { padding: 24px 2px 20px; }
+.care-effectiveness-page__intro > span { color: var(--rose-900); font-size: 12px; font-weight: 700; }
+.care-effectiveness-page__intro h1 { margin: 8px 0 0; font-size: 26px; line-height: 1.38; letter-spacing: -.035em; overflow-wrap: anywhere; }
+.care-effectiveness-page__intro > p { margin: 8px 0 0; color: #746b66; font-size: 13px; }
+.care-effectiveness-page__intro > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; margin-top: 20px; padding: 16px 17px; border-radius: 14px; background: var(--background-sub); }
+.care-effectiveness-page__intro > div strong { min-width: 0; font-size: 14px; overflow-wrap: anywhere; }
+.care-effectiveness-page__intro time { color: #817873; font-size: 11px; }
+.care-effectiveness-page__intro > div p { grid-column: 1 / -1; margin: 3px 0 0; color: #746b66; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+.care-effectiveness-page__chart-card { padding: 20px 12px 15px; }
+.care-effectiveness-page__chart-heading { padding: 0 6px; }
+.care-effectiveness-page__chart-heading span { color: #746b66; font-size: 11px; font-weight: 600; }
+.care-effectiveness-page__chart-heading h2 { margin: 4px 0 0; font-size: 18px; }
+.care-effectiveness-page__legend { display: flex; padding: 2px 7px 0; align-items: center; justify-content: flex-end; gap: 15px; color: #746b66; font-size: 10px; }
+.care-effectiveness-page__legend span { display: flex; align-items: center; gap: 6px; }
+.care-effectiveness-page__legend i { width: 20px; border-top: 2px solid var(--rose-900); }
+.care-effectiveness-page__legend span:last-child i { border-top-style: dashed; border-color: #817873; }
+.care-effectiveness-page__values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.care-effectiveness-page__values .base-card { min-width: 0; padding: 16px; }
+.care-effectiveness-page__values .base-card:last-child { grid-column: 1 / -1; }
+.care-effectiveness-page__values span { color: #746b66; font-size: 11px; font-weight: 600; }
+.care-effectiveness-page__values strong { display: block; margin-top: 7px; color: var(--rose-900); font-size: 24px; }
+.care-effectiveness-page__description { margin-top: 12px; padding: 16px; border-radius: 13px; color: #91501f; background: #f4d8ce; }
+.care-effectiveness-page__description strong { font-size: 13px; }
+.care-effectiveness-page__description p { margin: 6px 0 0; font-size: 12px; line-height: 1.6; }
+.care-effectiveness-page__state { display: grid; min-height: 280px; margin-top: 24px; align-content: center; justify-items: center; gap: 10px; color: #746b66; font-size: 13px; line-height: 1.6; text-align: center; }
+.care-effectiveness-page__state strong { color: var(--ink-900); font-size: 16px; }
+.care-effectiveness-page__state p { max-width: 270px; margin: 0; }
+.care-effectiveness-page__state--inline { min-height: 210px; margin-top: 0; }
+.metric-curve-chart__line--predicted { stroke: #817873; stroke-dasharray: 7 6; }
+.metric-curve-chart__care-start line { stroke: #b8aaa2; stroke-width: 1.2; stroke-dasharray: 3 3; }
+.metric-curve-chart__care-start text { fill: #817873; font-size: 8px; font-weight: 700; paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+@media (max-width: 370px) { .care-effectiveness-page { padding-inline: 16px; } .care-effectiveness-page__intro h1 { font-size: 23px; } .care-effectiveness-page__chart-card { padding-inline: 9px; } }

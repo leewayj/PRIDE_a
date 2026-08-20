@@ -4,6 +4,7 @@ import '../../styles/navigation.css'
 function BottomNavigation() {
   const location = useLocation()
   const isCurveRoute = location.pathname === '/curve' || location.pathname.startsWith('/curve/')
+  const isCareRoute = location.pathname.startsWith('/care-markers')
   return (
     <nav className="bottom-navigation" aria-label="주요 메뉴">
       <NavLink
@@ -35,7 +36,7 @@ function BottomNavigation() {
 
       <NavLink
         className={({ isActive }) =>
-          `bottom-navigation__item${isActive || isCurveRoute ? ' is-active' : ''}`
+          `bottom-navigation__item${isActive || isCurveRoute || isCareRoute ? ' is-active' : ''}`
         }
         to="/changes"
       >

@@ -18,6 +18,10 @@ import {
   curveSufficientCheckIns,
   curveSufficientMetricPoints,
 } from '../mocks/curveSufficientScenario'
+import {
+  careComparisonResults,
+  type CareComparisonResult,
+} from '../mocks/careEffectivenessScenario'
 
 /**
  * 사진 판정 결과를 조회한다.
@@ -49,6 +53,14 @@ export function fetchMetricCurve(): Promise<MetricCurveResult> {
  */
 export function fetchCareMarkers(): Promise<CareMarker[]> {
   return Promise.resolve(curveSufficientCareMarkers)
+}
+
+/**
+ * 관리 기록 ID에 연결된 프론트엔드 UI 개발용 비교 결과를 조회한다.
+ * 실제 분석 API가 준비되면 이 함수의 데이터 소스만 교체한다.
+ */
+export function fetchCareComparisonResult(careMarkerId: string): Promise<CareComparisonResult | undefined> {
+  return Promise.resolve(careComparisonResults.find((result) => result.careMarkerId === careMarkerId))
 }
 
 /**

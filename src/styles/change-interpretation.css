@@ -37,6 +37,7 @@
 .change-interpretation-page__records strong { font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
 .change-interpretation-page__records time { flex-shrink: 0; color: #9b928c; font-size: 10px; line-height: 1.5; }
 .change-interpretation-page__records .base-card > p { margin: 5px 0 0; color: #746b66; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+.change-interpretation-page__compare-record { width: 100%; margin-top: 13px; padding: 11px 12px; border: 1px solid var(--border-soft); border-radius: 10px; color: var(--rose-900); background: var(--surface); font-size: 12px; font-weight: 700; }
 .change-interpretation-page__records-empty { margin-top: 13px; color: #746b66; font-size: 13px; text-align: center; }
 .change-interpretation-page__cta { min-height: 54px; margin-top: 18px; border-radius: 14px; }
 

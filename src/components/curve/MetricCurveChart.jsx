@@ -13,6 +13,9 @@ function MetricCurveChart({
   selectedMarker,
   onSelectMarker,
   metricLabel = '턱선 각도',
+  predictedPoints = [],
+  careStartDate,
+  comparisonMode = false,
 }) {
   if (points.length === 0) {
     return (
@@ -23,10 +26,12 @@ function MetricCurveChart({
     )
   }
 
+  const allPoints = [...points, ...predictedPoints]
   const timestamps = points.map(({ capturedAt }) => new Date(capturedAt).getTime())
-  const values = points.map(({ value }) => value)
-  const minTime = Math.min(...timestamps)
-  const maxTime = Math.max(...timestamps)
+  const allTimestamps = allPoints.map(({ capturedAt }) => new Date(capturedAt).getTime())
+  const values = allPoints.map(({ value }) => value)
+  const minTime = Math.min(...allTimestamps)
+  const maxTime = Math.max(...allTimestamps)
   const minValue = Math.min(...values)
   const maxValue = Math.max(...values)
   const plotWidth = VIEW_WIDTH - PADDING.left - PADDING.right
@@ -46,6 +51,18 @@ function MetricCurveChart({
 
   const path = plottedPoints
     .map(({ x, y }, index) => `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`)
+    .join(' ')
+  const predictedPath = predictedPoints
+    .map((point, index) => {
+      const timestamp = new Date(point.capturedAt).getTime()
+      const x = timeRange === 0
+        ? PADDING.left + plotWidth / 2
+        : PADDING.left + ((timestamp - minTime) / timeRange) * plotWidth
+      const y = valueRange === 0
+        ? PADDING.top + plotHeight / 2
+        : PADDING.top + (1 - ((point.value - minValue) / valueRange)) * plotHeight
+      return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`
+    })
     .join(' ')
   const years = [...new Set(points.map(({ capturedAt }) => yearOf(capturedAt)))]
   const xForDate = (date) => {
@@ -108,11 +125,22 @@ function MetricCurveChart({
 
         {points.length > 1 && <path className="metric-curve-chart__line" d={path} />}
 
+        {predictedPoints.length > 1 && (
+          <path className="metric-curve-chart__line metric-curve-chart__line--predicted" d={predictedPath} />
+        )}
+
+        {comparisonMode && careStartDate && (
+          <g className="metric-curve-chart__care-start">
+            <line x1={xForDate(careStartDate)} x2={xForDate(careStartDate)} y1={PADDING.top} y2={VIEW_HEIGHT - PADDING.bottom} />
+            <text x={xForDate(careStartDate)} y={PADDING.top + 8} textAnchor="middle">관리 시작</text>
+          </g>
+        )}
+
         {plottedPoints.map(({ photoId, x, y }) => (
           <circle className="metric-curve-chart__point" cx={x} cy={y} r="3" key={photoId} />
         ))}
 
-        {changePoints.map((changePoint) => {
+        {!comparisonMode && changePoints.map((changePoint) => {
           const key = `change-${changePoint.metricType}-${changePoint.date}`
           const x = xForDate(changePoint.date)
           const y = Math.max(PADDING.top + 12, nearestPointForDate(changePoint.date).y - 14)
@@ -135,7 +163,7 @@ function MetricCurveChart({
           )
         })}
 
-        {careMarkerPositions.map(({ careMarker, x, lane }) => {
+        {!comparisonMode && careMarkerPositions.map(({ careMarker, x, lane }) => {
           const key = `care-${careMarker.id}`
           const y = PADDING.top + 9 + lane * 18
           const marker = { type: 'careMarker', key, item: careMarker }

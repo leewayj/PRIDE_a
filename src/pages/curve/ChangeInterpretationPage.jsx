@@ -171,6 +171,13 @@ function ChangeInterpretationPage() {
                     <BaseCard>
                       <div><strong>{marker.kind}</strong><time dateTime={marker.date}>{formatPhotoDate(marker.date)}</time></div>
                       <p>{marker.rawText}</p>
+                      <button
+                        className="change-interpretation-page__compare-record"
+                        type="button"
+                        onClick={() => navigate('/care-markers/effectiveness', { state: { careMarker: marker } })}
+                      >
+                        이 기록과 비교하기
+                      </button>
                     </BaseCard>
                   </li>
                 ))}
@@ -180,9 +187,6 @@ function ChangeInterpretationPage() {
             )}
           </section>
 
-          <ActionButton className="change-interpretation-page__cta" fullWidth onClick={() => navigate('/curve/rewind')}>
-            관리 전 흐름과 비교하기
-          </ActionButton>
         </>
       )}
 
