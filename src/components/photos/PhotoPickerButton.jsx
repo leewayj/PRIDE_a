@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import usePhotoSelection from '../../hooks/usePhotoSelection.js'
 import { validatePhotoFile } from '../../services/photoAnalysis.js'
 import ActionButton from '../ui/ActionButton.jsx'
 
 function PhotoPickerButton({ children = '사진 선택하기', className = '' }) {
+  const location = useLocation()
   const navigate = useNavigate()
   const fileInputRef = useRef(null)
   const isProcessingRef = useRef(false)
@@ -31,7 +32,7 @@ function PhotoPickerButton({ children = '사진 선택하기', className = '' })
 
       if (queuedCount > 0) {
         setSelectionMessage('')
-        navigate('/photos/analyzing')
+        navigate('/photos/analyzing', { state: location.state })
       } else {
         setSelectionMessage('이미 추가했거나 선택할 수 없는 사진이에요.')
       }

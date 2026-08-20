@@ -15,6 +15,13 @@ function DataInsufficientPage() {
   const judgementPhotos = Array.isArray(location.state?.photos)
     ? location.state.photos
     : curveInsufficientPhotos
+  const checkInState = location.state?.source === 'checkIn'
+    ? {
+        source: 'checkIn',
+        markerId: location.state?.markerId,
+        scheduledAt: location.state?.scheduledAt,
+      }
+    : undefined
   const {
     totalPassCount,
     yearlyShortfalls,
@@ -72,7 +79,10 @@ function DataInsufficientPage() {
       </BaseCard>
 
       <div className="data-insufficient-page__cta">
-        <ActionButton fullWidth onClick={() => navigate('/photos/years')}>
+        <ActionButton
+          fullWidth
+          onClick={() => navigate('/photos/years', { state: checkInState })}
+        >
           사진 더 추가하기
         </ActionButton>
       </div>

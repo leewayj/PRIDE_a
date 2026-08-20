@@ -16,6 +16,13 @@ function JudgementSummaryPage() {
   const [photos, setPhotos] = useState(routePhotos ?? [])
   const [isLoading, setIsLoading] = useState(routePhotos === null)
   const [hasError, setHasError] = useState(false)
+  const checkInState = location.state?.source === 'checkIn'
+    ? {
+        source: 'checkIn',
+        markerId: location.state?.markerId,
+        scheduledAt: location.state?.scheduledAt,
+      }
+    : {}
 
   useEffect(() => {
     if (routePhotos !== null) return undefined
@@ -47,11 +54,21 @@ function JudgementSummaryPage() {
     navigationStartedRef.current = true
 
     if (eligibility.eligible) {
-      navigate('/curve', { state: { firstAnalysis: location.state?.firstAnalysis === true } })
+      navigate('/curve', {
+        state: {
+          ...checkInState,
+          firstAnalysis: location.state?.firstAnalysis === true,
+        },
+      })
       return
     }
 
-    navigate(DATA_INSUFFICIENT_PATH, { state: { photos } })
+    navigate(DATA_INSUFFICIENT_PATH, {
+      state: {
+        ...checkInState,
+        photos,
+      },
+    })
   }
 
   if (isLoading) {

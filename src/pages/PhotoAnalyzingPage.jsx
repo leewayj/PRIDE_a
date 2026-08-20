@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import usePhotoSelection from '../hooks/usePhotoSelection.js'
 import { navigateAfterJudgement } from '../navigation/judgementNavigation'
 import { analyzePhotos } from '../services/photoAnalysis.js'
@@ -20,6 +20,7 @@ function wait(milliseconds) {
 }
 
 function PhotoAnalyzingPage() {
+  const location = useLocation()
   const navigate = useNavigate()
   const startedRef = useRef(false)
   const {
@@ -40,7 +41,7 @@ function PhotoAnalyzingPage() {
     startedRef.current = true
 
     if (selectedPhotoCount === 0) {
-      navigate('/photos/years', { replace: true })
+      navigate('/photos/years', { replace: true, state: location.state })
       return
     }
 
@@ -75,7 +76,7 @@ function PhotoAnalyzingPage() {
       navigateAfterJudgement(
         (path) => navigate(path, {
           replace: true,
-          state: { firstAnalysis: true, photos: judgementPhotos },
+          state: { ...location.state, firstAnalysis: true, photos: judgementPhotos },
         }),
         judgementPhotos,
       )
@@ -84,9 +85,9 @@ function PhotoAnalyzingPage() {
 
     runAnalysis().catch(() => {
       clearSelectedPhotos()
-      navigate('/photos/years', { replace: true })
+      navigate('/photos/years', { replace: true, state: location.state })
     })
-  }, [clearSelectedPhotos, navigate, photos, saveAnalysisResults, selectedFiles, selectedPhotoCount])
+  }, [clearSelectedPhotos, location.state, navigate, photos, saveAnalysisResults, selectedFiles, selectedPhotoCount])
 
   return (
     <section className="photo-analyzing-page" aria-live="polite">

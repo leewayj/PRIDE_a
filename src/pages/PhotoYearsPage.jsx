@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import PhotoPickerButton from '../components/photos/PhotoPickerButton.jsx'
 import { PHOTO_ANALYSIS_STATUS } from '../constants/photo.js'
 import usePhotoSelection from '../hooks/usePhotoSelection.js'
@@ -15,6 +15,7 @@ function BackIcon() {
 }
 
 function PhotoYearsPage() {
+  const location = useLocation()
   const navigate = useNavigate()
   const { photos } = usePhotoSelection()
   const currentYear = new Date().getFullYear()
@@ -48,7 +49,7 @@ function PhotoYearsPage() {
 
           return (
             <li key={year}>
-              <button type="button" onClick={() => navigate(`/photos/years/${year}`)}>
+              <button type="button" onClick={() => navigate(`/photos/years/${year}`, { state: location.state })}>
                 <span>{year}</span>
                 <span className="photo-years-page__summary">
                   <span className="photo-years-page__count">{count}장</span>
@@ -65,7 +66,7 @@ function PhotoYearsPage() {
       <button
         className="photo-years-page__other"
         type="button"
-        onClick={() => navigate('/photos/other')}
+        onClick={() => navigate('/photos/other', { state: location.state })}
       >
           <span>기타</span>
           <span className={`photo-years-page__other-status${failedPhotoCount > 0 ? ' is-needed' : ''}`}>

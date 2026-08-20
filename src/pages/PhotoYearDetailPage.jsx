@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import DeletePhotoDialog from '../components/photos/DeletePhotoDialog.jsx'
 import PhotoCard, { PhotoPlaceholderIcon } from '../components/photos/PhotoCard.jsx'
 import PhotoPickerButton from '../components/photos/PhotoPickerButton.jsx'
@@ -17,6 +17,7 @@ function BackIcon() {
 }
 
 function PhotoYearDetailPage() {
+  const location = useLocation()
   const navigate = useNavigate()
   const { year: yearParam } = useParams()
   const { photos: allPhotos, removePhoto } = usePhotoSelection()
@@ -29,7 +30,7 @@ function PhotoYearDetailPage() {
   const supportedYears = new Set([...defaultYears, ...groupedPhotos.map((group) => group.year)])
   const isValidYear = /^\d{4}$/.test(yearParam ?? '') && supportedYears.has(year)
 
-  if (!isValidYear) return <Navigate to="/photos/years" replace />
+  if (!isValidYear) return <Navigate to="/photos/years" replace state={location.state} />
 
   const photos = groupedPhotos.find((group) => group.year === year)?.photos ?? []
   const status = getYearPhotoStatus(photos.length)
