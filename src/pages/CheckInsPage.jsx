@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ActionButton from '../components/ui/ActionButton.jsx'
 import BaseCard from '../components/ui/BaseCard.jsx'
@@ -13,6 +13,7 @@ import '../styles/checkin.css'
 
 function CheckInsPage() {
   const navigate = useNavigate()
+  const navigationStartedRef = useRef(false)
   const [careMarkers, setCareMarkers] = useState([])
   const [savedCheckIns, setSavedCheckIns] = useState([])
   const [selectedMarkerId, setSelectedMarkerId] = useState(null)
@@ -61,6 +62,13 @@ function CheckInsPage() {
   const nextCheckInIndex = schedule.findIndex(({ responded }) => !responded)
   const nextCheckIn = nextCheckInIndex >= 0 ? schedule[nextCheckInIndex] : null
   const completedCount = schedule.filter(({ responded }) => responded).length
+  const handleCheckIn = () => {
+    if (!nextCheckIn || navigationStartedRef.current) return
+    navigationStartedRef.current = true
+    navigate('/check-in', {
+      state: { marker: selectedMarker, checkIn: nextCheckIn },
+    })
+  }
 
   return (
     <main className="app-shell check-ins-page">
@@ -145,9 +153,7 @@ function CheckInsPage() {
                 <div className="check-ins-page__actions">
                   <ActionButton
                     fullWidth
-                    onClick={() => navigate('/check-in', {
-                      state: { marker: selectedMarker, checkIn: nextCheckIn },
-                    })}
+                    onClick={handleCheckIn}
                   >
                     체크인 하기
                   </ActionButton>
