@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import ActionButton from '../components/ui/ActionButton.jsx'
 import BaseCard from '../components/ui/BaseCard.jsx'
 import SectionTitle from '../components/ui/SectionTitle.jsx'
@@ -11,11 +11,15 @@ import { curveInsufficientPhotos } from '../mocks/curveInsufficientScenario'
 
 function DataInsufficientPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const judgementPhotos = Array.isArray(location.state?.photos)
+    ? location.state.photos
+    : curveInsufficientPhotos
   const {
     totalPassCount,
     yearlyShortfalls,
     additionalTotalPassPhotosNeeded,
-  } = findCurveEligibilityGap(curveInsufficientPhotos)
+  } = findCurveEligibilityGap(judgementPhotos)
 
   return (
     <section className="data-insufficient-page">

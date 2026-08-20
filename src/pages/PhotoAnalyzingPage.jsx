@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import usePhotoSelection from '../hooks/usePhotoSelection.js'
+import { navigateAfterJudgement } from '../navigation/judgementNavigation'
 import { analyzePhotos } from '../services/photoAnalysis.js'
+import { fetchPhotoJudgement } from '../services/retraceApi'
 
 const MINIMUM_DISPLAY_TIME = 1000
 
@@ -62,10 +64,19 @@ function PhotoAnalyzingPage() {
 
       if (remainingTime > 0) await wait(remainingTime)
 
-      navigate('/photos/years', { replace: true })
+      const judgementPhotos = await fetchPhotoJudgement()
+      navigateAfterJudgement(
+        (path) => navigate(path, {
+          replace: true,
+          state: { firstAnalysis: true, photos: judgementPhotos },
+        }),
+        judgementPhotos,
+      )
     }
 
-    runAnalysis()
+    runAnalysis().catch(() => {
+      navigate('/photos/years', { replace: true })
+    })
   }, [navigate, photos, saveAnalysisResults, selectedFiles, selectedPhotoCount])
 
   return (

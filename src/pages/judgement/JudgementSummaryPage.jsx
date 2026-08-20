@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import ActionButton from '../../components/ui/ActionButton.jsx'
 import BaseCard from '../../components/ui/BaseCard.jsx'
 import SectionTitle from '../../components/ui/SectionTitle.jsx'
@@ -10,11 +10,16 @@ import { summarizeExcludedPhotos } from '../../utils/photoJudgement.js'
 
 function JudgementSummaryPage() {
   const navigate = useNavigate()
-  const [photos, setPhotos] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
+  const location = useLocation()
+  const navigationStartedRef = useRef(false)
+  const routePhotos = Array.isArray(location.state?.photos) ? location.state.photos : null
+  const [photos, setPhotos] = useState(routePhotos ?? [])
+  const [isLoading, setIsLoading] = useState(routePhotos === null)
   const [hasError, setHasError] = useState(false)
 
   useEffect(() => {
+    if (routePhotos !== null) return undefined
+
     let isActive = true
 
     fetchPhotoJudgement()
@@ -31,7 +36,7 @@ function JudgementSummaryPage() {
     return () => {
       isActive = false
     }
-  }, [])
+  }, [routePhotos])
 
   const summary = useMemo(() => {
     const passCount = photos.filter(({ grade }) => grade === 'pass').length
@@ -50,7 +55,15 @@ function JudgementSummaryPage() {
   const eligibility = useMemo(() => evaluateCurveEligibility(photos), [photos])
 
   const handleNext = () => {
-    navigate(eligibility.eligible ? '/curve' : DATA_INSUFFICIENT_PATH)
+    if (navigationStartedRef.current) return
+    navigationStartedRef.current = true
+
+    if (eligibility.eligible) {
+      navigate('/curve', { state: { firstAnalysis: location.state?.firstAnalysis === true } })
+      return
+    }
+
+    navigate(DATA_INSUFFICIENT_PATH, { state: { photos } })
   }
 
   if (isLoading) {
