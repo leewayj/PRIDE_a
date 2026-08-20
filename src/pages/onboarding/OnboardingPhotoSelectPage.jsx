@@ -98,8 +98,8 @@ function OnboardingPhotoSelectPage() {
 
     try {
       const userId = await getOrCreateUserId()
-      const evaluationResult = await evaluatePhotosBatch(userId, files)
       const registerResult = await registerFace(userId, files)
+      const evaluationResult = await evaluatePhotosBatch(userId, files)
 
       if (isMountedRef.current) {
         navigate('/onboarding/result', {
