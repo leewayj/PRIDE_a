@@ -10,8 +10,9 @@ import CompareTimePointsPage from '../pages/curve/CompareTimePointsPage.jsx'
 import CareMarkersPage from '../pages/careMarkers/CareMarkersPage.jsx'
 import CareEffectivenessPage from '../pages/careMarkers/CareEffectivenessPage.jsx'
 import CheckInsPage from '../pages/CheckInsPage.jsx'
-import ReMeasurementPage from '../pages/ReMeasurementPage.jsx'
+import DataInsufficientPage from '../pages/DataInsufficientPage.jsx'
 import SettingsPage from '../pages/SettingsPage.jsx'
+import PhotosLayout from '../layouts/PhotosLayout.jsx'
 
 /**
  * 유저플로우 문서의 화면 노드 중 아직 실제 화면이 없는 라우트 골격.
@@ -44,8 +45,10 @@ const retraceRoutes = (
     {/* 체크인 (기존 /check-in 화면과는 별개 노드) */}
     <Route path="/check-ins" element={<CheckInsPage />} />
 
-    {/* 재측정권유 */}
-    <Route path="/re-measurement" element={<ReMeasurementPage />} />
+    {/* 데이터 부족 안내 (기존 분기 경로 유지) */}
+    <Route element={<PhotosLayout />}>
+      <Route path="/re-measurement" element={<DataInsufficientPage />} />
+    </Route>
 
     {/* 설정 */}
     <Route path="/settings" element={<SettingsPage />} />

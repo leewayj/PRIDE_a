@@ -10,13 +10,151 @@
 .photo-years-page,
 .photo-analyzing-page,
 .photo-year-detail,
-.photo-status-page {
+.photo-status-page,
+.data-insufficient-page {
   display: flex;
   width: 100%;
   min-width: 0;
   min-height: calc(100dvh - 72px - env(safe-area-inset-bottom));
   padding: max(18px, env(safe-area-inset-top)) var(--photos-gutter) 24px;
   flex-direction: column;
+}
+
+.data-insufficient-page {
+  gap: 16px;
+}
+
+.data-insufficient-page__header {
+  padding: 20px 2px 8px;
+}
+
+.data-insufficient-page__eyebrow {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--rose-900);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.data-insufficient-page__header h1 {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: 26px;
+  line-height: 1.4;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.data-insufficient-page__header p {
+  margin: 14px 0 0;
+  color: #746b66;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.data-insufficient-page__summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 12px;
+}
+
+.data-insufficient-page__summary > div {
+  min-width: 0;
+}
+
+.data-insufficient-page__summary span {
+  display: block;
+  color: #746b66;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.data-insufficient-page__summary strong {
+  display: block;
+  margin-top: 7px;
+  color: var(--ink-900);
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.data-insufficient-page__summary .data-insufficient-page__remaining {
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
+  grid-column: 1 / -1;
+}
+
+.data-insufficient-page__remaining strong {
+  color: #91501f;
+  font-size: 20px;
+}
+
+.data-insufficient-page__yearly ul {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.data-insufficient-page__yearly li {
+  display: flex;
+  min-width: 0;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-soft);
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.data-insufficient-page__yearly li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.data-insufficient-page__yearly li > div {
+  min-width: 0;
+}
+
+.data-insufficient-page__yearly li strong,
+.data-insufficient-page__yearly li span {
+  display: block;
+}
+
+.data-insufficient-page__yearly li strong {
+  font-size: 15px;
+}
+
+.data-insufficient-page__yearly li > div span,
+.data-insufficient-page__yearly-complete {
+  margin-top: 5px;
+  color: #746b66;
+  font-size: 12px;
+}
+
+.data-insufficient-page__yearly .data-insufficient-page__badge {
+  flex-shrink: 0;
+  padding: 6px 9px;
+  border-radius: 999px;
+  color: #91501f;
+  background: #f6e3cb;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.data-insufficient-page__yearly-complete {
+  line-height: 1.6;
+}
+
+.data-insufficient-page__cta {
+  margin-top: auto;
+  padding-top: 8px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+.data-insufficient-page__cta .action-button {
+  min-height: 54px;
+  border-radius: 14px;
+  font-size: 16px;
 }
 
 .photo-status-page {

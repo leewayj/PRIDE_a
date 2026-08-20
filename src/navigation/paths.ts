@@ -7,7 +7,7 @@
 /** 판정결과요약 */
 export const JUDGEMENT_SUMMARY_PATH = '/judgement/summary'
 
-/** 데이터부족안내 — 별도 화면이 없어 "재측정권유" placeholder를 재사용한다 */
+/** 데이터부족안내 — 기존 분기 경로를 유지한다 */
 export const DATA_INSUFFICIENT_PATH = '/re-measurement'
 
 /** 재선택 화면 — 별도 화면이 없어 "사진업로드" placeholder를 재사용한다 */
