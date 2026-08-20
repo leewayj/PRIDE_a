@@ -932,6 +932,12 @@
 
 .photo-analyzing-page__actions { display: grid; width: 100%; gap: 9px; margin-top: 18px; }
 .photo-analyzing-page__result-counts { display: flex; justify-content: center; gap: 16px; color: #746b66; font-size: 12px; font-weight: 700; }
+.photo-analyzing-page__date-list { display: grid; width: 100%; gap: 12px; margin-top: 18px; text-align: left; }
+.photo-analyzing-page__date-list label { display: grid; gap: 7px; padding: 14px; border: 1px solid var(--border-soft); border-radius: 14px; background: var(--surface); }
+.photo-analyzing-page__date-list strong { overflow-wrap: anywhere; font-size: 13px; }
+.photo-analyzing-page__date-list span { color: #746b66; font-size: 12px; }
+.photo-analyzing-page__date-list input { min-height: 42px; padding: 8px 10px; border: 1px solid var(--border-soft); border-radius: 10px; color: var(--ink-900); background: #fff; }
+.photo-analyzing-page__date-list small { color: var(--alert); line-height: 1.45; }
 .photo-status-page__upload-issues { margin-top: 12px; padding: 18px; }
 .photo-status-page__upload-issues h2 { margin: 0; font-size: 16px; }
 .photo-status-page__upload-issues ul { display: grid; gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }

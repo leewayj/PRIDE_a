@@ -1,10 +1,23 @@
-function parseIndicatorResult(value) {
+export function parseIndicatorResult(value) {
   if (typeof value !== 'string') return value
   try {
     return JSON.parse(value)
   } catch {
     throw new Error('indicatorResult is not valid JSON')
   }
+}
+
+export function isMissingExifResult(result) {
+  return Boolean(
+    result?.status === 'skipped' &&
+    result?.captured_at == null &&
+    typeof result?.reason === 'string' &&
+    result.reason.includes('촬영일(EXIF)'),
+  )
+}
+
+export function isSinglePhotoExtractionSuccess(result) {
+  return result.total_count === 1 && result.succeeded_count === 1 && result.skipped_count === 0 && result.failed_count === 0
 }
 
 export function validateIndicatorExtraction(response) {
