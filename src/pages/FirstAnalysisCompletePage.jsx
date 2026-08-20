@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import BaseCard from '../components/ui/BaseCard.jsx'
-import { CHECK_IN_PATH, JUDGEMENT_SUMMARY_PATH } from '../navigation/paths'
+import { CHECK_IN_PATH } from '../navigation/paths'
 
 const HUB_ACTIONS = [
   {
     title: '분석 결과 보기',
     description: '통과한 사진과 제외 사유를 확인해요.',
-    path: JUDGEMENT_SUMMARY_PATH,
+    path: '/curve',
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M4 19V9M10 19V5M16 19v-7M22 19H2" />

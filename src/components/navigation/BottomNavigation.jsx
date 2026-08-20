@@ -1,7 +1,9 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import '../../styles/navigation.css'
 
 function BottomNavigation() {
+  const location = useLocation()
+  const isCurveRoute = location.pathname === '/curve' || location.pathname.startsWith('/curve/')
   return (
     <nav className="bottom-navigation" aria-label="주요 메뉴">
       <NavLink
@@ -45,7 +47,7 @@ function BottomNavigation() {
 
       <NavLink
         className={({ isActive }) =>
-          `bottom-navigation__item${isActive ? ' is-active' : ''}`
+          `bottom-navigation__item${isActive || isCurveRoute ? ' is-active' : ''}`
         }
         to="/changes"
       >

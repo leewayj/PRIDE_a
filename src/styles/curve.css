@@ -1,0 +1,183 @@
+.metric-curve-page {
+  min-width: 0;
+  padding: max(24px, env(safe-area-inset-top)) 20px 28px;
+  overflow-x: clip;
+  background: #fbede8;
+}
+
+.metric-curve-page__header {
+  padding: 18px 2px 24px;
+}
+
+.metric-curve-page__header > span,
+.metric-curve-page__chart-header > div > span {
+  color: var(--rose-900);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.metric-curve-page__header h1 {
+  margin: 10px 0 0;
+  font-size: 26px;
+  line-height: 1.4;
+  letter-spacing: -0.035em;
+}
+
+.metric-curve-page__summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 12px;
+}
+
+.metric-curve-page__summary span {
+  display: block;
+  color: #746b66;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.metric-curve-page__summary strong {
+  display: block;
+  margin-top: 7px;
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.metric-curve-page__summary .metric-curve-page__current {
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
+  grid-column: 1 / -1;
+}
+
+.metric-curve-page__current strong {
+  color: var(--rose-900);
+  font-size: 32px;
+}
+
+.metric-curve-page__chart-card {
+  margin-top: 14px;
+  padding: 20px 14px 12px;
+}
+
+.metric-curve-page__chart-header {
+  display: flex;
+  padding: 0 6px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.metric-curve-page__chart-header h2 {
+  margin: 4px 0 0;
+  font-size: 19px;
+}
+
+.metric-curve-page__chart-header > span {
+  color: #9b928c;
+  font-size: 11px;
+}
+
+.metric-curve-chart {
+  width: 100%;
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.metric-curve-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.metric-curve-chart__grid-line {
+  stroke: var(--border-soft);
+  stroke-width: 1;
+}
+
+.metric-curve-chart__line {
+  fill: none;
+  stroke: var(--rose-900);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+}
+
+.metric-curve-chart__point {
+  fill: var(--surface);
+  stroke: var(--rose-900);
+  stroke-width: 2;
+}
+
+.metric-curve-chart__year {
+  fill: #817873;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.metric-curve-chart__empty,
+.metric-curve-page__loading {
+  display: flex;
+  min-height: 190px;
+  padding: 28px 18px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  color: #746b66;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.metric-curve-chart__empty strong {
+  color: var(--ink-900);
+  font-size: 15px;
+}
+
+.metric-curve-chart__empty p {
+  margin: 8px 0 0;
+}
+
+.metric-curve-page__description {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 13px;
+  color: #91501f;
+  background: #f4d8ce;
+}
+
+.metric-curve-page__description strong {
+  font-size: 13px;
+}
+
+.metric-curve-page__description p {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.metric-curve-page__actions {
+  display: grid;
+  margin-top: 18px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+  gap: 10px;
+}
+
+.metric-curve-page__actions .action-button {
+  min-height: 54px;
+  border-radius: 14px;
+}
+
+@media (max-width: 370px) {
+  .metric-curve-page {
+    padding-inline: 18px;
+  }
+
+  .metric-curve-page__header h1 {
+    font-size: 23px;
+  }
+
+  .metric-curve-page__chart-card {
+    padding-inline: 10px;
+  }
+}
