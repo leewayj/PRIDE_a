@@ -10,7 +10,7 @@ function timelinePosition(date, startTime, timeRange) {
   return Math.min(100, Math.max(0, ((timestamp - startTime) / timeRange) * 100))
 }
 
-function PhotoPreview({ photo }) {
+export function PhotoPreview({ photo }) {
   const [previewUrl] = useState(() => photo.file ? URL.createObjectURL(photo.file) : '')
   const [hasImageError, setHasImageError] = useState(false)
 
@@ -95,7 +95,7 @@ function PhotoTimeline({ photos, careMarkers, selectedPhotoId, onSelectPhoto, on
         </div>
       </BaseCard>
 
-      <ActionButton fullWidth onClick={onCompare}>두 사진 비교하기</ActionButton>
+      <ActionButton fullWidth onClick={() => onCompare(selectedPhoto.id)}>두 사진 비교하기</ActionButton>
     </section>
   )
 }

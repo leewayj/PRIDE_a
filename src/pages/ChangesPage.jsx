@@ -175,7 +175,7 @@ function ChangesPage() {
             careMarkers={careMarkers}
             selectedPhotoId={activeTimelinePhotoId}
             onSelectPhoto={setSelectedPhotoId}
-            onCompare={() => navigate('/curve/compare')}
+            onCompare={(timelinePhotoId) => navigate('/curve/compare', { state: { timelinePhotoId } })}
             onUpload={() => navigate('/photos/upload')}
           />
           <CareRecords
