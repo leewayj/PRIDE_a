@@ -1,6 +1,9 @@
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { acknowledgeOnboarding } from '../../api/onboardingApi.js'
 import ActionButton from '../../components/ui/ActionButton.jsx'
 import '../../styles/onboarding.css'
+import { getOrCreateUserId } from '../../utils/userSession.js'
 
 const metrics = [
   { label: '눈썹 높이', value: '1.8', unit: 'mm' },
@@ -53,6 +56,47 @@ function ExampleCompareCard() {
 
 function OnboardingGuidePage() {
   const navigate = useNavigate()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const isSubmittingRef = useRef(false)
+  const isMountedRef = useRef(true)
+
+  useEffect(() => {
+    isMountedRef.current = true
+
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
+
+  async function handleConfirm() {
+    if (isSubmitting || isSubmittingRef.current) {
+      return
+    }
+
+    isSubmittingRef.current = true
+    setIsSubmitting(true)
+    setError('')
+
+    try {
+      const userId = await getOrCreateUserId()
+      await acknowledgeOnboarding(userId)
+
+      if (isMountedRef.current) {
+        navigate('/onboarding/photos')
+      }
+    } catch (requestError) {
+      console.error('온보딩 고지 확인에 실패했습니다.', requestError)
+      if (isMountedRef.current) {
+        setError('잠시 후 다시 시도해 주세요.')
+      }
+    } finally {
+      isSubmittingRef.current = false
+      if (isMountedRef.current) {
+        setIsSubmitting(false)
+      }
+    }
+  }
 
   return (
     <section className="photo-compare-guide">
@@ -80,8 +124,14 @@ function OnboardingGuidePage() {
       </aside>
 
       <div className="photo-compare-guide__cta">
-        <ActionButton fullWidth className="photo-compare-guide__button" onClick={() => navigate('/onboarding/photos')}>
-          확인했어요
+        {error && <p className="photo-compare-guide__error" role="alert">{error}</p>}
+        <ActionButton
+          fullWidth
+          className="photo-compare-guide__button"
+          disabled={isSubmitting}
+          onClick={handleConfirm}
+        >
+          {isSubmitting ? '처리 중...' : '확인했어요'}
         </ActionButton>
       </div>
     </section>

@@ -730,6 +730,13 @@
   padding-top: 28px;
 }
 
+.photo-compare-guide__error {
+  margin: 0 0 10px;
+  color: #a34235;
+  font-size: 13px;
+  text-align: center;
+}
+
 .photo-compare-guide__button {
   min-height: 56px;
   border-radius: var(--onboarding-radius-button);
