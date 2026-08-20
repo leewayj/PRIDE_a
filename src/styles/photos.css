@@ -989,6 +989,12 @@
   letter-spacing: -0.03em;
 }
 
+.photo-status-page__total-description {
+  margin: 10px 0 0;
+  color: #746b66;
+  font-size: 12px;
+}
+
 .photo-status-page__breakdown-bar {
   display: flex;
   height: 14px;
@@ -1052,29 +1058,21 @@
 }
 
 .photo-status-page__chart {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   align-items: flex-end;
   height: 140px;
   margin-top: 14px;
-  gap: 10px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.photo-status-page__chart::-webkit-scrollbar {
-  display: none;
+  gap: clamp(4px, 1.8vw, 10px);
 }
 
 .photo-status-page__bar {
-  display: flex;
-  min-width: 34px;
+  display: grid;
+  min-width: 0;
   height: 100%;
-  flex: 1 0 auto;
-  flex-direction: column;
+  grid-template-rows: 16px minmax(0, 1fr) 16px;
   align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
+  gap: 4px;
 }
 
 .photo-status-page__bar-count {
@@ -1086,14 +1084,15 @@
 .photo-status-page__bar-fill {
   width: 100%;
   min-height: 6px;
+  align-self: end;
   border-radius: 7px 7px 3px 3px;
   background: var(--rose-900);
   transition: height 180ms ease;
 }
 
-.photo-status-page__bar-fill.is-low {
-  border: 1.5px solid #91501f;
-  background: #f6e3cb;
+.photo-status-page__bar-fill.is-minimum {
+  border: 1.5px dashed var(--rose-900);
+  background: transparent;
 }
 
 .photo-status-page__bar-year {

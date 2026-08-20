@@ -1,26 +1,28 @@
 /**
  * 판정 결과 시나리오 목데이터
- * 업로드 300장 중 통과 46장 / 조건부 54장 / 제외 200장인 사례를 표현한다.
+ * 2019~2026년의 연도별 통과 사진과 조건부/제외 사진이 함께 있는 사례를 표현한다.
  */
 import type { Photo, PhotoGrade } from '../types/photo'
 import { MOCK_DATE_SOURCES, MOCK_REJECTION_REASON_CODES, isoDate, pad } from './shared'
 import { summarizePhotoJudgement } from '../utils/photoJudgement.js'
 
-export const JUDGMENT_RESULT_TOTAL_UPLOADED = 300
-export const JUDGMENT_RESULT_PASS_COUNT = 46
-export const JUDGMENT_RESULT_CONDITIONAL_COUNT = 54
-export const JUDGMENT_RESULT_EXCLUDE_COUNT =
-  JUDGMENT_RESULT_TOTAL_UPLOADED - JUDGMENT_RESULT_PASS_COUNT - JUDGMENT_RESULT_CONDITIONAL_COUNT
+export const JUDGMENT_RESULT_YEARLY_PASS_COUNTS = [
+  { year: 2019, passCount: 14 },
+  { year: 2020, passCount: 12 },
+  { year: 2021, passCount: 3 },
+  { year: 2022, passCount: 18 },
+  { year: 2023, passCount: 21 },
+  { year: 2024, passCount: 15 },
+  { year: 2025, passCount: 19 },
+  { year: 2026, passCount: 17 },
+] as const
 
-const START_YEAR = 2022
-const START_MONTH = 1
-const STEP_DAYS = 5
-
-function gradeAt(index: number): PhotoGrade {
-  if (index < JUDGMENT_RESULT_PASS_COUNT) return 'pass'
-  if (index < JUDGMENT_RESULT_PASS_COUNT + JUDGMENT_RESULT_CONDITIONAL_COUNT) return 'conditional'
-  return 'exclude'
-}
+export const JUDGMENT_RESULT_PASS_COUNT = JUDGMENT_RESULT_YEARLY_PASS_COUNTS
+  .reduce((sum, { passCount }) => sum + passCount, 0)
+export const JUDGMENT_RESULT_CONDITIONAL_COUNT = 38
+export const JUDGMENT_RESULT_EXCLUDE_COUNT = 55
+export const JUDGMENT_RESULT_TOTAL_UPLOADED =
+  JUDGMENT_RESULT_PASS_COUNT + JUDGMENT_RESULT_CONDITIONAL_COUNT + JUDGMENT_RESULT_EXCLUDE_COUNT
 
 function metricsForGrade(
   grade: PhotoGrade,
@@ -58,30 +60,48 @@ function metricsForGrade(
   }
 }
 
-function capturedAtForIndex(index: number): string {
-  const totalDays = index * STEP_DAYS
-  const totalMonths = Math.floor(totalDays / 30)
-  const day = (totalDays % 30) + 1
-  const year = START_YEAR + Math.floor((START_MONTH - 1 + totalMonths) / 12)
-  const month = ((START_MONTH - 1 + totalMonths) % 12) + 1
-  return isoDate(year, month, day)
-}
-
-export const judgmentResultPhotos: Photo[] = Array.from(
-  { length: JUDGMENT_RESULT_TOTAL_UPLOADED },
-  (_, index) => {
-    const grade = gradeAt(index)
+function buildPhotos(grade: PhotoGrade, count: number, startIndex: number): Photo[] {
+  return Array.from({ length: count }, (_, offset) => {
+    const index = startIndex + offset
+    const year = 2019 + (offset % JUDGMENT_RESULT_YEARLY_PASS_COUNTS.length)
 
     return {
       id: `judgment-${pad(index)}`,
       fileName: `IMG_${pad(index)}.jpg`,
-      capturedAt: capturedAtForIndex(index),
+      capturedAt: isoDate(year, (offset % 12) + 1, (offset % 27) + 1),
       dateSource: MOCK_DATE_SOURCES[index % MOCK_DATE_SOURCES.length],
       grade,
       ...metricsForGrade(grade, index),
     }
-  },
-)
+  })
+}
+
+const passPhotos = JUDGMENT_RESULT_YEARLY_PASS_COUNTS.flatMap(({ year, passCount }, yearIndex) => (
+  Array.from({ length: passCount }, (_, offset): Photo => {
+    const index = JUDGMENT_RESULT_YEARLY_PASS_COUNTS
+      .slice(0, yearIndex)
+      .reduce((sum, entry) => sum + entry.passCount, 0) + offset
+
+    return {
+      id: `judgment-${pad(index)}`,
+      fileName: `IMG_${pad(index)}.jpg`,
+      capturedAt: isoDate(year, (offset % 12) + 1, (offset % 27) + 1),
+      dateSource: MOCK_DATE_SOURCES[index % MOCK_DATE_SOURCES.length],
+      grade: 'pass',
+      ...metricsForGrade('pass', index),
+    }
+  })
+))
+
+export const judgmentResultPhotos: Photo[] = [
+  ...passPhotos,
+  ...buildPhotos('conditional', JUDGMENT_RESULT_CONDITIONAL_COUNT, passPhotos.length),
+  ...buildPhotos(
+    'exclude',
+    JUDGMENT_RESULT_EXCLUDE_COUNT,
+    passPhotos.length + JUDGMENT_RESULT_CONDITIONAL_COUNT,
+  ),
+]
 
 const summary = summarizePhotoJudgement(judgmentResultPhotos)
 

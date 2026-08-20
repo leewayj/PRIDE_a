@@ -2,23 +2,27 @@ import { useNavigate } from 'react-router-dom'
 import ActionButton from '../components/ui/ActionButton.jsx'
 import BaseCard from '../components/ui/BaseCard.jsx'
 import SectionTitle from '../components/ui/SectionTitle.jsx'
-import { CURVE_MIN_PASS_PHOTOS_PER_YEAR, evaluateCurveEligibility } from '../domain/curveEligibility'
+import { evaluateCurveEligibility } from '../domain/curveEligibility'
 import { judgmentResultPhotos } from '../mocks/judgmentResultScenario'
 import usePhotoSelection from '../hooks/usePhotoSelection.js'
 import { summarizePhotoJudgement } from '../utils/photoJudgement.js'
 
-function buildNoticeText(yearlyPassCounts) {
-  if (yearlyPassCounts.length === 0) {
-    return '아직 연도별 통과 사진이 없어요. 사진을 업로드해 주세요.'
-  }
+function findMinimumYear(yearlyPassCounts) {
+  if (yearlyPassCounts.length === 0) return null
 
-  const minYearEntry = yearlyPassCounts.reduce(
+  return yearlyPassCounts.reduce(
     (min, entry) => (entry.passCount < min.passCount ? entry : min),
     yearlyPassCounts[0],
   )
+}
 
-  return `${minYearEntry.year}년이 ${minYearEntry.passCount}장으로 최소치입니다. `
-    + `연도당 최소 ${CURVE_MIN_PASS_PHOTOS_PER_YEAR}장이 필요해요.`
+function buildNoticeText(minimumYear) {
+  if (!minimumYear) {
+    return '아직 연도별 통과 사진이 없어요. 사진을 업로드해 주세요.'
+  }
+
+  return `${minimumYear.year}년이 ${minimumYear.passCount}장으로 최소치입니다. `
+    + '그 시기 사진을 더 넣으면 이 구간이 점선에서 실선으로 바뀝니다.'
 }
 
 function PhotoStatusPage() {
@@ -28,12 +32,14 @@ function PhotoStatusPage() {
     passCount: pass,
     conditionalCount: conditional,
     excludeCount: exclude,
+    totalCount: totalUploaded,
   } = summarizePhotoJudgement(judgmentResultPhotos)
   const totalJudged = pass + conditional + exclude || 1
 
   const { yearlyPassCounts } = evaluateCurveEligibility(judgmentResultPhotos)
   const maxYearlyPassCount = Math.max(...yearlyPassCounts.map(({ passCount }) => passCount), 1)
-  const noticeText = buildNoticeText(yearlyPassCounts)
+  const minimumYear = findMinimumYear(yearlyPassCounts)
+  const noticeText = buildNoticeText(minimumYear)
 
   if (photos.length === 0) {
     return (
@@ -74,13 +80,14 @@ function PhotoStatusPage() {
       <BaseCard className="photo-status-page__total">
         <p className="photo-status-page__total-label">그래프에 들어간 사진</p>
         <strong className="photo-status-page__total-value">{pass}장</strong>
+        <p className="photo-status-page__total-description">넣은 사진 {totalUploaded}장 중 비교 가능</p>
       </BaseCard>
 
       <BaseCard className="photo-status-page__breakdown">
         <div
           className="photo-status-page__breakdown-bar"
           role="img"
-          aria-label={`통과 ${pass}장, 조건부 ${conditional}장, 제외 ${exclude}장`}
+          aria-label={`통과 ${pass}장, 참고용 ${conditional}장, 제외 ${exclude}장`}
         >
           <span
             className="photo-status-page__breakdown-segment photo-status-page__breakdown-segment--pass"
@@ -103,7 +110,7 @@ function PhotoStatusPage() {
           </li>
           <li>
             <span className="photo-status-page__legend-dot photo-status-page__legend-dot--conditional" aria-hidden="true" />
-            조건부 {conditional}장
+            참고용 {conditional}장
           </li>
           <li>
             <span className="photo-status-page__legend-dot photo-status-page__legend-dot--exclude" aria-hidden="true" />
@@ -121,16 +128,16 @@ function PhotoStatusPage() {
           <div className="photo-status-page__chart" aria-label="연도별 통과 사진 장수">
             {yearlyPassCounts.map(({ year, passCount }) => {
               const heightPercent = Math.max((passCount / maxYearlyPassCount) * 100, 6)
-              const isLow = passCount < CURVE_MIN_PASS_PHOTOS_PER_YEAR
+              const isMinimum = year === minimumYear?.year
 
               return (
                 <div className="photo-status-page__bar" key={year}>
                   <span className="photo-status-page__bar-count">{passCount}</span>
                   <span
-                    className={`photo-status-page__bar-fill${isLow ? ' is-low' : ''}`}
+                    className={`photo-status-page__bar-fill${isMinimum ? ' is-minimum' : ''}`}
                     style={{ height: `${heightPercent}%` }}
                   />
-                  <span className="photo-status-page__bar-year">{year}</span>
+                  <span className="photo-status-page__bar-year">{String(year).slice(-2)}'</span>
                 </div>
               )
             })}
