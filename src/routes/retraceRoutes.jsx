@@ -29,9 +29,8 @@ const retraceRoutes = (
     {/* 사진업로드 */}
     <Route path="/photo-upload" element={<PhotoUploadPage />} />
 
-    {/* 판정진행 / 판정결과요약 */}
+    {/* 판정진행 */}
     <Route path="/judgement/progress" element={<JudgementProgressPage />} />
-    <Route path="/judgement/summary" element={<JudgementSummaryPage />} />
 
     {/* 변화곡선 / 되감기 / 시점비교 */}
     <Route path="/curve" element={<MetricCurvePage />} />
@@ -45,8 +44,9 @@ const retraceRoutes = (
     {/* 체크인 (기존 /check-in 화면과는 별개 노드) */}
     <Route path="/check-ins" element={<CheckInsPage />} />
 
-    {/* 데이터 부족 안내 (기존 분기 경로 유지) */}
+    {/* 판정 결과 요약 / 데이터 부족 안내 (기존 분기 경로 유지) */}
     <Route element={<PhotosLayout />}>
+      <Route path="/judgement/summary" element={<JudgementSummaryPage />} />
       <Route path="/re-measurement" element={<DataInsufficientPage />} />
     </Route>
 
