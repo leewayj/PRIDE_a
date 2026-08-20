@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import PhotoSelectionProvider from './context/PhotoSelectionProvider.jsx'
 import OnboardingLayout from './layouts/OnboardingLayout.jsx'
@@ -19,8 +20,15 @@ import OnboardingIntroPage from './pages/onboarding/OnboardingIntroPage.jsx'
 import OnboardingPhotoGuidePage from './pages/onboarding/OnboardingPhotoGuidePage.jsx'
 import OnboardingPhotoSelectPage from './pages/onboarding/OnboardingPhotoSelectPage.jsx'
 import retraceRoutes from './routes/retraceRoutes.jsx'
+import { getOrCreateUserId } from './utils/userSession.js'
 
 function App() {
+  useEffect(() => {
+    getOrCreateUserId().catch((error) => {
+      console.error('사용자 ID 초기화에 실패했습니다.', error)
+    })
+  }, [])
+
   return (
     <PhotoSelectionProvider>
       <BrowserRouter>
