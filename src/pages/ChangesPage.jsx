@@ -5,8 +5,11 @@ import CareMarkerBottomSheet from '../components/careMarkers/CareMarkerBottomShe
 import BottomNavigation from '../components/navigation/BottomNavigation.jsx'
 import ActionButton from '../components/ui/ActionButton.jsx'
 import BaseCard from '../components/ui/BaseCard.jsx'
+import PhotoTimeline from '../components/changes/PhotoTimeline.jsx'
 import { fetchCareMarkers, fetchMetricCurve } from '../services/retraceApi'
+import usePhotoSelection from '../hooks/usePhotoSelection.js'
 import { formatPhotoDate } from '../utils/dateFormat.js'
+import { groupPhotosByYear } from '../utils/photoGrouping.js'
 import '../styles/changes.css'
 
 const METRICS = [
@@ -18,6 +21,7 @@ const METRICS = [
 
 function ChangesPage() {
   const navigate = useNavigate()
+  const { photos } = usePhotoSelection()
   const [activeTab, setActiveTab] = useState('curve')
   const [selectedMetric, setSelectedMetric] = useState('jaw-angle')
   const [metricPoints, setMetricPoints] = useState([])
@@ -27,6 +31,7 @@ function ChangesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
   const [isAddSheetOpen, setIsAddSheetOpen] = useState(false)
+  const [selectedPhotoId, setSelectedPhotoId] = useState(null)
 
   useEffect(() => {
     let isActive = true
@@ -78,6 +83,12 @@ function ChangesPage() {
   const interpretationPoint = selectedMarker?.type === 'changePoint'
     ? selectedMarker.item
     : visibleChangePoints[0]
+  const timelinePhotos = useMemo(() => (
+    groupPhotosByYear(photos).flatMap(({ photos: yearPhotos }) => yearPhotos).reverse()
+  ), [photos])
+  const activeTimelinePhotoId = timelinePhotos.some(({ id }) => id === selectedPhotoId)
+    ? selectedPhotoId
+    : timelinePhotos[timelinePhotos.length - 1]?.id ?? null
 
   return (
     <main className="app-shell changes-page">
@@ -159,11 +170,22 @@ function ChangesPage() {
         </section>
       ) : (
         <section className="changes-page__timeline" role="tabpanel">
-          <BaseCard>
-            <div className="changes-page__timeline-icon" aria-hidden="true"><span /><span /><span /></div>
-            <h2>시간의 흐름으로 기록을 모아볼게요.</h2>
-            <p>사진과 관리 기록을 한눈에 볼 수 있도록 준비하고 있어요.</p>
-          </BaseCard>
+          <PhotoTimeline
+            photos={timelinePhotos}
+            careMarkers={careMarkers}
+            selectedPhotoId={activeTimelinePhotoId}
+            onSelectPhoto={setSelectedPhotoId}
+            onCompare={() => navigate('/curve/compare')}
+            onUpload={() => navigate('/photos/upload')}
+          />
+          <CareRecords
+            careMarkers={careMarkers}
+            orderedCareMarkers={orderedCareMarkers}
+            selectedMarker={selectedMarker}
+            onSelectMarker={setSelectedMarker}
+            onAdd={() => setIsAddSheetOpen(true)}
+            isLoading={isLoading}
+          />
         </section>
       )}
 
@@ -178,6 +200,28 @@ function ChangesPage() {
         />
       )}
     </main>
+  )
+}
+
+function CareRecords({ careMarkers, orderedCareMarkers, selectedMarker, onSelectMarker, onAdd, isLoading }) {
+  return (
+    <section className="changes-page__records" aria-labelledby="timeline-care-records-title">
+      <div className="changes-page__section-heading"><h2 id="timeline-care-records-title">관리 기록</h2><span>{careMarkers.length}</span></div>
+      {isLoading ? (
+        <BaseCard className="changes-page__records-empty" aria-live="polite">관리 기록을 불러오고 있어요.</BaseCard>
+      ) : orderedCareMarkers.length > 0 ? (
+        <BaseCard className="changes-page__record-list"><ul>{orderedCareMarkers.map((marker) => (
+          <li className={selectedMarker?.key === `care-${marker.id}` ? 'is-selected' : ''} key={marker.id}>
+            <button type="button" aria-pressed={selectedMarker?.key === `care-${marker.id}`} onClick={() => onSelectMarker((current) => current?.key === `care-${marker.id}` ? null : { type: 'careMarker', key: `care-${marker.id}`, item: marker })}>
+              <span className="changes-page__record-dot" aria-hidden="true" /><span><strong>{marker.kind}</strong><small>{marker.rawText}</small></span><time dateTime={marker.date}>{formatPhotoDate(marker.date)}</time>
+            </button>
+          </li>
+        ))}</ul></BaseCard>
+      ) : (
+        <BaseCard className="changes-page__records-empty"><strong>아직 추가된 관리 기록이 없어요.</strong><p>관리를 기록하면 타임라인에서 함께 확인할 수 있어요.</p></BaseCard>
+      )}
+      <ActionButton fullWidth variant="outline" onClick={onAdd}>+ 기록 추가하기</ActionButton>
+    </section>
   )
 }
 
