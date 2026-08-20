@@ -7,18 +7,18 @@ import {
   CURVE_MIN_TOTAL_PASS_PHOTOS,
   findCurveEligibilityGap,
 } from '../domain/curveEligibility'
-import { curveInsufficientPhotos } from '../mocks/curveInsufficientScenario'
 
 function DataInsufficientPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const judgementPhotos = Array.isArray(location.state?.photos)
     ? location.state.photos
-    : curveInsufficientPhotos
+    : []
   const checkInState = location.state?.source === 'checkIn'
     ? {
         source: 'checkIn',
         markerId: location.state?.markerId,
+        indicator: location.state?.indicator,
         scheduledAt: location.state?.scheduledAt,
       }
     : undefined

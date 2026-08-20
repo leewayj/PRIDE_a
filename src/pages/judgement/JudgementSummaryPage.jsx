@@ -1,11 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { judgeEffect } from '../../api/effectApi.js'
 import ActionButton from '../../components/ui/ActionButton.jsx'
 import BaseCard from '../../components/ui/BaseCard.jsx'
 import SectionTitle from '../../components/ui/SectionTitle.jsx'
 import { evaluateCurveEligibility } from '../../domain/curveEligibility'
+import { mapEffectResult } from '../../domain/markerAnalysis.js'
 import { DATA_INSUFFICIENT_PATH } from '../../navigation/paths'
-import { fetchPhotoJudgement } from '../../services/retraceApi'
+import { getOrCreateUserId } from '../../utils/userSession.js'
 import { summarizePhotoJudgement } from '../../utils/photoJudgement.js'
 
 function JudgementSummaryPage() {
@@ -13,37 +15,46 @@ function JudgementSummaryPage() {
   const location = useLocation()
   const navigationStartedRef = useRef(false)
   const routePhotos = Array.isArray(location.state?.photos) ? location.state.photos : null
-  const [photos, setPhotos] = useState(routePhotos ?? [])
-  const [isLoading, setIsLoading] = useState(routePhotos === null)
-  const [hasError, setHasError] = useState(false)
+  const photos = useMemo(() => routePhotos ?? [], [routePhotos])
+  const markerId = typeof location.state?.markerId === 'string' ? location.state.markerId : ''
+  const indicator = typeof location.state?.indicator === 'string' ? location.state.indicator : ''
+  const [effectResult, setEffectResult] = useState(null)
+  const [isEffectLoading, setIsEffectLoading] = useState(Boolean(markerId && indicator))
+  const [hasEffectError, setHasEffectError] = useState(false)
+  const effectRequestIdRef = useRef(0)
   const checkInState = location.state?.source === 'checkIn'
     ? {
         source: 'checkIn',
         markerId: location.state?.markerId,
+        indicator: location.state?.indicator,
         scheduledAt: location.state?.scheduledAt,
       }
     : {}
 
-  useEffect(() => {
-    if (routePhotos !== null) return undefined
-
-    let isActive = true
-
-    fetchPhotoJudgement()
-      .then((result) => {
-        if (isActive) setPhotos(Array.isArray(result) ? result : [])
-      })
-      .catch(() => {
-        if (isActive) setHasError(true)
-      })
-      .finally(() => {
-        if (isActive) setIsLoading(false)
-      })
-
-    return () => {
-      isActive = false
+  const loadEffect = useCallback(async () => {
+    if (!markerId || !indicator) return
+    const requestId = effectRequestIdRef.current + 1
+    effectRequestIdRef.current = requestId
+    setIsEffectLoading(true)
+    setHasEffectError(false)
+    setEffectResult(null)
+    try {
+      const userId = await getOrCreateUserId()
+      const result = mapEffectResult(await judgeEffect(userId, indicator, markerId), indicator, markerId)
+      if (effectRequestIdRef.current === requestId) setEffectResult(result)
+    } catch (error) {
+      console.error('관리 효과를 확인하지 못했습니다.', error)
+      if (effectRequestIdRef.current === requestId) setHasEffectError(true)
+    } finally {
+      if (effectRequestIdRef.current === requestId) setIsEffectLoading(false)
     }
-  }, [routePhotos])
+  }, [indicator, markerId])
+
+  useEffect(() => {
+    let isActive = true
+    queueMicrotask(() => { if (isActive) loadEffect() })
+    return () => { isActive = false; effectRequestIdRef.current += 1 }
+  }, [loadEffect])
 
   const summary = useMemo(() => summarizePhotoJudgement(photos), [photos])
 
@@ -69,23 +80,6 @@ function JudgementSummaryPage() {
         photos,
       },
     })
-  }
-
-  if (isLoading) {
-    return (
-      <section className="judgement-summary-page judgement-summary-page--center" aria-live="polite">
-        <p>판정 결과를 불러오고 있어요.</p>
-      </section>
-    )
-  }
-
-  if (hasError) {
-    return (
-      <section className="judgement-summary-page judgement-summary-page--center" role="alert">
-        <p>판정 결과를 불러오지 못했어요.</p>
-        <ActionButton onClick={() => navigate('/photos')}>사진 현황으로 돌아가기</ActionButton>
-      </section>
-    )
   }
 
   if (photos.length === 0) {
@@ -141,6 +135,13 @@ function JudgementSummaryPage() {
           <p>제외된 사진이 없어요.</p>
         )}
       </BaseCard>
+
+      {markerId && indicator && (
+        <BaseCard className="judgement-summary-page__reasons">
+          <SectionTitle>관리 효과 판정</SectionTitle>
+          {isEffectLoading ? <p aria-live="polite">관리 효과를 확인하고 있어요.</p> : hasEffectError ? <div role="alert"><p>관리 효과를 확인하지 못했어요.</p><ActionButton onClick={loadEffect}>다시 시도</ActionButton></div> : effectResult ? <><p>{effectResult.verdict === 'pending' ? '효과를 확인하기 위한 기록이 아직 부족해요.' : effectResult.verdict === 'observed' ? '관리 이후 이전 흐름과 다른 변화가 관찰됐어요.' : '현재 기록에서는 이전 흐름과 다른 변화가 관찰되지 않았어요.'}</p>{effectResult.reasons.length > 0 && <ul>{effectResult.reasons.map((reason) => <li key={reason}><span>{reason}</span></li>)}</ul>}</> : null}
+        </BaseCard>
+      )}
 
       <div className="judgement-summary-page__cta">
         <ActionButton fullWidth onClick={handleNext}>

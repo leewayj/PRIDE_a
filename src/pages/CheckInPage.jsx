@@ -92,12 +92,14 @@ function CheckInPage() {
       ?? location.state?.marker?.id
       ?? location.state?.checkIn?.markerId
     const scheduledAt = location.state?.checkIn?.scheduledAt
+    const indicator = location.state?.indicator
 
     navigate('/photos/years', {
       state: {
         source: 'checkIn',
         ...(markerId ? { markerId } : {}),
         ...(scheduledAt ? { scheduledAt } : {}),
+        ...(indicator ? { indicator } : {}),
       },
     })
   }

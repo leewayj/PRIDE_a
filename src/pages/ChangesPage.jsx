@@ -174,9 +174,6 @@ function ChangesPage() {
   const selectedCareMarker = selectedMarker?.type === 'careMarker'
     ? careMarkers.find(({ id }) => `care-${id}` === selectedMarker.key) ?? null
     : null
-  const interpretationPoint = selectedMarker?.type === 'changePoint'
-    ? selectedMarker.item
-    : visibleChangePoints[0]
   return (
     <main className="app-shell changes-page">
       <header className="changes-page__header"><h1>기록</h1></header>
@@ -211,12 +208,12 @@ function ChangesPage() {
             <button className="changes-page__detail-link" type="button" onClick={() => navigate('/curve')}>상세 변화 보기 <span aria-hidden="true">→</span></button>
           </BaseCard>
 
-          {interpretationPoint && (
+          {selectedCareMarker && (
             <BaseCard className="changes-page__interpretation-card">
               <span>변화 해석</span>
               <h2>이 시점의 변화를 자세히 살펴보세요.</h2>
-              <p>{formatPhotoDate(interpretationPoint.date)}에 확인된 실제 변화와 같은 시기의 관리 기록을 함께 볼 수 있어요.</p>
-              <button type="button" onClick={() => navigate('/curve/interpretation', { state: { changePoint: interpretationPoint, careMarkers } })}>
+              <p>{formatPhotoDate(selectedCareMarker.date)} 관리 기록을 기준으로 실제 변화 해석을 확인할 수 있어요.</p>
+              <button type="button" onClick={() => navigate(`/curve/interpretation?markerId=${encodeURIComponent(selectedCareMarker.id)}&indicator=${encodeURIComponent(selectedIndicator.indicator)}`, { state: { careMarker: selectedCareMarker, indicator: selectedIndicator.indicator } })}>
                 변화 해석 보기 <span aria-hidden="true">→</span>
               </button>
             </BaseCard>
