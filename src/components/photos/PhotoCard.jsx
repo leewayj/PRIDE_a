@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { formatPhotoDate } from '../../utils/dateFormat.js'
+import { buildImageDataUrl } from '../../utils/imageFormat.js'
 
 function PhotoPlaceholderIcon() {
   return (
@@ -11,17 +12,18 @@ function PhotoPlaceholderIcon() {
   )
 }
 
-function PhotoPreview({ file, fileName }) {
+function PhotoPreview({ file, fileName, imageBase64 }) {
   const imageRef = useRef(null)
 
   useEffect(() => {
-    if (!file || !imageRef.current) return undefined
+    if (!file || imageBase64 || !imageRef.current) return undefined
 
     const previewUrl = URL.createObjectURL(file)
     imageRef.current.src = previewUrl
     return () => URL.revokeObjectURL(previewUrl)
-  }, [file])
+  }, [file, imageBase64])
 
+  if (imageBase64) return <img src={buildImageDataUrl(imageBase64)} alt={fileName || '등록한 사진'} />
   if (file) return <img ref={imageRef} alt={fileName || '등록한 사진'} />
 
   return (
@@ -36,21 +38,23 @@ function PhotoCard({ photo, file, deleting = false, onDelete }) {
   return (
     <article className="photo-card">
       <div className="photo-card__thumbnail">
-        <PhotoPreview file={file} fileName={photo.fileName} />
-        <button
-          className="photo-card__delete"
-          type="button"
-          aria-label="사진 삭제"
-          disabled={deleting}
-          onClick={(event) => {
-            event.stopPropagation()
-            onDelete(photo)
-          }}
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m8 8 8 8M16 8l-8 8" />
-          </svg>
-        </button>
+        <PhotoPreview file={file} fileName={photo.fileName} imageBase64={photo.imageBase64} />
+        {onDelete && (
+          <button
+            className="photo-card__delete"
+            type="button"
+            aria-label="사진 삭제"
+            disabled={deleting}
+            onClick={(event) => {
+              event.stopPropagation()
+              onDelete(photo)
+            }}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m8 8 8 8M16 8l-8 8" />
+            </svg>
+          </button>
+        )}
       </div>
       <time dateTime={photo.capturedAt ?? undefined}>
         {photo.failureReason ?? formatPhotoDate(photo.capturedAt)}
