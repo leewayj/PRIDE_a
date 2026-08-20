@@ -21,7 +21,7 @@ function BackIcon() {
 function PhotoYearsPage() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { selectedPhotoResults: pendingPhotos } = usePhotoSelection()
+  const { photos: pendingPhotos } = usePhotoSelection()
   const [storedPhotos, setStoredPhotos] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)

@@ -4,11 +4,12 @@ import { createPhotoId, validatePhotoFile } from '../services/photoAnalysis.js'
 
 function PhotoSelectionProvider({ children }) {
   const [selectedFiles, setSelectedFiles] = useState([])
-  const [selectedPhotoResults, setSelectedPhotoResults] = useState([])
+  const [photos, setPhotos] = useState([])
+  const [needsDatePhotos, setNeedsDatePhotos] = useState([])
 
   const queueSelectedPhotos = useCallback((files) => {
     const safeFiles = Array.isArray(files) ? files : []
-    const analyzedIds = new Set(selectedPhotoResults.map(({ id }) => id))
+    const analyzedIds = new Set(photos.map(({ id }) => id))
     const queuedFiles = [
       ...new Map(
         safeFiles
@@ -19,11 +20,11 @@ function PhotoSelectionProvider({ children }) {
 
     setSelectedFiles(queuedFiles)
     return queuedFiles.length
-  }, [selectedPhotoResults])
+  }, [photos])
 
-  const saveSelectedPhotoResults = useCallback((analysisResults) => {
+  const saveAnalysisResults = useCallback((analysisResults) => {
     const safeResults = Array.isArray(analysisResults) ? analysisResults : []
-    setSelectedPhotoResults((currentPhotos) => {
+    setPhotos((currentPhotos) => {
       const knownIds = new Set(currentPhotos.map(({ id }) => id))
       const uniquePhotos = safeResults
         .filter(({ id }) => !knownIds.has(id))
@@ -34,7 +35,6 @@ function PhotoSelectionProvider({ children }) {
 
   const clearSelectedPhotos = useCallback(() => {
     setSelectedFiles([])
-    setSelectedPhotoResults([])
   }, [])
 
   const replaceSelectedPhotos = useCallback((files) => {
@@ -42,22 +42,47 @@ function PhotoSelectionProvider({ children }) {
   }, [])
 
   const removePhoto = useCallback((photoId) => {
-    setSelectedPhotoResults((currentPhotos) => currentPhotos.filter(({ id }) => id !== photoId))
+    setPhotos((currentPhotos) => currentPhotos.filter(({ id }) => id !== photoId))
     setSelectedFiles((files) => files.filter((file) => createPhotoId(file) !== photoId))
+  }, [])
+
+  const updateNeedsDatePhoto = useCallback((key, capturedAt) => {
+    setNeedsDatePhotos((current) => current.map((photo) => (
+      photo.key === key ? { ...photo, capturedAt, retryError: '' } : photo
+    )))
+  }, [])
+
+  const removeNeedsDatePhoto = useCallback((key) => {
+    setNeedsDatePhotos((current) => current.filter((photo) => photo.key !== key))
   }, [])
 
   const value = useMemo(
     () => ({
+      photos,
       clearSelectedPhotos,
       queueSelectedPhotos,
       replaceSelectedPhotos,
       removePhoto,
-      saveSelectedPhotoResults,
+      saveAnalysisResults,
       selectedFiles,
-      selectedPhotoResults,
       selectedPhotoCount: selectedFiles.length,
+      needsDatePhotos,
+      setNeedsDatePhotos,
+      updateNeedsDatePhoto,
+      removeNeedsDatePhoto,
     }),
-    [clearSelectedPhotos, queueSelectedPhotos, removePhoto, replaceSelectedPhotos, saveSelectedPhotoResults, selectedFiles, selectedPhotoResults],
+    [
+      clearSelectedPhotos,
+      photos,
+      queueSelectedPhotos,
+      removePhoto,
+      removeNeedsDatePhoto,
+      replaceSelectedPhotos,
+      saveAnalysisResults,
+      selectedFiles,
+      needsDatePhotos,
+      updateNeedsDatePhoto,
+    ],
   )
 
   return (

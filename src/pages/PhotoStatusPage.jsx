@@ -5,6 +5,7 @@ import ActionButton from '../components/ui/ActionButton.jsx'
 import BaseCard from '../components/ui/BaseCard.jsx'
 import SectionTitle from '../components/ui/SectionTitle.jsx'
 import { mapYearCounts } from '../domain/photoUploadSummary.js'
+import usePhotoSelection from '../hooks/usePhotoSelection.js'
 import { getOrCreateUserId } from '../utils/userSession.js'
 
 function assertCount(value, fieldName) {
@@ -54,6 +55,7 @@ function buildNoticeText(minimumYear) {
 function PhotoStatusPage() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { needsDatePhotos } = usePhotoSelection()
   const uploadIssues = Array.isArray(location.state?.uploadIssues) ? location.state.uploadIssues : []
   const [uploadSummary, setUploadSummary] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -157,6 +159,8 @@ function PhotoStatusPage() {
           <p>사진을 추가하면 시간에 따른 변화 기록을 시작할 수 있어요.</p>
         </BaseCard>
 
+        <NeedsDateNotice count={needsDatePhotos.length} onRetry={() => navigate('/photos/analyzing', { state: location.state })} />
+
         <UploadIssues issues={uploadIssues} />
 
         <div className="photo-status-page__cta">
@@ -180,6 +184,8 @@ function PhotoStatusPage() {
         <strong className="photo-status-page__total-value">{succeededCount}장</strong>
         <p className="photo-status-page__total-description">판정한 사진 {totalUploaded}장 중 처리 완료</p>
       </BaseCard>
+
+      <NeedsDateNotice count={needsDatePhotos.length} onRetry={() => navigate('/photos/analyzing', { state: location.state })} />
 
       <UploadIssues issues={uploadIssues} />
 
@@ -253,6 +259,17 @@ function PhotoStatusPage() {
         </ActionButton>
       </div>
     </section>
+  )
+}
+
+function NeedsDateNotice({ count, onRetry }) {
+  if (count === 0) return null
+  return (
+    <BaseCard className="photo-status-page__upload-issues" role="status">
+      <h2>촬영 날짜 입력이 필요한 사진 {count}장</h2>
+      <p>날짜를 입력해야 곡선/되감기에 반영돼요.</p>
+      <ActionButton fullWidth onClick={onRetry}>지금 입력하기</ActionButton>
+    </BaseCard>
   )
 }
 

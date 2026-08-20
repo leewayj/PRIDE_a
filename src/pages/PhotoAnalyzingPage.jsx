@@ -30,22 +30,34 @@ function waitForNextPaint() {
   return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
 }
 
+// EXIF 촬영일이 없을 때, 파일의 마지막 수정일을 날짜 입력칸의 기본값으로 미리 채워준다.
+// 실제 촬영일과 다를 수 있는 근사치일 뿐이라, 사용자가 알고 있으면 직접 고칠 수 있게 둔다.
+function fallbackDateFromFile(file) {
+  if (!file?.lastModified) return ''
+  const date = new Date(file.lastModified)
+  if (Number.isNaN(date.getTime())) return ''
+  return date.toISOString().slice(0, 10)
+}
+
 function PhotoAnalyzingPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const startedRef = useRef(false)
   const isSubmittingRef = useRef(false)
   const isMountedRef = useRef(true)
-  const { clearSelectedPhotos, replaceSelectedPhotos, saveSelectedPhotoResults, selectedFiles, selectedPhotoCount, selectedPhotoResults } = usePhotoSelection()
-  const [analysisState, setAnalysisState] = useState('selected')
-  const [attemptTotalCount, setAttemptTotalCount] = useState(selectedPhotoCount)
-  const [processedCount, setProcessedCount] = useState(0)
+  const {
+    clearSelectedPhotos, photos, replaceSelectedPhotos, selectedFiles, selectedPhotoCount,
+    needsDatePhotos, setNeedsDatePhotos, updateNeedsDatePhoto,
+  } = usePhotoSelection()
+  const isResumingDateOnly = selectedPhotoCount === 0 && needsDatePhotos.length > 0
+  const [analysisState, setAnalysisState] = useState(() => (isResumingDateOnly ? 'partial-success' : 'selected'))
+  const [attemptTotalCount, setAttemptTotalCount] = useState(() => (isResumingDateOnly ? needsDatePhotos.length : selectedPhotoCount))
+  const [processedCount, setProcessedCount] = useState(() => (isResumingDateOnly ? needsDatePhotos.length : 0))
   const [successCount, setSuccessCount] = useState(0)
-  const [needsDatePhotos, setNeedsDatePhotos] = useState([])
   const [skippedCount, setSkippedCount] = useState(0)
   const [failedCount, setFailedCount] = useState(0)
   const [failedFiles, setFailedFiles] = useState([])
-  const [status, setStatus] = useState('선택한 사진을 확인하고 있어요')
+  const [status, setStatus] = useState(() => (isResumingDateOnly ? '입력하지 않은 촬영 날짜가 남아있어요.' : '선택한 사진을 확인하고 있어요'))
   const [uploadIssues, setUploadIssues] = useState([])
   const progress = attemptTotalCount === 0 ? 0 : Math.round((processedCount / attemptTotalCount) * 100)
   const isAnalyzing = analysisState === 'analyzing'
@@ -76,8 +88,7 @@ function PhotoAnalyzingPage() {
     try {
       setStatus('촬영 날짜와 파일 정보를 확인하고 있어요')
       await waitForNextPaint()
-      const localAnalysis = await analyzePhotos(filesForAttempt, { existingPhotoIds: selectedPhotoResults.map(({ id }) => id) })
-      saveSelectedPhotoResults([...localAnalysis.successfulPhotos, ...localAnalysis.failedPhotos])
+      await analyzePhotos(filesForAttempt, { existingPhotoIds: photos.map(({ id }) => id) })
       if (!isMountedRef.current) return
 
       setStatus('사진을 전송하고 지표를 분석하고 있어요')
@@ -116,7 +127,7 @@ function PhotoAnalyzingPage() {
         matchFilesToResults(batchFiles, result.results).forEach(({ file, result: photoResult }) => {
           if (isMissingExifResult(photoResult) && file) {
             missingInBatch += 1
-            missingDate.push({ file, key: createPhotoId(file), filename: photoResult.filename, reason: photoResult.reason, capturedAt: '', retryError: '' })
+            missingDate.push({ file, key: createPhotoId(file), filename: photoResult.filename, reason: photoResult.reason, capturedAt: fallbackDateFromFile(file), retryError: '' })
           } else if ((photoResult.status === 'failed' || photoResult.status === 'skipped') && file) {
             processingFailures.push(file)
           }
@@ -158,11 +169,7 @@ function PhotoAnalyzingPage() {
     } finally {
       isSubmittingRef.current = false
     }
-  }, [goToStoredPhotos, replaceSelectedPhotos, saveSelectedPhotoResults, selectedFiles, selectedPhotoResults])
-
-  const updateCapturedAt = (key, capturedAt) => {
-    setNeedsDatePhotos((current) => current.map((photo) => photo.key === key ? { ...photo, capturedAt, retryError: '' } : photo))
-  }
+  }, [goToStoredPhotos, photos, replaceSelectedPhotos, selectedFiles, setNeedsDatePhotos])
 
   const retryWithDates = async () => {
     if (isSubmittingRef.current || needsDatePhotos.length === 0 || needsDatePhotos.some(({ capturedAt }) => !DATE_PATTERN.test(capturedAt))) return
@@ -230,16 +237,16 @@ function PhotoAnalyzingPage() {
 
   useEffect(() => {
     isMountedRef.current = true
-    if (selectedPhotoCount === 0 && analysisState !== 'success') {
+    if (selectedPhotoCount === 0 && needsDatePhotos.length === 0 && analysisState !== 'success') {
       navigate('/photos/years', { replace: true, state: location.state })
       return undefined
     }
-    if (!startedRef.current) {
+    if (!startedRef.current && selectedPhotoCount > 0) {
       startedRef.current = true
       queueMicrotask(() => runAnalysis())
     }
     return () => { isMountedRef.current = false }
-  }, [analysisState, location.state, navigate, runAnalysis, selectedPhotoCount])
+  }, [analysisState, location.state, navigate, runAnalysis, selectedPhotoCount, needsDatePhotos.length])
 
   return (
     <section className="photo-analyzing-page" aria-live="polite">
@@ -253,7 +260,14 @@ function PhotoAnalyzingPage() {
         {!isAnalyzing && <div className="photo-analyzing-page__result-counts"><span>성공 {successCount}장</span><span>촬영 날짜 필요 {needsDatePhotos.length}장</span><span>스킵 {skippedCount}장</span><span>실패 {failedCount}장</span></div>}
         <p className="photo-analyzing-page__status">{status}</p>
 
-        {showsDateForm && <div className="photo-analyzing-page__date-list">{needsDatePhotos.map((photo) => <label key={photo.key}><strong>{photo.filename}</strong><span>촬영 날짜</span><input type="date" value={photo.capturedAt} disabled={isDateRetrying} onChange={(event) => updateCapturedAt(photo.key, event.target.value)} />{photo.retryError && <small role="alert">{photo.retryError}</small>}</label>)}</div>}
+        {showsDateForm && (
+          <>
+            <p className="photo-analyzing-page__date-hint">
+              정확한 촬영일을 모르면 대략적인 시기(연/월)만 입력하셔도 곡선에는 큰 영향 없어요.
+            </p>
+            <div className="photo-analyzing-page__date-list">{needsDatePhotos.map((photo) => <label key={photo.key}><strong>{photo.filename}</strong><span>촬영 날짜</span><input type="date" value={photo.capturedAt} disabled={isDateRetrying} onChange={(event) => updateNeedsDatePhoto(photo.key, event.target.value)} />{photo.retryError && <small role="alert">{photo.retryError}</small>}</label>)}</div>
+          </>
+        )}
 
         {(showsDateForm || hasFailure) && <div className="photo-analyzing-page__actions">
           {showsDateForm && <ActionButton fullWidth disabled={isDateRetrying || needsDatePhotos.some(({ capturedAt }) => !DATE_PATTERN.test(capturedAt))} onClick={retryWithDates}>{isDateRetrying ? '다시 분석 중...' : '날짜 입력 후 다시 분석'}</ActionButton>}
