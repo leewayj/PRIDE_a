@@ -5,10 +5,10 @@
  */
 import type { Photo } from '../types/photo'
 import type { MetricPoint } from '../types/metric'
+import { CURVE_MIN_PASS_PHOTOS_PER_YEAR } from '../domain/curveEligibility'
 import { MOCK_DATE_SOURCES, MOCK_METRIC_TYPES, isoDate, pad } from './shared'
 
-/** 곡선 생성에 필요한 연도별 최소 통과 사진 수 (이 값 미만이면 미달) */
-export const CURVE_MIN_PASS_PHOTOS_PER_YEAR = 3
+export { CURVE_MIN_PASS_PHOTOS_PER_YEAR } from '../domain/curveEligibility'
 
 type YearPlan = {
   year: number

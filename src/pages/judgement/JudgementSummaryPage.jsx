@@ -6,7 +6,7 @@ import SectionTitle from '../../components/ui/SectionTitle.jsx'
 import { evaluateCurveEligibility } from '../../domain/curveEligibility'
 import { DATA_INSUFFICIENT_PATH } from '../../navigation/paths'
 import { fetchPhotoJudgement } from '../../services/retraceApi'
-import { summarizeExcludedPhotos } from '../../utils/photoJudgement.js'
+import { summarizePhotoJudgement } from '../../utils/photoJudgement.js'
 
 function JudgementSummaryPage() {
   const navigate = useNavigate()
@@ -38,19 +38,7 @@ function JudgementSummaryPage() {
     }
   }, [routePhotos])
 
-  const summary = useMemo(() => {
-    const passCount = photos.filter(({ grade }) => grade === 'pass').length
-    const conditionalCount = photos.filter(({ grade }) => grade === 'conditional').length
-    const excludeCount = photos.filter(({ grade }) => grade === 'exclude').length
-
-    return {
-      totalCount: photos.length,
-      passCount,
-      conditionalCount,
-      excludeCount,
-      rejectionReasons: summarizeExcludedPhotos(photos),
-    }
-  }, [photos])
+  const summary = useMemo(() => summarizePhotoJudgement(photos), [photos])
 
   const eligibility = useMemo(() => evaluateCurveEligibility(photos), [photos])
 

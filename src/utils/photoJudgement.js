@@ -18,3 +18,20 @@ export function summarizeExcludedPhotos(photos) {
     count,
   }))
 }
+
+export function summarizePhotoJudgement(photos) {
+  const summary = photos.reduce((counts, { grade }) => {
+    if (grade === 'pass') counts.pass += 1
+    if (grade === 'conditional') counts.conditional += 1
+    if (grade === 'exclude') counts.exclude += 1
+    return counts
+  }, { pass: 0, conditional: 0, exclude: 0 })
+
+  return {
+    totalCount: photos.length,
+    passCount: summary.pass,
+    conditionalCount: summary.conditional,
+    excludeCount: summary.exclude,
+    rejectionReasons: summarizeExcludedPhotos(photos),
+  }
+}

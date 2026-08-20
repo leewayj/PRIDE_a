@@ -3,8 +3,9 @@ import ActionButton from '../components/ui/ActionButton.jsx'
 import BaseCard from '../components/ui/BaseCard.jsx'
 import SectionTitle from '../components/ui/SectionTitle.jsx'
 import { CURVE_MIN_PASS_PHOTOS_PER_YEAR, evaluateCurveEligibility } from '../domain/curveEligibility'
-import { judgmentResultPhotos, judgmentResultSummary } from '../mocks/judgmentResultScenario'
+import { judgmentResultPhotos } from '../mocks/judgmentResultScenario'
 import usePhotoSelection from '../hooks/usePhotoSelection.js'
+import { summarizePhotoJudgement } from '../utils/photoJudgement.js'
 
 function buildNoticeText(yearlyPassCounts) {
   if (yearlyPassCounts.length === 0) {
@@ -23,7 +24,11 @@ function buildNoticeText(yearlyPassCounts) {
 function PhotoStatusPage() {
   const navigate = useNavigate()
   const { photos } = usePhotoSelection()
-  const { pass, conditional, exclude } = judgmentResultSummary
+  const {
+    passCount: pass,
+    conditionalCount: conditional,
+    excludeCount: exclude,
+  } = summarizePhotoJudgement(judgmentResultPhotos)
   const totalJudged = pass + conditional + exclude || 1
 
   const { yearlyPassCounts } = evaluateCurveEligibility(judgmentResultPhotos)

@@ -4,6 +4,7 @@
  */
 import type { Photo, PhotoGrade } from '../types/photo'
 import { MOCK_DATE_SOURCES, MOCK_REJECTION_REASON_CODES, isoDate, pad } from './shared'
+import { summarizePhotoJudgement } from '../utils/photoJudgement.js'
 
 export const JUDGMENT_RESULT_TOTAL_UPLOADED = 300
 export const JUDGMENT_RESULT_PASS_COUNT = 46
@@ -82,9 +83,11 @@ export const judgmentResultPhotos: Photo[] = Array.from(
   },
 )
 
+const summary = summarizePhotoJudgement(judgmentResultPhotos)
+
 export const judgmentResultSummary = {
-  totalUploaded: JUDGMENT_RESULT_TOTAL_UPLOADED,
-  pass: JUDGMENT_RESULT_PASS_COUNT,
-  conditional: JUDGMENT_RESULT_CONDITIONAL_COUNT,
-  exclude: JUDGMENT_RESULT_EXCLUDE_COUNT,
+  totalUploaded: summary.totalCount,
+  pass: summary.passCount,
+  conditional: summary.conditionalCount,
+  exclude: summary.excludeCount,
 }
