@@ -23,18 +23,6 @@ function BottomNavigation() {
         className={({ isActive }) =>
           `bottom-navigation__item${isActive ? ' is-active' : ''}`
         }
-        to="/onboarding"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4.5 5.5c2.8-.7 5.3-.1 7.5 1.7v12c-2.2-1.8-4.7-2.4-7.5-1.7zM19.5 5.5c-2.8-.7-5.3-.1-7.5 1.7v12c2.2-1.8 4.7-2.4 7.5-1.7z" />
-        </svg>
-        <span>온보딩</span>
-      </NavLink>
-
-      <NavLink
-        className={({ isActive }) =>
-          `bottom-navigation__item${isActive ? ' is-active' : ''}`
-        }
         to="/photos"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -42,7 +30,7 @@ function BottomNavigation() {
           <circle cx="9" cy="9" r="1.5" />
           <path d="m5.5 17 4.2-4.2 3.1 3 2.2-2.2 3.5 3.4" />
         </svg>
-        <span>사진</span>
+        <span>사진 업로드</span>
       </NavLink>
 
       <NavLink
@@ -58,7 +46,19 @@ function BottomNavigation() {
           <circle cx="12.7" cy="13.7" r="1" />
           <circle cx="18.5" cy="7" r="1" />
         </svg>
-        <span>변화</span>
+        <span>기록</span>
+      </NavLink>
+
+      <NavLink
+        className={({ isActive }) =>
+          `bottom-navigation__item${isActive ? ' is-active' : ''}`
+        }
+        to="/onboarding"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4.5 5.5c2.8-.7 5.3-.1 7.5 1.7v12c-2.2-1.8-4.7-2.4-7.5-1.7zM19.5 5.5c-2.8-.7-5.3-.1-7.5 1.7v12c2.2-1.8 4.7-2.4 7.5-1.7z" />
+        </svg>
+        <span>내 얼굴</span>
       </NavLink>
 
     </nav>

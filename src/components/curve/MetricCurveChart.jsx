@@ -12,6 +12,7 @@ function MetricCurveChart({
   careMarkers = [],
   selectedMarker,
   onSelectMarker,
+  metricLabel = '턱선 각도',
 }) {
   if (points.length === 0) {
     return (
@@ -74,7 +75,7 @@ function MetricCurveChart({
       <svg
         viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
         role="img"
-        aria-label={`${years[0]}년부터 ${years[years.length - 1]}년까지의 턱선 각도 변화곡선`}
+        aria-label={`${years[0]}년부터 ${years[years.length - 1]}년까지의 ${metricLabel} 변화곡선`}
       >
         {[0, 0.5, 1].map((position) => (
           <line
