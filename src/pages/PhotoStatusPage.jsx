@@ -55,7 +55,7 @@ function PhotoStatusPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const uploadIssues = Array.isArray(location.state?.uploadIssues) ? location.state.uploadIssues : []
-  const [summary, setSummary] = useState(null)
+  const [uploadSummary, setUploadSummary] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
   const requestIdRef = useRef(0)
@@ -69,12 +69,12 @@ function PhotoStatusPage() {
     requestIdRef.current = requestId
     setIsLoading(true)
     setHasError(false)
-    setSummary(null)
+    setUploadSummary(null)
 
     try {
       const userId = await getOrCreateUserId()
       const result = validateSummary(await getPhotoUploadSummary(userId))
-      if (requestIdRef.current === requestId) setSummary(result)
+      if (requestIdRef.current === requestId) setUploadSummary(result)
     } catch (error) {
       console.error('사진 업로드 통계를 불러오지 못했습니다.', error)
       if (requestIdRef.current === requestId) setHasError(true)
@@ -110,7 +110,7 @@ function PhotoStatusPage() {
     )
   }
 
-  if (hasError || !summary) {
+  if (hasError || !uploadSummary) {
     return (
       <section className="photo-status-page photo-status-page--empty">
         <header className="photo-status-page__header"><h1>Photo</h1></header>
@@ -123,18 +123,18 @@ function PhotoStatusPage() {
     )
   }
 
-  const pass = summary.gradeCounts.pass ?? 0
-  const conditional = summary.gradeCounts.conditional ?? 0
-  const exclude = summary.gradeCounts.exclude ?? 0
-  const totalUploaded = summary.totalEvaluatedCount
-  const succeededCount = summary.succeededCount
+  const pass = uploadSummary.gradeCounts.pass ?? 0
+  const conditional = uploadSummary.gradeCounts.conditional ?? 0
+  const exclude = uploadSummary.gradeCounts.exclude ?? 0
+  const totalUploaded = uploadSummary.totalEvaluatedCount
+  const succeededCount = uploadSummary.succeededCount
   const totalJudged = pass + conditional + exclude || 1
-  const yearlyCounts = mapYearCounts(summary.yearCounts)
-  const maxYearlyCount = Math.max(...yearlyCounts.map(({ count }) => count), 1)
-  const minimumYear = findMinimumYear(yearlyCounts)
+  const storedYearCounts = mapYearCounts(uploadSummary.yearCounts)
+  const maxYearlyCount = Math.max(...storedYearCounts.map(({ count }) => count), 1)
+  const minimumYear = findMinimumYear(storedYearCounts)
   const noticeText = buildNoticeText(minimumYear)
-  const yearRange = yearlyCounts.length > 0
-    ? `${yearlyCounts[0].year} – ${yearlyCounts[yearlyCounts.length - 1].year}`
+  const yearRange = storedYearCounts.length > 0
+    ? `${storedYearCounts[0].year} – ${storedYearCounts[storedYearCounts.length - 1].year}`
     : '연도 기록 없음'
 
   if (totalUploaded === 0) {
@@ -222,11 +222,11 @@ function PhotoStatusPage() {
       <BaseCard className="photo-status-page__yearly">
         <SectionTitle>연도별 사진</SectionTitle>
 
-        {yearlyCounts.length === 0 ? (
+        {storedYearCounts.length === 0 ? (
           <div className="photo-status-page__empty" role="status"><strong>연도별 사진 0장</strong><p>서버에 집계된 연도별 사진이 없어요.</p></div>
         ) : (
           <div className="photo-status-page__chart" aria-label="연도별 사진 장수">
-            {yearlyCounts.map(({ year, count }) => {
+            {storedYearCounts.map(({ year, count }) => {
               const heightPercent = Math.max((count / maxYearlyCount) * 100, 6)
               const isMinimum = year === minimumYear?.year
 

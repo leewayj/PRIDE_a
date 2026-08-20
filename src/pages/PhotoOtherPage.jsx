@@ -16,10 +16,10 @@ function BackIcon() {
 
 function PhotoOtherPage() {
   const navigate = useNavigate()
-  const { photos, removePhoto } = usePhotoSelection()
+  const { selectedPhotoResults, removePhoto } = usePhotoSelection()
   const [pendingPhoto, setPendingPhoto] = useState(null)
   const [deleting, setDeleting] = useState(false)
-  const failedPhotos = photos.filter(
+  const failedPhotos = selectedPhotoResults.filter(
     ({ analysisStatus }) => analysisStatus === PHOTO_ANALYSIS_STATUS.FAILED,
   )
 

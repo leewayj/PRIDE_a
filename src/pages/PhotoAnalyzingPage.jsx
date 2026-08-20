@@ -36,7 +36,7 @@ function PhotoAnalyzingPage() {
   const startedRef = useRef(false)
   const isSubmittingRef = useRef(false)
   const isMountedRef = useRef(true)
-  const { clearSelectedPhotos, photos, replaceSelectedPhotos, selectedFiles, selectedPhotoCount } = usePhotoSelection()
+  const { clearSelectedPhotos, replaceSelectedPhotos, saveSelectedPhotoResults, selectedFiles, selectedPhotoCount, selectedPhotoResults } = usePhotoSelection()
   const [analysisState, setAnalysisState] = useState('selected')
   const [attemptTotalCount, setAttemptTotalCount] = useState(selectedPhotoCount)
   const [processedCount, setProcessedCount] = useState(0)
@@ -76,7 +76,8 @@ function PhotoAnalyzingPage() {
     try {
       setStatus('촬영 날짜와 파일 정보를 확인하고 있어요')
       await waitForNextPaint()
-      await analyzePhotos(filesForAttempt, { existingPhotoIds: photos.map(({ id }) => id) })
+      const localAnalysis = await analyzePhotos(filesForAttempt, { existingPhotoIds: selectedPhotoResults.map(({ id }) => id) })
+      saveSelectedPhotoResults([...localAnalysis.successfulPhotos, ...localAnalysis.failedPhotos])
       if (!isMountedRef.current) return
 
       setStatus('사진을 전송하고 지표를 분석하고 있어요')
@@ -157,7 +158,7 @@ function PhotoAnalyzingPage() {
     } finally {
       isSubmittingRef.current = false
     }
-  }, [goToStoredPhotos, photos, replaceSelectedPhotos, selectedFiles])
+  }, [goToStoredPhotos, replaceSelectedPhotos, saveSelectedPhotoResults, selectedFiles, selectedPhotoResults])
 
   const updateCapturedAt = (key, capturedAt) => {
     setNeedsDatePhotos((current) => current.map((photo) => photo.key === key ? { ...photo, capturedAt, retryError: '' } : photo))

@@ -4,11 +4,11 @@ import { createPhotoId, validatePhotoFile } from '../services/photoAnalysis.js'
 
 function PhotoSelectionProvider({ children }) {
   const [selectedFiles, setSelectedFiles] = useState([])
-  const [photos, setPhotos] = useState([])
+  const [selectedPhotoResults, setSelectedPhotoResults] = useState([])
 
   const queueSelectedPhotos = useCallback((files) => {
     const safeFiles = Array.isArray(files) ? files : []
-    const analyzedIds = new Set(photos.map(({ id }) => id))
+    const analyzedIds = new Set(selectedPhotoResults.map(({ id }) => id))
     const queuedFiles = [
       ...new Map(
         safeFiles
@@ -19,11 +19,11 @@ function PhotoSelectionProvider({ children }) {
 
     setSelectedFiles(queuedFiles)
     return queuedFiles.length
-  }, [photos])
+  }, [selectedPhotoResults])
 
-  const saveAnalysisResults = useCallback((analysisResults) => {
+  const saveSelectedPhotoResults = useCallback((analysisResults) => {
     const safeResults = Array.isArray(analysisResults) ? analysisResults : []
-    setPhotos((currentPhotos) => {
+    setSelectedPhotoResults((currentPhotos) => {
       const knownIds = new Set(currentPhotos.map(({ id }) => id))
       const uniquePhotos = safeResults
         .filter(({ id }) => !knownIds.has(id))
@@ -34,6 +34,7 @@ function PhotoSelectionProvider({ children }) {
 
   const clearSelectedPhotos = useCallback(() => {
     setSelectedFiles([])
+    setSelectedPhotoResults([])
   }, [])
 
   const replaceSelectedPhotos = useCallback((files) => {
@@ -41,22 +42,22 @@ function PhotoSelectionProvider({ children }) {
   }, [])
 
   const removePhoto = useCallback((photoId) => {
-    setPhotos((currentPhotos) => currentPhotos.filter(({ id }) => id !== photoId))
+    setSelectedPhotoResults((currentPhotos) => currentPhotos.filter(({ id }) => id !== photoId))
     setSelectedFiles((files) => files.filter((file) => createPhotoId(file) !== photoId))
   }, [])
 
   const value = useMemo(
     () => ({
-      photos,
       clearSelectedPhotos,
       queueSelectedPhotos,
       replaceSelectedPhotos,
       removePhoto,
-      saveAnalysisResults,
+      saveSelectedPhotoResults,
       selectedFiles,
+      selectedPhotoResults,
       selectedPhotoCount: selectedFiles.length,
     }),
-    [clearSelectedPhotos, photos, queueSelectedPhotos, removePhoto, replaceSelectedPhotos, saveAnalysisResults, selectedFiles],
+    [clearSelectedPhotos, queueSelectedPhotos, removePhoto, replaceSelectedPhotos, saveSelectedPhotoResults, selectedFiles, selectedPhotoResults],
   )
 
   return (

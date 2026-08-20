@@ -17,14 +17,14 @@ function BackIcon() {
 function PhotoYearsPage() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { photos } = usePhotoSelection()
+  const { selectedPhotoResults } = usePhotoSelection()
   const currentYear = new Date().getFullYear()
   const defaultYears = Array.from({ length: 8 }, (_, index) => currentYear - index)
-  const groupedPhotos = groupPhotosByYear(photos)
-  const photosByYear = new Map(groupedPhotos.map((group) => [group.year, group.photos]))
-  const years = [...new Set([...defaultYears, ...groupedPhotos.map(({ year }) => year)])]
+  const groupedSelectedPhotos = groupPhotosByYear(selectedPhotoResults)
+  const selectedYearCounts = new Map(groupedSelectedPhotos.map((group) => [group.year, group.photos.length]))
+  const years = [...new Set([...defaultYears, ...groupedSelectedPhotos.map(({ year }) => year)])]
     .sort((a, b) => b - a)
-  const failedPhotoCount = photos.filter(
+  const failedPhotoCount = selectedPhotoResults.filter(
     ({ analysisStatus }) => analysisStatus === PHOTO_ANALYSIS_STATUS.FAILED,
   ).length
 
@@ -38,13 +38,13 @@ function PhotoYearsPage() {
       </header>
 
       <div className="photo-years-page__intro">
-        <h1>한 해씩 골라 넣으세요.</h1>
+        <h1>선택한 사진의 연도별 분포</h1>
         <p>한 해에 사진 {YEAR_UPLOAD_MIN_COUNT}장쯤이면 그 해의 그래프가 확실히 생깁니다.</p>
       </div>
 
-      <ul className="photo-years-page__list" aria-label="연도별 사진 현황">
+      <ul className="photo-years-page__list" aria-label="선택한 사진의 연도별 현황">
         {years.map((year) => {
-          const count = photosByYear.get(year)?.length ?? 0
+          const count = selectedYearCounts.get(year) ?? 0
           const status = getYearPhotoStatus(count)
 
           return (
