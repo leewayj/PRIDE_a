@@ -1,16 +1,20 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import ActionButton from '../../components/ui/ActionButton.jsx'
 import BaseCard from '../../components/ui/BaseCard.jsx'
 import BottomNavigation from '../../components/navigation/BottomNavigation.jsx'
 import MetricCurveChart from '../../components/curve/MetricCurveChart.jsx'
 import { formatPhotoDate } from '../../utils/dateFormat.js'
-import { fetchCareMarkers, fetchMetricCurve } from '../../services/retraceApi'
+import { getIndicatorCurve } from '../../api/indicatorApi.js'
+import { fetchCareMarkers } from '../../services/retraceApi'
+import { INDICATOR_OPTIONS, mapIndicatorCurveToChartData } from '../../domain/indicatorCurve.js'
+import { getOrCreateUserId } from '../../utils/userSession.js'
 import { validateInterpretationCardText } from '../../domain/interpretationCardValidation'
 import '../../styles/curve.css'
 
 const CARE_OBSERVATION_TEXT = '관리 기록과 같은 시기의 실제 변화 흐름을 함께 확인할 수 있어요.'
 const CARE_COMPARISON_EMPTY_TEXT = '아직 기존 흐름을 기준으로 한 예측 결과가 준비되지 않았어요.'
+const JAW_ANGLE_OPTION = INDICATOR_OPTIONS.find(({ metricType }) => metricType === 'jaw-angle')
 
 function safeInterpretationText(text) {
   return validateInterpretationCardText(text).hasForbiddenExpression ? '' : text
@@ -26,32 +30,51 @@ function MetricCurvePage() {
   const [selectedMarker, setSelectedMarker] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
+  const [totalCount, setTotalCount] = useState(0)
+  const curveRequestIdRef = useRef(0)
+
+  const loadCurve = useCallback(async () => {
+    const requestId = curveRequestIdRef.current + 1
+    curveRequestIdRef.current = requestId
+    setIsLoading(true)
+    setHasError(false)
+    setMetricPoints([])
+    setChangePoints([])
+    setTotalCount(0)
+    setSelectedMarker(null)
+
+    try {
+      const userId = await getOrCreateUserId()
+      const response = await getIndicatorCurve(userId, JAW_ANGLE_OPTION.indicator)
+      const curve = mapIndicatorCurveToChartData(response, JAW_ANGLE_OPTION)
+      if (curveRequestIdRef.current !== requestId) return
+      setMetricPoints(curve.metricPoints)
+      setChangePoints(curve.changePoints)
+      setTotalCount(curve.totalCount)
+    } catch (error) {
+      console.error('변화 곡선을 불러오지 못했습니다.', error)
+      if (curveRequestIdRef.current === requestId) setHasError(true)
+    } finally {
+      if (curveRequestIdRef.current === requestId) setIsLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
     let isActive = true
 
-    Promise.allSettled([fetchMetricCurve(), fetchCareMarkers()])
-      .then(([curveResponse, markerResponse]) => {
-        if (!isActive) return
-        if (curveResponse.status === 'rejected') {
-          setHasError(true)
-          return
-        }
+    fetchCareMarkers().then((markers) => {
+      if (isActive) setCareMarkers(Array.isArray(markers) ? markers : [])
+    }).catch((error) => console.error('관리 기록을 불러오지 못했습니다.', error))
 
-        const curveResult = curveResponse.value
-        const markerResult = markerResponse.status === 'fulfilled' ? markerResponse.value : []
-        setMetricPoints(Array.isArray(curveResult?.metricPoints) ? curveResult.metricPoints : [])
-        setChangePoints(Array.isArray(curveResult?.changePoints) ? curveResult.changePoints : [])
-        setCareMarkers(Array.isArray(markerResult) ? markerResult : [])
-      })
-      .finally(() => {
-        if (isActive) setIsLoading(false)
-      })
+    queueMicrotask(() => {
+      if (isActive) loadCurve()
+    })
 
     return () => {
       isActive = false
+      curveRequestIdRef.current += 1
     }
-  }, [])
+  }, [loadCurve])
 
   const visiblePoints = useMemo(() => (
     metricPoints
@@ -64,7 +87,7 @@ function MetricCurvePage() {
 
   const firstPoint = visiblePoints[0]
   const currentPoint = visiblePoints[visiblePoints.length - 1]
-  const analyzedPhotoCount = new Set(metricPoints.map(({ photoId }) => photoId)).size
+  const analyzedPhotoCount = totalCount
   const visibleChangePoints = changePoints.filter(({ metricType }) => metricType === 'jaw-angle')
   const periodLabel = firstPoint && currentPoint
     ? `${new Date(firstPoint.capturedAt).getUTCFullYear()} – ${new Date(currentPoint.capturedAt).getUTCFullYear()}`
@@ -106,7 +129,11 @@ function MetricCurvePage() {
         {isLoading ? (
           <div className="metric-curve-page__loading" aria-live="polite">변화 데이터를 불러오고 있어요.</div>
         ) : hasError ? (
-          <div className="metric-curve-page__loading" role="alert">변화 데이터를 불러오지 못했어요.</div>
+          <div className="metric-curve-page__loading" role="alert">
+            <strong>변화 기록을 불러오지 못했어요.</strong>
+            <p>잠시 후 다시 시도해 주세요.</p>
+            <ActionButton onClick={loadCurve}>다시 시도</ActionButton>
+          </div>
         ) : (
           <MetricCurveChart
             points={visiblePoints}

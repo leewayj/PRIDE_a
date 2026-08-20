@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { getPhotos } from '../api/photoApi.js'
+import { getIndicatorCurve } from '../api/indicatorApi.js'
 import MetricCurveChart from '../components/curve/MetricCurveChart.jsx'
 import CareMarkerBottomSheet from '../components/careMarkers/CareMarkerBottomSheet.jsx'
 import DeleteCareMarkerDialog from '../components/careMarkers/DeleteCareMarkerDialog.jsx'
@@ -8,17 +9,11 @@ import BottomNavigation from '../components/navigation/BottomNavigation.jsx'
 import ActionButton from '../components/ui/ActionButton.jsx'
 import BaseCard from '../components/ui/BaseCard.jsx'
 import PhotoTimeline from '../components/changes/PhotoTimeline.jsx'
-import { fetchCareMarkers, fetchMetricCurve } from '../services/retraceApi'
+import { fetchCareMarkers } from '../services/retraceApi'
+import { INDICATOR_OPTIONS, mapIndicatorCurveToChartData } from '../domain/indicatorCurve.js'
 import { formatPhotoDate } from '../utils/dateFormat.js'
 import { getOrCreateUserId } from '../utils/userSession.js'
 import '../styles/changes.css'
-
-const METRICS = [
-  { type: 'face-width', label: '얼굴폭' },
-  { type: 'jaw-angle', label: '턱선 각도' },
-  { type: 'eyelid-height', label: '눈꺼풀 높이' },
-  { type: 'mouth-corner-angle', label: '입가 각도' },
-]
 
 function ChangesPage() {
   const location = useLocation()
@@ -41,6 +36,33 @@ function ChangesPage() {
   const [hasPhotosError, setHasPhotosError] = useState(false)
   const photoRequestIdRef = useRef(0)
   const isPhotoRequestingRef = useRef(false)
+  const curveRequestIdRef = useRef(0)
+
+  const selectedIndicator = INDICATOR_OPTIONS.find(({ metricType }) => metricType === selectedMetric)
+
+  const loadCurve = useCallback(async (option) => {
+    const requestId = curveRequestIdRef.current + 1
+    curveRequestIdRef.current = requestId
+    setIsLoading(true)
+    setHasError(false)
+    setMetricPoints([])
+    setChangePoints([])
+    setSelectedMarker(null)
+
+    try {
+      const userId = await getOrCreateUserId()
+      const response = await getIndicatorCurve(userId, option.indicator)
+      const curve = mapIndicatorCurveToChartData(response, option)
+      if (curveRequestIdRef.current !== requestId) return
+      setMetricPoints(curve.metricPoints)
+      setChangePoints(curve.changePoints)
+    } catch (error) {
+      console.error('변화 곡선을 불러오지 못했습니다.', error)
+      if (curveRequestIdRef.current === requestId) setHasError(true)
+    } finally {
+      if (curveRequestIdRef.current === requestId) setIsLoading(false)
+    }
+  }, [])
 
   const loadStoredPhotos = useCallback(async () => {
     if (isPhotoRequestingRef.current) return
@@ -70,31 +92,26 @@ function ChangesPage() {
   useEffect(() => {
     let isActive = true
 
-    Promise.allSettled([fetchMetricCurve(), fetchCareMarkers()])
-      .then(([curveResponse, markerResponse]) => {
-        if (!isActive) return
-
-        if (curveResponse.status === 'fulfilled') {
-          setMetricPoints(Array.isArray(curveResponse.value?.metricPoints) ? curveResponse.value.metricPoints : [])
-          setChangePoints(Array.isArray(curveResponse.value?.changePoints) ? curveResponse.value.changePoints : [])
-        } else {
-          setHasError(true)
-        }
-
-        setCareMarkers(
-          markerResponse.status === 'fulfilled' && Array.isArray(markerResponse.value)
-            ? markerResponse.value
-            : [],
-        )
-      })
-      .finally(() => {
-        if (isActive) setIsLoading(false)
-      })
+    fetchCareMarkers().then((markers) => {
+      if (isActive) setCareMarkers(Array.isArray(markers) ? markers : [])
+    }).catch((error) => console.error('관리 기록을 불러오지 못했습니다.', error))
 
     return () => {
       isActive = false
     }
   }, [])
+
+  useEffect(() => {
+    let isActive = true
+    queueMicrotask(() => {
+      if (isActive && selectedIndicator) loadCurve(selectedIndicator)
+    })
+
+    return () => {
+      isActive = false
+      curveRequestIdRef.current += 1
+    }
+  }, [loadCurve, selectedIndicator])
 
   useEffect(() => {
     let isActive = true
@@ -126,7 +143,7 @@ function ChangesPage() {
       .sort((first, second) => new Date(second.date) - new Date(first.date))
   ), [careMarkers])
 
-  const metricLabel = METRICS.find(({ type }) => type === selectedMetric)?.label ?? ''
+  const metricLabel = selectedIndicator?.label ?? ''
   const selectedCareMarker = selectedMarker?.type === 'careMarker'
     ? careMarkers.find(({ id }) => `care-${id}` === selectedMarker.key) ?? null
     : null
@@ -147,8 +164,8 @@ function ChangesPage() {
           <div className="changes-page__metric-section">
             <h2>변화 지표</h2>
             <div className="changes-page__metrics" aria-label="변화 지표 선택">
-              {METRICS.map(({ type, label }) => (
-                <button type="button" className={selectedMetric === type ? 'is-active' : ''} aria-pressed={selectedMetric === type} onClick={() => { setSelectedMetric(type); setSelectedMarker(null) }} key={type}>{label}</button>
+              {INDICATOR_OPTIONS.map(({ metricType, label }) => (
+                <button type="button" className={selectedMetric === metricType ? 'is-active' : ''} aria-pressed={selectedMetric === metricType} onClick={() => { setSelectedMetric(metricType); setSelectedMarker(null) }} key={metricType}>{label}</button>
               ))}
             </div>
           </div>
@@ -158,7 +175,9 @@ function ChangesPage() {
             {isLoading ? (
               <div className="changes-page__chart-state" aria-live="polite">변화 데이터를 불러오고 있어요.</div>
             ) : hasError ? (
-              <div className="changes-page__chart-state" role="alert">변화 데이터를 불러오지 못했어요.</div>
+              <div className="changes-page__chart-state" role="alert">
+                <div><strong>변화 기록을 불러오지 못했어요.</strong><p>잠시 후 다시 시도해 주세요.</p><ActionButton onClick={() => loadCurve(selectedIndicator)}>다시 시도</ActionButton></div>
+              </div>
             ) : (
               <MetricCurveChart points={visiblePoints} changePoints={visibleChangePoints} careMarkers={careMarkers} selectedMarker={selectedMarker} metricLabel={metricLabel} onSelectMarker={(marker) => setSelectedMarker((current) => current?.key === marker.key ? null : marker)} />
             )}
