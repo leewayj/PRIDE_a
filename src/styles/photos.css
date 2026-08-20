@@ -12,13 +12,142 @@
 .photo-year-detail,
 .photo-status-page,
 .data-insufficient-page,
-.judgement-summary-page {
+.judgement-summary-page,
+.first-analysis-complete-page {
   display: flex;
   width: 100%;
   min-width: 0;
   min-height: calc(100dvh - 72px - env(safe-area-inset-bottom));
   padding: max(18px, env(safe-area-inset-top)) var(--photos-gutter) 24px;
   flex-direction: column;
+}
+
+.first-analysis-complete-page {
+  gap: 20px;
+}
+
+.first-analysis-complete-page__header {
+  padding: 22px 2px 8px;
+}
+
+.first-analysis-complete-page__icon {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 24px;
+  border-radius: 50%;
+  color: var(--rose-900);
+  background: var(--background-sub);
+  place-items: center;
+}
+
+.first-analysis-complete-page__icon svg {
+  width: 48px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.first-analysis-complete-page__header > span {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--rose-900);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.first-analysis-complete-page__header h1 {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: 26px;
+  line-height: 1.4;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.first-analysis-complete-page__header p {
+  margin: 14px 0 0;
+  color: #746b66;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.first-analysis-complete-page__actions {
+  display: grid;
+  gap: 12px;
+}
+
+.first-analysis-complete-page__card {
+  padding: 0;
+}
+
+.first-analysis-complete-page__card > button {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 92px;
+  padding: 18px;
+  border: 0;
+  align-items: center;
+  gap: 14px;
+  color: var(--ink-900);
+  background: transparent;
+  text-align: left;
+}
+
+.first-analysis-complete-page__card-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border-radius: 13px;
+  color: var(--rose-900);
+  background: var(--background-sub);
+  place-items: center;
+}
+
+.first-analysis-complete-page__card-icon svg {
+  width: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.first-analysis-complete-page__card-copy {
+  display: block;
+  min-width: 0;
+  flex: 1;
+}
+
+.first-analysis-complete-page__card-copy strong,
+.first-analysis-complete-page__card-copy > span {
+  display: block;
+}
+
+.first-analysis-complete-page__card-copy strong {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.first-analysis-complete-page__card-copy > span {
+  margin-top: 5px;
+  color: #746b66;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.first-analysis-complete-page__chevron {
+  width: 20px;
+  flex: 0 0 20px;
+  fill: none;
+  stroke: #9b928c;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
 }
 
 .judgement-summary-page {

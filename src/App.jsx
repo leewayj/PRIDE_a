@@ -6,6 +6,7 @@ import ChangesPage from './pages/ChangesPage.jsx'
 import CheckInPage from './pages/CheckInPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import PhotoAnalyzingPage from './pages/PhotoAnalyzingPage.jsx'
+import FirstAnalysisCompletePage from './pages/FirstAnalysisCompletePage.jsx'
 import PhotoOtherPage from './pages/PhotoOtherPage.jsx'
 import PhotoStatusPage from './pages/PhotoStatusPage.jsx'
 import PhotoYearDetailPage from './pages/PhotoYearDetailPage.jsx'
@@ -30,6 +31,7 @@ function App() {
             <Route index element={<PhotoStatusPage />} />
             <Route path="upload" element={<PhotosPage />} />
             <Route path="analyzing" element={<PhotoAnalyzingPage />} />
+            <Route path="analysis-complete" element={<FirstAnalysisCompletePage />} />
             <Route path="other" element={<PhotoOtherPage />} />
             <Route path="years" element={<PhotoYearsPage />} />
             <Route path="years/:year" element={<PhotoYearDetailPage />} />
