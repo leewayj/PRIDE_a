@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import ActionButton from '../ui/ActionButton.jsx'
 import BaseCard from '../ui/BaseCard.jsx'
 import { formatPhotoDate } from '../../utils/dateFormat.js'
+import { buildImageDataUrl } from '../../utils/imageFormat.js'
 
 function timelinePosition(date, startTime, timeRange) {
   if (timeRange === 0) return 50
@@ -11,16 +12,17 @@ function timelinePosition(date, startTime, timeRange) {
 }
 
 export function PhotoPreview({ photo }) {
-  const [previewUrl] = useState(() => photo.file ? URL.createObjectURL(photo.file) : '')
+  const [objectUrl] = useState(() => (!photo.imageBase64 && photo.file) ? URL.createObjectURL(photo.file) : '')
   const [hasImageError, setHasImageError] = useState(false)
+  const previewUrl = photo.imageBase64 ? buildImageDataUrl(photo.imageBase64) : objectUrl
 
   useEffect(() => () => {
-    if (previewUrl) URL.revokeObjectURL(previewUrl)
-  }, [previewUrl])
+    if (objectUrl) URL.revokeObjectURL(objectUrl)
+  }, [objectUrl])
 
   if (!previewUrl || hasImageError) {
     return (
-      <div className="photo-timeline__preview-fallback" role="img" aria-label={`${photo.fileName} 미리보기 없음`}>
+      <div className="photo-timeline__preview-fallback" role="img" aria-label={`${photo.fileName ?? formatPhotoDate(photo.capturedAt)} 미리보기 없음`}>
         <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="13" width="44" height="38" rx="5" /><circle cx="25" cy="27" r="5" /><path d="m14 45 11-11 8 8 6-6 11 9" /></svg>
         <span>저장된 사진 정보</span>
       </div>
@@ -62,7 +64,7 @@ function PhotoTimeline({ photos, careMarkers, selectedPhotoId, onSelectPhoto, on
       <BaseCard className="photo-timeline__viewer">
         <div className="photo-timeline__date"><span>선택한 시점</span><time dateTime={selectedPhoto.capturedAt}>{formatPhotoDate(selectedPhoto.capturedAt)}</time></div>
         <div className="photo-timeline__preview" key={selectedPhoto.id}><PhotoPreview photo={selectedPhoto} /></div>
-        <p>{selectedPhoto.fileName}</p>
+        {selectedPhoto.fileName && <p>{selectedPhoto.fileName}</p>}
       </BaseCard>
 
       <BaseCard className="photo-timeline__track-card">

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { getPhotos } from '../api/photoApi.js'
 import { getIndicatorCurve } from '../api/indicatorApi.js'
 import { getMarkerList, registerMarker } from '../api/markerApi.js'
+import { validateStoredPhotos } from '../domain/photoStorage.js'
 import MetricCurveChart from '../components/curve/MetricCurveChart.jsx'
 import CareMarkerBottomSheet from '../components/careMarkers/CareMarkerBottomSheet.jsx'
 import BottomNavigation from '../components/navigation/BottomNavigation.jsx'
@@ -31,6 +32,7 @@ function ChangesPage() {
   const [areMarkersLoading, setAreMarkersLoading] = useState(true)
   const [hasMarkersError, setHasMarkersError] = useState(false)
   const [storedPhotos, setStoredPhotos] = useState([])
+  const [selectedStoredPhotoId, setSelectedStoredPhotoId] = useState(null)
   const [arePhotosLoading, setArePhotosLoading] = useState(true)
   const [hasPhotosError, setHasPhotosError] = useState(false)
   const photoRequestIdRef = useRef(0)
@@ -75,8 +77,7 @@ function ChangesPage() {
 
     try {
       const userId = await getOrCreateUserId()
-      const result = await getPhotos(userId)
-      if (!Array.isArray(result)) throw new Error('photos response must be an array')
+      const result = validateStoredPhotos(await getPhotos(userId))
       if (photoRequestIdRef.current === requestId) setStoredPhotos(result)
     } catch (error) {
       console.error('저장된 사진 목록을 불러오지 못했습니다.', error)
@@ -281,10 +282,14 @@ function ChangesPage() {
               onUpload={() => navigate('/photos/upload')}
             />
           ) : (
-            <BaseCard className="photo-timeline__empty">
-              <strong>저장된 사진 {storedPhotos.length}장을 불러왔어요.</strong>
-              <p>사진 항목의 표시 필드가 확인되면 타임라인에서 볼 수 있어요.</p>
-            </BaseCard>
+            <PhotoTimeline
+              photos={storedPhotos}
+              careMarkers={careMarkers}
+              selectedPhotoId={selectedStoredPhotoId ?? storedPhotos[storedPhotos.length - 1]?.id ?? null}
+              onSelectPhoto={setSelectedStoredPhotoId}
+              onCompare={() => navigate('/curve/compare')}
+              onUpload={() => navigate('/photos/upload')}
+            />
           )}
           <CareRecords
             careMarkers={careMarkers}
