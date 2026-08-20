@@ -1,46 +1,45 @@
 import BaseCard from '../ui/BaseCard.jsx'
+import ActionButton from '../ui/ActionButton.jsx'
 
-function ChangeSummaryCard() {
+function ChangeSummaryCard({ summary, status, onRetry }) {
+  if (status === 'loading') {
+    return (
+      <BaseCard className="change-summary-card home-data-state" aria-live="polite">
+        <p>최근 변화 정보를 불러오고 있어요.</p>
+      </BaseCard>
+    )
+  }
+
+  if (status === 'error') {
+    return (
+      <BaseCard className="change-summary-card home-data-state" role="alert">
+        <strong>최근 변화 정보를 불러오지 못했어요.</strong>
+        <p>잠시 후 다시 시도해 주세요.</p>
+        <ActionButton onClick={onRetry}>다시 시도</ActionButton>
+      </BaseCard>
+    )
+  }
+
+  if (!summary?.eligible) {
+    const reasons = summary?.reasons ?? []
+    return (
+      <BaseCard className="change-summary-card home-data-state">
+        <p className="change-summary-card__label">턱선 각도 · 최근 변화</p>
+        <strong>아직 변화 요약을 만들 수 없어요.</strong>
+        {reasons.length > 0 && (
+          <ul>
+            {reasons.map((reason) => <li key={reason}>{reason}</li>)}
+          </ul>
+        )}
+      </BaseCard>
+    )
+  }
+
   return (
-    <BaseCard className="change-summary-card">
-      <p className="change-summary-card__label">
-        턱선 각도 · 홈케어 시작 대비
-      </p>
-      <strong className="change-summary-card__value">+1.5°</strong>
-
-      <div className="change-summary-card__period">
-        <span>홈케어 이후</span>
-        <p>8주 전 130.2° → 오늘 131.7°</p>
-      </div>
-
-      <div className="change-summary-card__chart">
-        <svg viewBox="0 0 320 116" aria-hidden="true">
-          <line
-            className="change-summary-card__start-line"
-            x1="76"
-            y1="24"
-            x2="76"
-            y2="101"
-          />
-          <text className="change-summary-card__start-label" x="82" y="18">
-            관리 시작
-          </text>
-          <path
-            className="change-summary-card__trend-line"
-            d="M14 88 C38 87 57 89 78 86 C108 83 126 85 150 77 C176 68 194 62 218 56 C248 48 271 39 304 29"
-          />
-          <circle
-            className="change-summary-card__end-point"
-            cx="304"
-            cy="29"
-            r="5"
-          />
-        </svg>
-      </div>
-
-      <p className="change-summary-card__note">
-        3주차부터 8주 내내 변화가 지속되고 있습니다
-      </p>
+    <BaseCard className="change-summary-card home-data-state">
+      <p className="change-summary-card__label">턱선 각도 · 최근 변화</p>
+      <strong>변화 요약이 준비되었어요.</strong>
+      <p>기록에서 시간에 따른 변화 흐름을 자세히 확인해 보세요.</p>
     </BaseCard>
   )
 }

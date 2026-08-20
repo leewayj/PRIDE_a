@@ -115,7 +115,7 @@
 
 .home-status-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   margin-top: 8px;
 }
@@ -199,6 +199,17 @@
   white-space: normal;
 }
 
+.management-card__list strong,
+.management-card__list span {
+  display: block;
+}
+
+.management-card__list span {
+  margin-top: 4px;
+  color: #6f6660;
+  font-size: 10px;
+}
+
 .management-card__list li::before {
   content: '●';
   margin-right: 5px;
@@ -222,6 +233,41 @@
 
 .management-card__add::before {
   content: '+ ';
+}
+
+.management-card__state,
+.home-data-state > p {
+  color: #6f6660;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.management-card__state {
+  margin: 10px 0 0;
+}
+
+.management-card__state .action-button,
+.home-data-state .action-button {
+  min-height: 38px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.home-data-state > strong {
+  display: block;
+  margin-top: 12px;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.home-data-state > ul {
+  display: grid;
+  gap: 6px;
+  margin: 14px 0 0;
+  padding-left: 18px;
+  color: #6f6660;
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 .how-it-works {
