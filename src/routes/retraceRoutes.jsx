@@ -15,10 +15,8 @@ import SettingsPage from '../pages/SettingsPage.jsx'
 import PhotosLayout from '../layouts/PhotosLayout.jsx'
 
 /**
- * 유저플로우 문서의 화면 노드 중 아직 실제 화면이 없는 라우트 골격.
- * 각 라우트는 화면 제목만 표시하는 placeholder 컴포넌트로 연결되어 있다.
- * 기존 홈/온보딩/사진/변화 라우트는 건드리지 않고, App.jsx의 <Routes> 안에
- * 이 조각을 그대로 이어 붙이기만 하면 되도록 구성했다.
+ * RETRACE의 추가 사용자 흐름을 App.jsx의 <Routes>에 연결하는 라우트 모음.
+ * 아직 구현 전인 화면은 기존 placeholder 컴포넌트 연결을 유지한다.
  */
 const retraceRoutes = (
   <>
