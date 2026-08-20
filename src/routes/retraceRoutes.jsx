@@ -1,6 +1,4 @@
 import { Route } from 'react-router-dom'
-import BaselineVectorRegistrationPage from '../pages/onboarding/BaselineVectorRegistrationPage.jsx'
-import MeasurementScopeNoticePage from '../pages/onboarding/MeasurementScopeNoticePage.jsx'
 import PhotoUploadPage from '../pages/PhotoUploadPage.jsx'
 import JudgementProgressPage from '../pages/judgement/JudgementProgressPage.jsx'
 import JudgementSummaryPage from '../pages/judgement/JudgementSummaryPage.jsx'
@@ -21,10 +19,6 @@ import PhotosLayout from '../layouts/PhotosLayout.jsx'
  */
 const retraceRoutes = (
   <>
-    {/* 온보딩 - 측정범위고지 / 기준벡터등록 */}
-    <Route path="/onboarding/measurement-scope" element={<MeasurementScopeNoticePage />} />
-    <Route path="/onboarding/baseline-vector" element={<BaselineVectorRegistrationPage />} />
-
     {/* 사진업로드 */}
     <Route path="/photo-upload" element={<PhotoUploadPage />} />
 

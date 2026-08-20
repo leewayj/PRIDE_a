@@ -73,3 +73,14 @@ svg {
 .app-shell:has(> .bottom-navigation) {
   padding-bottom: calc(72px + env(safe-area-inset-bottom));
 }
+/* Protected routes render only this neutral state until server access checks finish. */
+.app-access-state {
+  display: grid;
+  min-height: 100dvh;
+  place-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.app-access-state p { margin: 0; }

@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import AppAccessGuard from './components/routing/AppAccessGuard.jsx'
 import PhotoSelectionProvider from './context/PhotoSelectionProvider.jsx'
 import OnboardingLayout from './layouts/OnboardingLayout.jsx'
 import PhotosLayout from './layouts/PhotosLayout.jsx'
@@ -15,6 +16,8 @@ import PhotosPage from './pages/PhotosPage.jsx'
 import PhotoYearsPage from './pages/PhotoYearsPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import OnboardingCompletePage from './pages/onboarding/OnboardingCompletePage.jsx'
+import BaselineVectorRegistrationPage from './pages/onboarding/BaselineVectorRegistrationPage.jsx'
+import MeasurementScopeNoticePage from './pages/onboarding/MeasurementScopeNoticePage.jsx'
 import OnboardingGuidePage from './pages/onboarding/OnboardingGuidePage.jsx'
 import OnboardingIntroPage from './pages/onboarding/OnboardingIntroPage.jsx'
 import OnboardingPhotoGuidePage from './pages/onboarding/OnboardingPhotoGuidePage.jsx'
@@ -33,19 +36,22 @@ function App() {
     <PhotoSelectionProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/check-in" element={<CheckInPage />} />
-          <Route path="/photos" element={<PhotosLayout />}>
-            <Route index element={<PhotoStatusPage />} />
-            <Route path="upload" element={<PhotosPage />} />
-            <Route path="analyzing" element={<PhotoAnalyzingPage />} />
-            <Route path="analysis-complete" element={<FirstAnalysisCompletePage />} />
-            <Route path="other" element={<PhotoOtherPage />} />
-            <Route path="years" element={<PhotoYearsPage />} />
-            <Route path="years/:year" element={<PhotoYearDetailPage />} />
+          <Route element={<AppAccessGuard />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/check-in" element={<CheckInPage />} />
+            <Route path="/photos" element={<PhotosLayout />}>
+              <Route index element={<PhotoStatusPage />} />
+              <Route path="upload" element={<PhotosPage />} />
+              <Route path="analyzing" element={<PhotoAnalyzingPage />} />
+              <Route path="analysis-complete" element={<FirstAnalysisCompletePage />} />
+              <Route path="other" element={<PhotoOtherPage />} />
+              <Route path="years" element={<PhotoYearsPage />} />
+              <Route path="years/:year" element={<PhotoYearDetailPage />} />
+            </Route>
+            <Route path="/changes" element={<ChangesPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            {retraceRoutes}
           </Route>
-          <Route path="/changes" element={<ChangesPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/onboarding" element={<OnboardingLayout />}>
             <Route index element={<OnboardingIntroPage />} />
             <Route path="guide" element={<OnboardingGuidePage />} />
@@ -54,7 +60,8 @@ function App() {
             <Route path="result" element={<OnboardingCompletePage />} />
             <Route path="complete" element={<OnboardingCompletePage completion />} />
           </Route>
-          {retraceRoutes}
+          <Route path="/onboarding/measurement-scope" element={<MeasurementScopeNoticePage />} />
+          <Route path="/onboarding/baseline-vector" element={<BaselineVectorRegistrationPage />} />
         </Routes>
       </BrowserRouter>
     </PhotoSelectionProvider>
