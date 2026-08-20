@@ -1199,7 +1199,7 @@
 
 /* Figma photo-upload flow alignment */
 .photos-layout {
-  background: #fbede8;
+  background: var(--background-main);
 }
 
 .photos-layout:has(.photo-analyzing-page) {
