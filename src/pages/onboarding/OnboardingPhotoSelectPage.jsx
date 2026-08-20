@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { registerFace } from '../../api/faceApi.js'
 import PhotoRequirements from '../../components/onboarding/PhotoRequirements.jsx'
 import PhotoSlot from '../../components/onboarding/PhotoSlot.jsx'
 import ActionButton from '../../components/ui/ActionButton.jsx'
 import '../../styles/onboarding.css'
+import { getOrCreateUserId } from '../../utils/userSession.js'
 
 function BackIcon() {
   return (
@@ -18,6 +20,8 @@ function OnboardingPhotoSelectPage() {
   const location = useLocation()
   const fileInputRef = useRef(null)
   const selectedPhotosRef = useRef([])
+  const isSubmittingRef = useRef(false)
+  const isMountedRef = useRef(true)
   const [selectedPhotos, setSelectedPhotos] = useState(() => (
     (location.state?.photos ?? []).slice(0, 3).map((file) => ({
       file,
@@ -26,13 +30,19 @@ function OnboardingPhotoSelectPage() {
     }))
   ))
   const [fileError, setFileError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     selectedPhotosRef.current = selectedPhotos
   }, [selectedPhotos])
 
-  useEffect(() => () => {
-    selectedPhotosRef.current.forEach(({ previewUrl }) => URL.revokeObjectURL(previewUrl))
+  useEffect(() => {
+    isMountedRef.current = true
+
+    return () => {
+      isMountedRef.current = false
+      selectedPhotosRef.current.forEach(({ previewUrl }) => URL.revokeObjectURL(previewUrl))
+    }
   }, [])
 
   const openPhotoPicker = () => {
@@ -72,6 +82,38 @@ function OnboardingPhotoSelectPage() {
       return currentPhotos.filter((photo) => photo.id !== id)
     })
     setFileError('')
+  }
+
+  const handleSubmit = async () => {
+    if (isSubmitting || isSubmittingRef.current || selectedPhotos.length !== 3) {
+      return
+    }
+
+    const files = selectedPhotos.map(({ file }) => file)
+    isSubmittingRef.current = true
+    setIsSubmitting(true)
+    setFileError('')
+
+    try {
+      const userId = await getOrCreateUserId()
+      await registerFace(userId, files)
+
+      if (isMountedRef.current) {
+        navigate('/onboarding/result', {
+          state: { photos: files },
+        })
+      }
+    } catch (error) {
+      console.error('얼굴 등록에 실패했습니다.', error)
+      if (isMountedRef.current) {
+        setFileError('사진을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.')
+      }
+    } finally {
+      isSubmittingRef.current = false
+      if (isMountedRef.current) {
+        setIsSubmitting(false)
+      }
+    }
   }
 
   return (
@@ -133,12 +175,10 @@ function OnboardingPhotoSelectPage() {
         <ActionButton
           fullWidth
           className="photo-select-page__button"
-          disabled={selectedPhotos.length !== 3}
-          onClick={() => navigate('/onboarding/result', {
-            state: { photos: selectedPhotos.map(({ file }) => file) },
-          })}
+          disabled={isSubmitting || selectedPhotos.length !== 3}
+          onClick={handleSubmit}
         >
-          다음
+          {isSubmitting ? '사진 확인 중...' : '다음'}
         </ActionButton>
       </div>
     </section>
