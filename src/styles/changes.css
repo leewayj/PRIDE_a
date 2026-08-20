@@ -56,6 +56,129 @@
 .changes-page__timeline h2 { margin: 0; font-size: 18px; line-height: 1.45; }
 .changes-page__timeline p { margin: 8px 0 0; color: #746b66; font-size: 13px; line-height: 1.6; }
 
+.care-marker-sheet__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgb(26 24 22 / 42%);
+}
+
+.care-marker-sheet {
+  width: min(100%, 390px);
+  max-height: min(88dvh, 680px);
+  padding: 10px 20px max(20px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+  border-radius: 24px 24px 0 0;
+  background: var(--surface);
+  box-shadow: 0 -12px 40px rgb(26 24 22 / 20%);
+  overscroll-behavior: contain;
+}
+
+.care-marker-sheet__handle {
+  width: 38px;
+  height: 4px;
+  margin: 0 auto 7px;
+  border-radius: 999px;
+  background: var(--border-soft);
+}
+
+.care-marker-sheet__header {
+  position: relative;
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+}
+
+.care-marker-sheet__header h2 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.care-marker-sheet__header button {
+  position: absolute;
+  right: -5px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  color: #746b66;
+  background: transparent;
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.care-marker-sheet form {
+  display: grid;
+  gap: 18px;
+  padding-top: 12px;
+}
+
+.care-marker-sheet__field {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.care-marker-sheet__field > span {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.care-marker-sheet__field small {
+  margin-left: 4px;
+  color: #9b928c;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.care-marker-sheet__field input,
+.care-marker-sheet__field textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  color: var(--ink-900);
+  background: var(--background-main);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.care-marker-sheet__field input {
+  min-height: 50px;
+  padding: 12px 14px;
+}
+
+.care-marker-sheet__field textarea {
+  min-height: 104px;
+  padding: 13px 14px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.care-marker-sheet__field input:focus,
+.care-marker-sheet__field textarea:focus {
+  border-color: var(--rose-900);
+  box-shadow: 0 0 0 2px rgb(168 112 106 / 12%);
+}
+
+.care-marker-sheet__field input::placeholder,
+.care-marker-sheet__field textarea::placeholder {
+  color: #a49b95;
+}
+
+.care-marker-sheet .action-button {
+  min-height: 54px;
+  margin-top: 2px;
+  border-radius: 14px;
+}
+
 @media (max-width: 370px) {
   .changes-page { padding-inline: 16px; }
   .changes-page__record-list { padding-inline: 14px; }

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MetricCurveChart from '../components/curve/MetricCurveChart.jsx'
+import CareMarkerBottomSheet from '../components/careMarkers/CareMarkerBottomSheet.jsx'
 import BottomNavigation from '../components/navigation/BottomNavigation.jsx'
 import ActionButton from '../components/ui/ActionButton.jsx'
 import BaseCard from '../components/ui/BaseCard.jsx'
@@ -25,6 +26,7 @@ function ChangesPage() {
   const [selectedMarker, setSelectedMarker] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
+  const [isAddSheetOpen, setIsAddSheetOpen] = useState(false)
 
   useEffect(() => {
     let isActive = true
@@ -127,7 +129,7 @@ function ChangesPage() {
             ) : (
               <BaseCard className="changes-page__records-empty"><strong>아직 추가된 관리 기록이 없어요.</strong><p>관리를 기록하면 변화곡선과 함께 확인할 수 있어요.</p></BaseCard>
             )}
-            <ActionButton fullWidth variant="outline" onClick={() => navigate('/care-markers')}>+ 기록 추가하기</ActionButton>
+            <ActionButton fullWidth variant="outline" onClick={() => setIsAddSheetOpen(true)}>+ 기록 추가하기</ActionButton>
           </section>
         </section>
       ) : (
@@ -141,6 +143,15 @@ function ChangesPage() {
       )}
 
       <BottomNavigation />
+      {isAddSheetOpen && (
+        <CareMarkerBottomSheet
+          onClose={() => setIsAddSheetOpen(false)}
+          onSave={(marker) => {
+            setCareMarkers((current) => [...current, marker])
+            setIsAddSheetOpen(false)
+          }}
+        />
+      )}
     </main>
   )
 }
