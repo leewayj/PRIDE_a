@@ -4,7 +4,8 @@ import ActionButton from '../../components/ui/ActionButton.jsx'
 import BaseCard from '../../components/ui/BaseCard.jsx'
 import BottomNavigation from '../../components/navigation/BottomNavigation.jsx'
 import MetricCurveChart from '../../components/curve/MetricCurveChart.jsx'
-import { fetchMetricCurve } from '../../services/retraceApi'
+import { formatPhotoDate } from '../../utils/dateFormat.js'
+import { fetchCareMarkers, fetchMetricCurve } from '../../services/retraceApi'
 import '../../styles/curve.css'
 
 function MetricCurvePage() {
@@ -12,19 +13,28 @@ function MetricCurvePage() {
   const navigate = useNavigate()
   const isFirstAnalysis = location.state?.firstAnalysis === true
   const [metricPoints, setMetricPoints] = useState([])
+  const [changePoints, setChangePoints] = useState([])
+  const [careMarkers, setCareMarkers] = useState([])
+  const [selectedMarker, setSelectedMarker] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
 
   useEffect(() => {
     let isActive = true
 
-    fetchMetricCurve()
-      .then((result) => {
+    Promise.allSettled([fetchMetricCurve(), fetchCareMarkers()])
+      .then(([curveResponse, markerResponse]) => {
         if (!isActive) return
-        setMetricPoints(Array.isArray(result?.metricPoints) ? result.metricPoints : [])
-      })
-      .catch(() => {
-        if (isActive) setHasError(true)
+        if (curveResponse.status === 'rejected') {
+          setHasError(true)
+          return
+        }
+
+        const curveResult = curveResponse.value
+        const markerResult = markerResponse.status === 'fulfilled' ? markerResponse.value : []
+        setMetricPoints(Array.isArray(curveResult?.metricPoints) ? curveResult.metricPoints : [])
+        setChangePoints(Array.isArray(curveResult?.changePoints) ? curveResult.changePoints : [])
+        setCareMarkers(Array.isArray(markerResult) ? markerResult : [])
       })
       .finally(() => {
         if (isActive) setIsLoading(false)
@@ -47,6 +57,7 @@ function MetricCurvePage() {
   const firstPoint = visiblePoints[0]
   const currentPoint = visiblePoints[visiblePoints.length - 1]
   const analyzedPhotoCount = new Set(metricPoints.map(({ photoId }) => photoId)).size
+  const visibleChangePoints = changePoints.filter(({ metricType }) => metricType === 'jaw-angle')
   const periodLabel = firstPoint && currentPoint
     ? `${new Date(firstPoint.capturedAt).getUTCFullYear()} – ${new Date(currentPoint.capturedAt).getUTCFullYear()}`
     : '표시할 기간 없음'
@@ -89,9 +100,37 @@ function MetricCurvePage() {
         ) : hasError ? (
           <div className="metric-curve-page__loading" role="alert">변화 데이터를 불러오지 못했어요.</div>
         ) : (
-          <MetricCurveChart points={visiblePoints} />
+          <MetricCurveChart
+            points={visiblePoints}
+            changePoints={visibleChangePoints}
+            careMarkers={careMarkers}
+            selectedMarker={selectedMarker}
+            onSelectMarker={(marker) => {
+              setSelectedMarker((current) => current?.key === marker.key ? null : marker)
+            }}
+          />
         )}
       </BaseCard>
+
+      {selectedMarker && (
+        <BaseCard className="metric-curve-page__marker-card" aria-live="polite">
+          <div>
+            <span>{selectedMarker.type === 'changePoint' ? '변화 시점' : '관리 기록'}</span>
+            <time dateTime={selectedMarker.item.date}>{formatPhotoDate(selectedMarker.item.date)}</time>
+          </div>
+          {selectedMarker.type === 'changePoint' ? (
+            <>
+              <strong>{selectedMarker.item.direction === 'increase' ? '증가' : '감소'}</strong>
+              <p>변화폭 {selectedMarker.item.magnitude}</p>
+            </>
+          ) : (
+            <>
+              <strong>{selectedMarker.item.kind}</strong>
+              <p>{selectedMarker.item.rawText}</p>
+            </>
+          )}
+        </BaseCard>
+      )}
 
       <aside className="metric-curve-page__description">
         <strong>그래프는 이렇게 읽어보세요</strong>

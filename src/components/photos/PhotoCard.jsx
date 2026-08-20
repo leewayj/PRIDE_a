@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { formatPhotoDate } from '../../utils/dateFormat.js'
 
 function PhotoPlaceholderIcon() {
   return (
@@ -8,17 +9,6 @@ function PhotoPlaceholderIcon() {
       <path d="m10 35 9-9 7 7 5-5 7 7" />
     </svg>
   )
-}
-
-function formatPhotoDate(value) {
-  if (!value) return '촬영 날짜 확인 불가'
-
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return '촬영 날짜 확인 불가'
-
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${date.getFullYear()}. ${month}. ${day}.`
 }
 
 function PhotoPreview({ file, fileName }) {

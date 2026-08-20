@@ -109,6 +109,38 @@
   stroke-width: 2;
 }
 
+.metric-curve-chart__marker {
+  cursor: pointer;
+  outline: none;
+}
+
+.metric-curve-chart__marker-hit {
+  fill: transparent;
+  stroke: none;
+}
+
+.metric-curve-chart__marker--change > path {
+  fill: var(--rose-900);
+  stroke: var(--surface);
+  stroke-width: 1.5;
+}
+
+.metric-curve-chart__marker--care > path {
+  fill: var(--surface);
+  stroke: var(--ink-900);
+  stroke-width: 1.7;
+}
+
+.metric-curve-chart__marker.is-selected > path {
+  stroke: var(--rose-900);
+  stroke-width: 3;
+}
+
+.metric-curve-chart__marker:focus-visible > path {
+  stroke: var(--ink-900);
+  stroke-width: 3;
+}
+
 .metric-curve-chart__year {
   fill: #817873;
   font-size: 10px;
@@ -144,6 +176,44 @@
   border-radius: 13px;
   color: #91501f;
   background: #f4d8ce;
+}
+
+.metric-curve-page__marker-card {
+  min-width: 0;
+  margin-top: 14px;
+  overflow-wrap: anywhere;
+}
+
+.metric-curve-page__marker-card > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.metric-curve-page__marker-card > div span {
+  color: var(--rose-900);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.metric-curve-page__marker-card time {
+  color: #817873;
+  font-size: 11px;
+}
+
+.metric-curve-page__marker-card > strong {
+  display: block;
+  margin-top: 14px;
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.metric-curve-page__marker-card > p {
+  margin: 7px 0 0;
+  color: #746b66;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 .metric-curve-page__description strong {
