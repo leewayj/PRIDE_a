@@ -29,6 +29,11 @@
 .changes-page__chart-heading h2 { margin: 4px 0 0; font-size: 19px; }
 .changes-page__chart-state { display: flex; min-height: 204px; align-items: center; justify-content: center; color: #746b66; font-size: 13px; }
 .changes-page__detail-link { display: flex; width: calc(100% - 12px); margin: 4px 6px 0; padding: 14px 0 4px; border-top: 1px solid var(--border-soft); align-items: center; justify-content: space-between; color: var(--rose-900); font-size: 13px; font-weight: 700; }
+.changes-page__interpretation-card { margin-top: 14px; padding: 20px; background: #f0dfdc; }
+.changes-page__interpretation-card > span { color: var(--rose-900); font-size: 12px; font-weight: 700; }
+.changes-page__interpretation-card h2 { margin: 8px 0 0; font-size: 17px; line-height: 1.45; }
+.changes-page__interpretation-card p { margin: 7px 0 0; color: #746b66; font-size: 12px; line-height: 1.6; }
+.changes-page__interpretation-card button { display: flex; width: 100%; margin-top: 15px; padding: 12px 0 0; border: 0; border-top: 1px solid rgb(168 112 106 / 22%); align-items: center; justify-content: space-between; color: var(--rose-900); background: transparent; font-size: 12px; font-weight: 700; }
 
 .changes-page__records { margin-top: 30px; }
 .changes-page__section-heading { display: flex; align-items: center; gap: 7px; }

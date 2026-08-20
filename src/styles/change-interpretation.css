@@ -1,0 +1,52 @@
+.change-interpretation-page {
+  min-width: 0;
+  padding: max(14px, env(safe-area-inset-top)) 18px 32px;
+  overflow-x: clip;
+  background: var(--background-main);
+}
+
+.change-interpretation-page__header { position: relative; display: flex; min-height: 52px; align-items: center; justify-content: center; }
+.change-interpretation-page__header > button { position: absolute; left: -7px; display: grid; width: 42px; height: 42px; padding: 0; border: 0; place-items: center; color: var(--ink-900); background: transparent; }
+.change-interpretation-page__header svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.change-interpretation-page__header > span { font-size: 15px; font-weight: 700; }
+
+.change-interpretation-page__intro { padding: 26px 2px 22px; }
+.change-interpretation-page__intro > span, .change-interpretation-page__observation > span { color: var(--rose-900); font-size: 12px; font-weight: 700; }
+.change-interpretation-page__intro h1 { margin: 8px 0 0; font-size: 27px; line-height: 1.35; letter-spacing: -0.035em; }
+.change-interpretation-page__intro p { margin: 9px 0 0; color: #746b66; font-size: 13px; line-height: 1.6; }
+
+.change-interpretation-page__chart-card { padding: 20px 14px 12px; }
+.change-interpretation-page__chart-heading { display: flex; padding: 0 6px; align-items: start; justify-content: space-between; gap: 12px; }
+.change-interpretation-page__chart-heading span { color: #746b66; font-size: 11px; font-weight: 600; }
+.change-interpretation-page__chart-heading h2 { margin: 4px 0 0; font-size: 18px; }
+.change-interpretation-page__chart-heading > strong { color: var(--rose-900); font-size: 23px; line-height: 1.25; }
+
+.change-interpretation-page__observation { margin-top: 14px; }
+.change-interpretation-page__observation h2 { margin: 9px 0 0; font-size: 17px; line-height: 1.45; }
+.change-interpretation-page__observation p { margin: 8px 0 0; color: #746b66; font-size: 12px; line-height: 1.6; }
+
+.change-interpretation-page__records { margin-top: 28px; }
+.change-interpretation-page__records > div:first-child { display: flex; align-items: center; gap: 7px; }
+.change-interpretation-page__records h2 { margin: 0; font-size: 18px; line-height: 1.4; }
+.change-interpretation-page__records > div:first-child span { color: var(--rose-900); font-size: 12px; font-weight: 700; }
+.change-interpretation-page__records > p { margin: 8px 0 0; color: #746b66; font-size: 11px; line-height: 1.6; }
+.change-interpretation-page__records ul { display: grid; gap: 9px; margin: 13px 0 0; padding: 0; list-style: none; }
+.change-interpretation-page__records li { min-width: 0; }
+.change-interpretation-page__records .base-card { padding: 17px 18px; }
+.change-interpretation-page__records .base-card > div { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.change-interpretation-page__records strong { font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+.change-interpretation-page__records time { flex-shrink: 0; color: #9b928c; font-size: 10px; line-height: 1.5; }
+.change-interpretation-page__records .base-card > p { margin: 5px 0 0; color: #746b66; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+.change-interpretation-page__records-empty { margin-top: 13px; color: #746b66; font-size: 13px; text-align: center; }
+.change-interpretation-page__cta { min-height: 54px; margin-top: 18px; border-radius: 14px; }
+
+.change-interpretation-page__state { display: grid; min-height: 280px; margin-top: 24px; align-content: center; justify-items: center; gap: 12px; color: #746b66; font-size: 13px; line-height: 1.6; text-align: center; }
+.change-interpretation-page__state strong { color: var(--ink-900); font-size: 16px; }
+.change-interpretation-page__state p { margin: 0; }
+.change-interpretation-page__state .action-button { margin-top: 8px; }
+
+@media (max-width: 370px) {
+  .change-interpretation-page { padding-inline: 16px; }
+  .change-interpretation-page__chart-card { padding-inline: 10px; }
+  .change-interpretation-page__chart-heading > strong { font-size: 21px; }
+}

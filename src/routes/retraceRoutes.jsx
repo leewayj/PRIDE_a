@@ -7,6 +7,7 @@ import JudgementSummaryPage from '../pages/judgement/JudgementSummaryPage.jsx'
 import MetricCurvePage from '../pages/curve/MetricCurvePage.jsx'
 import RewindPage from '../pages/curve/RewindPage.jsx'
 import CompareTimePointsPage from '../pages/curve/CompareTimePointsPage.jsx'
+import ChangeInterpretationPage from '../pages/curve/ChangeInterpretationPage.jsx'
 import CareMarkersPage from '../pages/careMarkers/CareMarkersPage.jsx'
 import CareEffectivenessPage from '../pages/careMarkers/CareEffectivenessPage.jsx'
 import CheckInsPage from '../pages/CheckInsPage.jsx'
@@ -34,6 +35,7 @@ const retraceRoutes = (
     <Route path="/curve" element={<MetricCurvePage />} />
     <Route path="/curve/rewind" element={<RewindPage />} />
     <Route path="/curve/compare" element={<CompareTimePointsPage />} />
+    <Route path="/curve/interpretation" element={<ChangeInterpretationPage />} />
 
     {/* 관리마커확인 / 관리효과판정 */}
     <Route path="/care-markers" element={<CareMarkersPage />} />

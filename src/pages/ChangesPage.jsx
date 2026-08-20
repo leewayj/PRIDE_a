@@ -75,6 +75,9 @@ function ChangesPage() {
   ), [careMarkers])
 
   const metricLabel = METRICS.find(({ type }) => type === selectedMetric)?.label ?? ''
+  const interpretationPoint = selectedMarker?.type === 'changePoint'
+    ? selectedMarker.item
+    : visibleChangePoints[0]
 
   return (
     <main className="app-shell changes-page">
@@ -107,6 +110,17 @@ function ChangesPage() {
             )}
             <button className="changes-page__detail-link" type="button" onClick={() => navigate('/curve')}>상세 변화 보기 <span aria-hidden="true">→</span></button>
           </BaseCard>
+
+          {interpretationPoint && (
+            <BaseCard className="changes-page__interpretation-card">
+              <span>변화 해석</span>
+              <h2>이 시점의 변화를 자세히 살펴보세요.</h2>
+              <p>{formatPhotoDate(interpretationPoint.date)}에 확인된 실제 변화와 같은 시기의 관리 기록을 함께 볼 수 있어요.</p>
+              <button type="button" onClick={() => navigate('/curve/interpretation', { state: { changePoint: interpretationPoint, careMarkers } })}>
+                변화 해석 보기 <span aria-hidden="true">→</span>
+              </button>
+            </BaseCard>
+          )}
 
           <section className="changes-page__records" aria-labelledby="care-records-title">
             <div className="changes-page__section-heading"><h2 id="care-records-title">관리 기록</h2><span>{careMarkers.length}</span></div>
