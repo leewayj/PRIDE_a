@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import ActionButton from '../../components/ui/ActionButton.jsx'
 import '../../styles/onboarding.css'
 
+const FACE_STATUS = {
+  LOADING: 'loading',
+  UNREGISTERED: 'unregistered',
+  REGISTERED: 'registered',
+  ERROR: 'error',
+}
+
 function EyeIllustration() {
   return (
     <svg viewBox="0 0 148 96" aria-hidden="true">
@@ -66,6 +73,53 @@ function OnboardingIntroSlide({ illustration, title, description, buttonLabel, s
   )
 }
 
+function FaceLoadingState() {
+  return (
+    <section className="face-status-page" aria-live="polite" aria-busy="true">
+      <div className="face-status-page__content">
+        <div className="face-status-page__indicator" aria-hidden="true" />
+        <h1>내 얼굴</h1>
+        <p>얼굴 등록 상태를 확인하고 있어요.</p>
+      </div>
+    </section>
+  )
+}
+
+function FaceRegisteredState({ onRegisterAgain }) {
+  return (
+    <section className="face-status-page">
+      <div className="face-status-page__content">
+        <div className="face-status-page__badge" role="status">
+          <span aria-hidden="true">✓</span>
+          등록 완료
+        </div>
+        <h1>내 얼굴</h1>
+        <p>얼굴 등록이 완료되었어요.</p>
+        <small>등록한 얼굴 정보를 기준으로<br />사진을 확인할 수 있어요.</small>
+      </div>
+
+      <div className="face-status-page__cta">
+        <ActionButton fullWidth variant="outline" onClick={onRegisterAgain}>
+          다시 등록하기
+        </ActionButton>
+      </div>
+    </section>
+  )
+}
+
+function FaceErrorState() {
+  return (
+    <section className="face-status-page" role="alert">
+      <div className="face-status-page__content">
+        <div className="face-status-page__error-icon" aria-hidden="true">!</div>
+        <h1>내 얼굴</h1>
+        <p>얼굴 등록 상태를 확인하지 못했어요.</p>
+        <small>잠시 후 다시 시도해 주세요.</small>
+      </div>
+    </section>
+  )
+}
+
 const slides = [
   {
     illustration: <EyeIllustration />,
@@ -83,6 +137,8 @@ const slides = [
 
 function OnboardingIntroPage() {
   const [currentSlide, setCurrentSlide] = useState(0)
+  // TODO: 얼굴 등록 상태 조회 API가 확정되면 이 상태를 서버 응답과 연결한다.
+  const [faceStatus] = useState(FACE_STATUS.UNREGISTERED)
   const navigate = useNavigate()
   const slide = slides[currentSlide]
 
@@ -93,6 +149,18 @@ function OnboardingIntroPage() {
     }
 
     navigate('/onboarding/guide')
+  }
+
+  if (faceStatus === FACE_STATUS.LOADING) {
+    return <FaceLoadingState />
+  }
+
+  if (faceStatus === FACE_STATUS.ERROR) {
+    return <FaceErrorState />
+  }
+
+  if (faceStatus === FACE_STATUS.REGISTERED) {
+    return <FaceRegisteredState onRegisterAgain={() => navigate('/onboarding/guide')} />
   }
 
   return (
