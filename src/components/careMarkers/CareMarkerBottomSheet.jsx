@@ -7,10 +7,11 @@ function todayForInput() {
   return new Date(today.getTime() - offset).toISOString().slice(0, 10)
 }
 
-function CareMarkerBottomSheet({ onClose, onSave }) {
-  const [date, setDate] = useState(todayForInput)
-  const [kind, setKind] = useState('')
-  const [rawText, setRawText] = useState('')
+function CareMarkerBottomSheet({ careMarker = null, onClose, onSave }) {
+  const isEditing = careMarker !== null
+  const [date, setDate] = useState(() => careMarker?.date?.slice(0, 10) ?? todayForInput())
+  const [kind, setKind] = useState(() => careMarker?.kind ?? '')
+  const [rawText, setRawText] = useState(() => careMarker?.rawText ?? '')
   const kindInputRef = useRef(null)
   const isSubmittingRef = useRef(false)
   const canSave = date !== '' && kind.trim() !== ''
@@ -39,11 +40,11 @@ function CareMarkerBottomSheet({ onClose, onSave }) {
     isSubmittingRef.current = true
 
     onSave({
-      id: `marker-${crypto.randomUUID()}`,
+      id: careMarker?.id ?? `marker-${crypto.randomUUID()}`,
       kind: trimmedKind,
       date: new Date(`${date}T00:00:00.000Z`).toISOString(),
       rawText: rawText.trim() || trimmedKind,
-      registrationPath: 'manual',
+      registrationPath: careMarker?.registrationPath ?? 'manual',
     })
   }
 
@@ -57,8 +58,8 @@ function CareMarkerBottomSheet({ onClose, onSave }) {
       >
         <div className="care-marker-sheet__handle" aria-hidden="true" />
         <header className="care-marker-sheet__header">
-          <h2 id="care-marker-sheet-title">기록 추가</h2>
-          <button type="button" aria-label="기록 추가 닫기" onClick={onClose}>×</button>
+          <h2 id="care-marker-sheet-title">{isEditing ? '기록 수정' : '기록 추가'}</h2>
+          <button type="button" aria-label={`${isEditing ? '기록 수정' : '기록 추가'} 닫기`} onClick={onClose}>×</button>
         </header>
 
         <form onSubmit={handleSubmit}>
@@ -90,7 +91,7 @@ function CareMarkerBottomSheet({ onClose, onSave }) {
             />
           </label>
 
-          <ActionButton fullWidth type="submit" disabled={!canSave}>저장</ActionButton>
+          <ActionButton fullWidth type="submit" disabled={!canSave}>{isEditing ? '수정 저장' : '저장'}</ActionButton>
         </form>
       </section>
     </div>
