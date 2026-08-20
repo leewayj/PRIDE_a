@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import ActionButton from '../../components/ui/ActionButton.jsx'
+import { ONBOARDING_RESULT_STATUS } from '../../constants/onboarding.js'
 import '../../styles/onboarding.css'
-
-// 개발 중 아래 값만 바꿔 세 결과 화면을 확인할 수 있습니다.
-// 'success' | 'face-not-found' | 'identity-mismatch'
-const MOCK_RESULT = 'success'
 
 function SuccessIllustration() {
   return (
@@ -35,7 +32,7 @@ function ResultPreview({ previewUrl, number, isProblem }) {
 }
 
 function ErrorResult({ result, previewUrls, onRetry, onContinue }) {
-  const isFaceNotFound = result === 'face-not-found'
+  const isFaceNotFound = result === ONBOARDING_RESULT_STATUS.FACE_NOT_FOUND
 
   return (
     <section className="photo-result photo-result--error">
@@ -66,9 +63,31 @@ function ErrorResult({ result, previewUrls, onRetry, onContinue }) {
 
       <div className="photo-result__actions">
         <ActionButton fullWidth onClick={onRetry}>다른 사진 고르기</ActionButton>
-        {isFaceNotFound ? (
+        {isFaceNotFound && onContinue ? (
           <ActionButton fullWidth variant="outline" onClick={onContinue}>그냥 계속하기</ActionButton>
         ) : null}
+      </div>
+    </section>
+  )
+}
+
+function GenericErrorResult({ onRetry }) {
+  return (
+    <section className="photo-result photo-result--error">
+      <header className="photo-result__error-header">
+        <span aria-hidden="true">!</span>
+        <div>
+          <h1>사진을 처리하지<br />못했어요</h1>
+          <p>잠시 후 다시 시도해 주세요.</p>
+        </div>
+      </header>
+
+      <aside className="photo-result__notice">
+        서버 오류와 사진 판정 결과는 서로 다를 수 있어요. 사진을 다시 확인해 주세요.
+      </aside>
+
+      <div className="photo-result__actions">
+        <ActionButton fullWidth onClick={onRetry}>사진 다시 선택하기</ActionButton>
       </div>
     </section>
   )
@@ -77,7 +96,10 @@ function ErrorResult({ result, previewUrls, onRetry, onContinue }) {
 function OnboardingCompletePage({ completion = false }) {
   const navigate = useNavigate()
   const location = useLocation()
-  const photos = location.state?.photos ?? []
+  const photos = Array.isArray(location.state?.photos)
+    ? location.state.photos.filter((photo) => photo instanceof Blob)
+    : []
+  const resultStatus = location.state?.resultStatus
   const [previewUrls] = useState(() => (
     photos.slice(0, 3).map((file) => URL.createObjectURL(file))
   ))
@@ -86,19 +108,29 @@ function OnboardingCompletePage({ completion = false }) {
     previewUrls.forEach((previewUrl) => URL.revokeObjectURL(previewUrl))
   }, [previewUrls])
 
-  if (!completion && MOCK_RESULT !== 'success') {
+  if (!Object.values(ONBOARDING_RESULT_STATUS).includes(resultStatus)) {
+    return <Navigate to="/onboarding/photos/select" replace />
+  }
+
+  if (resultStatus === ONBOARDING_RESULT_STATUS.ERROR) {
+    return <GenericErrorResult onRetry={() => navigate('/onboarding/photos/select', { state: { photos } })} />
+  }
+
+  if (
+    resultStatus === ONBOARDING_RESULT_STATUS.FACE_NOT_FOUND ||
+    resultStatus === ONBOARDING_RESULT_STATUS.IDENTITY_MISMATCH
+  ) {
     return (
       <ErrorResult
-        result={MOCK_RESULT}
+        result={resultStatus}
         previewUrls={previewUrls}
         onRetry={() => navigate('/onboarding/photos/select', { state: { photos } })}
-        onContinue={() => navigate('/onboarding/complete', { state: { photos } })}
       />
     )
   }
 
   if (!completion) {
-    return <Navigate to="/onboarding/complete" replace state={{ photos }} />
+    return <Navigate to="/onboarding/complete" replace state={location.state} />
   }
 
   return (

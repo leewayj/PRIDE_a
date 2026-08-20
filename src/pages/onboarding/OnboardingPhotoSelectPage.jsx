@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { registerFace } from '../../api/faceApi.js'
+import { evaluatePhotosBatch } from '../../api/photoApi.js'
 import PhotoRequirements from '../../components/onboarding/PhotoRequirements.jsx'
 import PhotoSlot from '../../components/onboarding/PhotoSlot.jsx'
 import ActionButton from '../../components/ui/ActionButton.jsx'
+import { ONBOARDING_RESULT_STATUS } from '../../constants/onboarding.js'
 import '../../styles/onboarding.css'
 import { getOrCreateUserId } from '../../utils/userSession.js'
 
@@ -96,17 +98,28 @@ function OnboardingPhotoSelectPage() {
 
     try {
       const userId = await getOrCreateUserId()
-      await registerFace(userId, files)
+      const evaluationResult = await evaluatePhotosBatch(userId, files)
+      const registerResult = await registerFace(userId, files)
 
       if (isMountedRef.current) {
         navigate('/onboarding/result', {
-          state: { photos: files },
+          state: {
+            photos: files,
+            resultStatus: ONBOARDING_RESULT_STATUS.SUCCESS,
+            evaluationResult,
+            registerResult,
+          },
         })
       }
     } catch (error) {
       console.error('얼굴 등록에 실패했습니다.', error)
       if (isMountedRef.current) {
-        setFileError('사진을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.')
+        navigate('/onboarding/result', {
+          state: {
+            photos: files,
+            resultStatus: ONBOARDING_RESULT_STATUS.ERROR,
+          },
+        })
       }
     } finally {
       isSubmittingRef.current = false

@@ -26,6 +26,16 @@ function assertFile(file) {
   }
 }
 
+function assertFiles(files) {
+  if (!Array.isArray(files) || files.length === 0) {
+    throw new Error('files are required')
+  }
+
+  if (files.some((file) => !(file instanceof Blob))) {
+    throw new Error('files must contain only File or Blob values')
+  }
+}
+
 function appendOptionalUserId(query, userId) {
   if (userId == null) return
 
@@ -60,6 +70,22 @@ export function normalizePhoto(file, userId) {
   formData.append('file', file)
 
   return apiRequest(`/photo/normalize${queryString ? `?${queryString}` : ''}`, {
+    method: 'POST',
+    body: formData,
+  })
+}
+
+export function evaluatePhotosBatch(userId, files) {
+  assertUserId(userId)
+  assertFiles(files)
+
+  const formData = new FormData()
+  files.forEach((file) => {
+    formData.append('files', file)
+  })
+
+  const query = new URLSearchParams({ userId: userId.trim() })
+  return apiRequest(`/photo/evaluate-batch?${query}`, {
     method: 'POST',
     body: formData,
   })
