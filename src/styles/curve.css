@@ -216,6 +216,61 @@
   line-height: 1.6;
 }
 
+.metric-curve-page__marker-note {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 11px;
+  color: #746b66;
+  background: var(--background-sub);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.metric-curve-page__comparison {
+  min-width: 0;
+  margin-top: 18px;
+  padding-top: 17px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.metric-curve-page__comparison h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.metric-curve-page__comparison-empty {
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 11px;
+  background: var(--background-sub);
+}
+
+.metric-curve-page__comparison-empty strong,
+.metric-curve-page__observation strong {
+  font-size: 12px;
+}
+
+.metric-curve-page__comparison-empty p,
+.metric-curve-page__observation p {
+  margin: 6px 0 0;
+  color: #746b66;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.metric-curve-page__observation {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 11px;
+  color: #91501f;
+  background: #f4d8ce;
+}
+
+.metric-curve-page__observation p {
+  color: inherit;
+}
+
 .metric-curve-page__description strong {
   font-size: 13px;
 }

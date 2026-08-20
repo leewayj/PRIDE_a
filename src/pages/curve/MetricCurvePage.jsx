@@ -6,7 +6,15 @@ import BottomNavigation from '../../components/navigation/BottomNavigation.jsx'
 import MetricCurveChart from '../../components/curve/MetricCurveChart.jsx'
 import { formatPhotoDate } from '../../utils/dateFormat.js'
 import { fetchCareMarkers, fetchMetricCurve } from '../../services/retraceApi'
+import { validateInterpretationCardText } from '../../domain/interpretationCardValidation'
 import '../../styles/curve.css'
+
+const CARE_OBSERVATION_TEXT = '관리 기록과 같은 시기의 실제 변화 흐름을 함께 확인할 수 있어요.'
+const CARE_COMPARISON_EMPTY_TEXT = '아직 기존 흐름을 기준으로 한 예측 결과가 준비되지 않았어요.'
+
+function safeInterpretationText(text) {
+  return validateInterpretationCardText(text).hasForbiddenExpression ? '' : text
+}
 
 function MetricCurvePage() {
   const location = useLocation()
@@ -122,11 +130,25 @@ function MetricCurvePage() {
             <>
               <strong>{selectedMarker.item.direction === 'increase' ? '증가' : '감소'}</strong>
               <p>변화폭 {selectedMarker.item.magnitude}</p>
+              <div className="metric-curve-page__marker-note">
+                연결된 관리 기록 정보가 없어 변화 시점 정보만 표시합니다.
+              </div>
             </>
           ) : (
             <>
               <strong>{selectedMarker.item.kind}</strong>
               <p>{selectedMarker.item.rawText}</p>
+              <section className="metric-curve-page__comparison" aria-label="실제값과 예측값 비교">
+                <h3>예측과 실제 비교</h3>
+                <div className="metric-curve-page__comparison-empty">
+                  <strong>비교 데이터 준비 중</strong>
+                  <p>{safeInterpretationText(CARE_COMPARISON_EMPTY_TEXT)}</p>
+                </div>
+              </section>
+              <div className="metric-curve-page__observation">
+                <strong>관찰 정보</strong>
+                <p>{safeInterpretationText(CARE_OBSERVATION_TEXT)}</p>
+              </div>
             </>
           )}
         </BaseCard>
