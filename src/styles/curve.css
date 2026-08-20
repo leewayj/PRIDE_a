@@ -2,7 +2,7 @@
   min-width: 0;
   padding: max(24px, env(safe-area-inset-top)) 20px 28px;
   overflow-x: clip;
-  background: #fbede8;
+  background: var(--background-main);
 }
 
 .metric-curve-page__header {

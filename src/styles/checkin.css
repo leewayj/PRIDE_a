@@ -206,7 +206,7 @@
   min-width: 0;
   padding: max(24px, env(safe-area-inset-top)) 20px 30px;
   overflow-x: clip;
-  background: #fbede8;
+  background: var(--background-main);
 }
 
 .check-ins-page__header {
