@@ -24,7 +24,7 @@ function JudgementSummaryPage() {
 
     fetchPhotoJudgement()
       .then((result) => {
-        if (isActive) setPhotos(result)
+        if (isActive) setPhotos(Array.isArray(result) ? result : [])
       })
       .catch(() => {
         if (isActive) setHasError(true)
@@ -78,6 +78,17 @@ function JudgementSummaryPage() {
     return (
       <section className="judgement-summary-page judgement-summary-page--center" role="alert">
         <p>판정 결과를 불러오지 못했어요.</p>
+        <ActionButton onClick={() => navigate('/photos')}>사진 현황으로 돌아가기</ActionButton>
+      </section>
+    )
+  }
+
+  if (photos.length === 0) {
+    return (
+      <section className="judgement-summary-page judgement-summary-page--center">
+        <h1>표시할 분석 결과가 없어요.</h1>
+        <p>사진을 추가한 뒤 다시 분석해 주세요.</p>
+        <ActionButton onClick={() => navigate('/photos/upload')}>사진 추가하기</ActionButton>
       </section>
     )
   }

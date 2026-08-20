@@ -32,10 +32,11 @@ function PhotoSelectionProvider({ children }) {
   }, [photos])
 
   const queueSelectedPhotos = useCallback((files) => {
+    const safeFiles = Array.isArray(files) ? files : []
     const analyzedIds = new Set(photos.map(({ id }) => id))
     const queuedFiles = [
       ...new Map(
-        files
+        safeFiles
           .filter((file) => validatePhotoFile(file).valid)
           .map((file) => [createPhotoId(file), file]),
       ).values(),
@@ -46,13 +47,18 @@ function PhotoSelectionProvider({ children }) {
   }, [photos])
 
   const saveAnalysisResults = useCallback((analysisResults) => {
+    const safeResults = Array.isArray(analysisResults) ? analysisResults : []
     setPhotos((currentPhotos) => {
       const knownIds = new Set(currentPhotos.map(({ id }) => id))
-      const uniquePhotos = analysisResults
+      const uniquePhotos = safeResults
         .filter(({ id }) => !knownIds.has(id))
 
       return [...currentPhotos, ...uniquePhotos]
     })
+  }, [])
+
+  const clearSelectedPhotos = useCallback(() => {
+    setSelectedFiles([])
   }, [])
 
   const removePhoto = useCallback((photoId) => {
@@ -63,13 +69,14 @@ function PhotoSelectionProvider({ children }) {
   const value = useMemo(
     () => ({
       photos,
+      clearSelectedPhotos,
       queueSelectedPhotos,
       removePhoto,
       saveAnalysisResults,
       selectedFiles,
       selectedPhotoCount: selectedFiles.length,
     }),
-    [photos, queueSelectedPhotos, removePhoto, saveAnalysisResults, selectedFiles],
+    [clearSelectedPhotos, photos, queueSelectedPhotos, removePhoto, saveAnalysisResults, selectedFiles],
   )
 
   return (

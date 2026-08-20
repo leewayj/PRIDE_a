@@ -22,7 +22,13 @@ function wait(milliseconds) {
 function PhotoAnalyzingPage() {
   const navigate = useNavigate()
   const startedRef = useRef(false)
-  const { photos, selectedFiles, selectedPhotoCount, saveAnalysisResults } = usePhotoSelection()
+  const {
+    clearSelectedPhotos,
+    photos,
+    selectedFiles,
+    selectedPhotoCount,
+    saveAnalysisResults,
+  } = usePhotoSelection()
   const [completedCount, setCompletedCount] = useState(0)
   const [status, setStatus] = useState('사진 정보를 불러오는 중이에요')
   const progress = selectedPhotoCount === 0
@@ -64,7 +70,8 @@ function PhotoAnalyzingPage() {
 
       if (remainingTime > 0) await wait(remainingTime)
 
-      const judgementPhotos = await fetchPhotoJudgement()
+      const fetchedJudgement = await fetchPhotoJudgement()
+      const judgementPhotos = Array.isArray(fetchedJudgement) ? fetchedJudgement : []
       navigateAfterJudgement(
         (path) => navigate(path, {
           replace: true,
@@ -72,12 +79,14 @@ function PhotoAnalyzingPage() {
         }),
         judgementPhotos,
       )
+      clearSelectedPhotos()
     }
 
     runAnalysis().catch(() => {
+      clearSelectedPhotos()
       navigate('/photos/years', { replace: true })
     })
-  }, [navigate, photos, saveAnalysisResults, selectedFiles, selectedPhotoCount])
+  }, [clearSelectedPhotos, navigate, photos, saveAnalysisResults, selectedFiles, selectedPhotoCount])
 
   return (
     <section className="photo-analyzing-page" aria-live="polite">

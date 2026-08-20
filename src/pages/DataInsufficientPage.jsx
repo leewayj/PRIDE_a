@@ -46,7 +46,11 @@ function DataInsufficientPage() {
 
       <BaseCard className="data-insufficient-page__yearly">
         <SectionTitle>연도별 부족 현황</SectionTitle>
-        {yearlyShortfalls.length > 0 ? (
+        {totalPassCount === 0 ? (
+          <p className="data-insufficient-page__yearly-complete">
+            아직 연도별 통과 사진이 없어요. 사진을 추가해 주세요.
+          </p>
+        ) : yearlyShortfalls.length > 0 ? (
           <ul>
             {yearlyShortfalls.map(({ year, passCount, additionalPassPhotosNeeded }) => (
               <li key={year}>

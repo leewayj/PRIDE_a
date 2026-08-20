@@ -23,11 +23,15 @@ function PhotoYearDetailPage() {
   const [pendingPhoto, setPendingPhoto] = useState(null)
   const [deleting, setDeleting] = useState(false)
   const year = Number(yearParam)
-  const isValidYear = /^\d{1,4}$/.test(yearParam ?? '') && year >= 1 && year <= 9999
+  const currentYear = new Date().getFullYear()
+  const defaultYears = Array.from({ length: 8 }, (_, index) => currentYear - index)
+  const groupedPhotos = groupPhotosByYear(allPhotos)
+  const supportedYears = new Set([...defaultYears, ...groupedPhotos.map((group) => group.year)])
+  const isValidYear = /^\d{4}$/.test(yearParam ?? '') && supportedYears.has(year)
 
   if (!isValidYear) return <Navigate to="/photos/years" replace />
 
-  const photos = groupPhotosByYear(allPhotos).find((group) => group.year === year)?.photos ?? []
+  const photos = groupedPhotos.find((group) => group.year === year)?.photos ?? []
   const status = getYearPhotoStatus(photos.length)
 
   const confirmDelete = async () => {

@@ -4,6 +4,7 @@ import { PHOTO_ANALYSIS_STATUS } from '../constants/photo.js'
 import usePhotoSelection from '../hooks/usePhotoSelection.js'
 import { groupPhotosByYear } from '../utils/photoGrouping.js'
 import { getYearPhotoStatus, getYearPhotoStatusLabel } from '../utils/photoStatus.js'
+import { YEAR_UPLOAD_MIN_COUNT } from '../utils/uploadConstraints.js'
 
 function BackIcon() {
   return (
@@ -37,7 +38,7 @@ function PhotoYearsPage() {
 
       <div className="photo-years-page__intro">
         <h1>한 해씩 골라 넣으세요.</h1>
-        <p>한 해에 사진 5장쯤이면 그 해의 그래프가 확실히 생깁니다.</p>
+        <p>한 해에 사진 {YEAR_UPLOAD_MIN_COUNT}장쯤이면 그 해의 그래프가 확실히 생깁니다.</p>
       </div>
 
       <ul className="photo-years-page__list" aria-label="연도별 사진 현황">

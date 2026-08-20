@@ -623,6 +623,14 @@
   border: 0;
 }
 
+.photo-picker-button__message {
+  margin: 9px 0 0;
+  color: #91501f;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
 .photo-year-detail {
   padding-bottom: max(30px, env(safe-area-inset-bottom));
 }
@@ -1122,6 +1130,65 @@
   min-height: 54px;
   border-radius: 14px;
   font-size: 16px;
+}
+
+.photo-status-page--empty {
+  gap: 16px;
+}
+
+.photo-status-page__empty-state {
+  display: flex;
+  flex: 1;
+  min-height: 340px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.photo-status-page__empty-icon {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 24px;
+  border-radius: 50%;
+  color: var(--rose-900);
+  background: var(--background-sub);
+  place-items: center;
+}
+
+.photo-status-page__empty-icon svg {
+  width: 42px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.photo-status-page__empty-state h2,
+.judgement-summary-page--center h1 {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+.photo-status-page__empty-state p {
+  margin: 12px 0 0;
+  color: #746b66;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.judgement-summary-page--center {
+  gap: 14px;
+  text-align: center;
+}
+
+.judgement-summary-page--center p {
+  margin: 0;
+  line-height: 1.6;
 }
 
 @media (prefers-reduced-motion: reduce) {

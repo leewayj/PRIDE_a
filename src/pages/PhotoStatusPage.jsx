@@ -4,6 +4,7 @@ import BaseCard from '../components/ui/BaseCard.jsx'
 import SectionTitle from '../components/ui/SectionTitle.jsx'
 import { CURVE_MIN_PASS_PHOTOS_PER_YEAR, evaluateCurveEligibility } from '../domain/curveEligibility'
 import { judgmentResultPhotos, judgmentResultSummary } from '../mocks/judgmentResultScenario'
+import usePhotoSelection from '../hooks/usePhotoSelection.js'
 
 function buildNoticeText(yearlyPassCounts) {
   if (yearlyPassCounts.length === 0) {
@@ -21,12 +22,42 @@ function buildNoticeText(yearlyPassCounts) {
 
 function PhotoStatusPage() {
   const navigate = useNavigate()
+  const { photos } = usePhotoSelection()
   const { pass, conditional, exclude } = judgmentResultSummary
   const totalJudged = pass + conditional + exclude || 1
 
   const { yearlyPassCounts } = evaluateCurveEligibility(judgmentResultPhotos)
   const maxYearlyPassCount = Math.max(...yearlyPassCounts.map(({ passCount }) => passCount), 1)
   const noticeText = buildNoticeText(yearlyPassCounts)
+
+  if (photos.length === 0) {
+    return (
+      <section className="photo-status-page photo-status-page--empty">
+        <header className="photo-status-page__header">
+          <h1>Photo</h1>
+          <span>2019 – {new Date().getFullYear()}</span>
+        </header>
+
+        <BaseCard className="photo-status-page__empty-state">
+          <div className="photo-status-page__empty-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64">
+              <rect x="10" y="13" width="44" height="38" rx="5" />
+              <circle cx="25" cy="27" r="5" />
+              <path d="m14 45 11-11 8 8 6-6 11 9" />
+            </svg>
+          </div>
+          <h2>아직 등록된 사진이 없어요</h2>
+          <p>사진을 추가하면 시간에 따른 변화 기록을 시작할 수 있어요.</p>
+        </BaseCard>
+
+        <div className="photo-status-page__cta">
+          <ActionButton fullWidth onClick={() => navigate('/photos/upload')}>
+            사진 추가하기
+          </ActionButton>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="photo-status-page">
