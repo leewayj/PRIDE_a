@@ -256,6 +256,7 @@ function ChangesPage() {
               <BaseCard className="changes-page__selected-record" aria-live="polite">
                 <div><span>선택한 관리 기록</span><time dateTime={selectedCareMarker.date}>{formatPhotoDate(selectedCareMarker.date)}</time></div>
                 <strong>{selectedCareMarker.rawText}</strong>
+                <button type="button" onClick={() => navigate(`/care-markers/effectiveness?markerId=${encodeURIComponent(selectedCareMarker.id)}&indicator=${encodeURIComponent(selectedIndicator.indicator)}`, { state: { careMarker: selectedCareMarker, indicator: selectedIndicator.indicator } })}>관리 효과와 변화 해석 보기</button>
               </BaseCard>
             )}
             <ActionButton fullWidth variant="outline" onClick={() => setIsAddSheetOpen(true)}>+ 기록 추가하기</ActionButton>

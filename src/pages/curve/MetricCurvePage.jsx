@@ -193,6 +193,7 @@ function MetricCurvePage() {
           ) : (
             <>
               <strong>{selectedMarker.item.rawText}</strong>
+              <ActionButton variant="outline" onClick={() => navigate(`/care-markers/effectiveness?markerId=${encodeURIComponent(selectedMarker.item.id)}&indicator=${encodeURIComponent(JAW_ANGLE_OPTION.indicator)}`, { state: { careMarker: selectedMarker.item, indicator: JAW_ANGLE_OPTION.indicator } })}>관리 효과와 변화 해석 보기</ActionButton>
               <section className="metric-curve-page__comparison" aria-label="실제값과 예측값 비교">
                 <h3>예측과 실제 비교</h3>
                 <div className="metric-curve-page__comparison-empty">

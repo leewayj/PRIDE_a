@@ -5,6 +5,7 @@ import BottomNavigation from '../../components/navigation/BottomNavigation.jsx'
 import ActionButton from '../../components/ui/ActionButton.jsx'
 import BaseCard from '../../components/ui/BaseCard.jsx'
 import { validateInterpretationCardText } from '../../domain/interpretationCardValidation'
+import { INDICATOR_OPTIONS } from '../../domain/indicatorCurve.js'
 import { fetchCareMarkers, fetchMetricCurve } from '../../services/retraceApi'
 import { formatPhotoDate } from '../../utils/dateFormat.js'
 import '../../styles/change-interpretation.css'
@@ -98,6 +99,7 @@ function ChangeInterpretationPage() {
   }, [careMarkers, selectedChangePoint])
 
   const metricLabel = selectedChangePoint ? METRIC_LABELS[selectedChangePoint.metricType] : ''
+  const indicator = INDICATOR_OPTIONS.find(({ metricType }) => metricType === selectedChangePoint?.metricType)?.indicator ?? ''
   const selectedMarker = selectedChangePoint ? {
     type: 'changePoint',
     key: `change-${selectedChangePoint.metricType}-${selectedChangePoint.date}`,
@@ -174,7 +176,7 @@ function ChangeInterpretationPage() {
                       <button
                         className="change-interpretation-page__compare-record"
                         type="button"
-                        onClick={() => navigate('/care-markers/effectiveness', { state: { careMarker: marker } })}
+                        onClick={() => navigate(`/care-markers/effectiveness?markerId=${encodeURIComponent(marker.id)}&indicator=${encodeURIComponent(indicator)}`, { state: { careMarker: marker, indicator } })}
                       >
                         이 기록과 비교하기
                       </button>

@@ -30,6 +30,19 @@
 .care-effectiveness-page__state { display: grid; min-height: 280px; margin-top: 24px; align-content: center; justify-items: center; gap: 10px; color: #746b66; font-size: 13px; line-height: 1.6; text-align: center; }
 .care-effectiveness-page__state strong { color: var(--ink-900); font-size: 16px; }
 .care-effectiveness-page__state p { max-width: 270px; margin: 0; }
+.care-effectiveness-page__indicators { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0 2px 18px; }
+.care-effectiveness-page__indicators button { min-height: 40px; border: 1px solid var(--border-soft); border-radius: 10px; color: #746b66; background: var(--surface); font-size: 12px; font-weight: 700; }
+.care-effectiveness-page__indicators button.is-selected { border-color: var(--rose-900); color: var(--rose-900); background: #f8eeec; }
+.care-effectiveness-page__analysis-card { padding: 20px; }
+.care-effectiveness-page__analysis-card > span { color: var(--rose-900); font-size: 12px; font-weight: 700; }
+.care-effectiveness-page__analysis-card h2 { margin: 9px 0 0; font-size: 18px; line-height: 1.5; }
+.care-effectiveness-page__analysis-card p, .care-effectiveness-page__analysis-card li { color: #746b66; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.care-effectiveness-page__analysis-card ul { margin: 12px 0 0; padding-left: 18px; }
+.care-effectiveness-page__interpretation { display: grid; gap: 10px; margin-top: 24px; }
+.care-effectiveness-page__interpretation > h2 { margin: 0 0 2px; font-size: 18px; }
+.care-effectiveness-page__interpretation .base-card { padding: 18px; }
+.care-effectiveness-page__interpretation h3 { margin: 0; font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; }
+.care-effectiveness-page__interpretation p { margin: 7px 0 0; color: #746b66; font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
 .care-effectiveness-page__state--inline { min-height: 210px; margin-top: 0; }
 .metric-curve-chart__line--predicted { stroke: #817873; stroke-dasharray: 7 6; }
 .metric-curve-chart__care-start line { stroke: #b8aaa2; stroke-width: 1.2; stroke-dasharray: 3 3; }
