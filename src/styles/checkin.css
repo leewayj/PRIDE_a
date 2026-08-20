@@ -201,3 +201,243 @@
   color: var(--rose-900);
   background: transparent;
 }
+
+.check-ins-page {
+  min-width: 0;
+  padding: max(24px, env(safe-area-inset-top)) 20px 30px;
+  overflow-x: clip;
+  background: #fbede8;
+}
+
+.check-ins-page__header {
+  padding: 18px 2px 26px;
+}
+
+.check-ins-page__header > span {
+  color: var(--rose-900);
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.check-ins-page__header h1 {
+  margin: 10px 0 0;
+  font-size: 26px;
+  line-height: 1.4;
+  letter-spacing: -0.035em;
+}
+
+.check-ins-page__header p {
+  margin: 13px 0 0;
+  color: #746b66;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.check-ins-page__marker-selector {
+  display: grid;
+  margin-bottom: 14px;
+  gap: 8px;
+}
+
+.check-ins-page__marker-selector button {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  color: var(--ink-900);
+  background: var(--surface);
+  text-align: left;
+}
+
+.check-ins-page__marker-selector button.is-selected {
+  border-color: var(--rose-900);
+  background: #f4d8ce;
+}
+
+.check-ins-page__marker-selector strong,
+.check-ins-page__marker-selector span {
+  display: block;
+}
+
+.check-ins-page__marker-selector strong {
+  font-size: 12px;
+}
+
+.check-ins-page__marker-selector span {
+  margin-top: 5px;
+  color: #746b66;
+  font-size: 10px;
+}
+
+.check-ins-page__basis span,
+.check-ins-page__next > span {
+  color: var(--rose-900);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.check-ins-page__basis strong,
+.check-ins-page__basis time {
+  display: block;
+}
+
+.check-ins-page__basis strong {
+  margin-top: 9px;
+  font-size: 18px;
+}
+
+.check-ins-page__basis time {
+  margin-top: 5px;
+  color: #746b66;
+  font-size: 12px;
+}
+
+.check-ins-page__next {
+  margin-top: 14px;
+}
+
+.check-ins-page__next > div {
+  display: flex;
+  margin-top: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.check-ins-page__next > div strong,
+.check-ins-page__next > strong {
+  font-size: 19px;
+}
+
+.check-ins-page__next time {
+  flex-shrink: 0;
+  color: #746b66;
+  font-size: 12px;
+}
+
+.check-ins-page__next p {
+  margin: 14px 0 0;
+  color: #817873;
+  font-size: 11px;
+}
+
+.check-ins-page__schedule {
+  margin: 14px 0 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--surface);
+  list-style: none;
+}
+
+.check-ins-page__schedule li {
+  display: grid;
+  min-width: 0;
+  min-height: 72px;
+  padding: 15px 16px;
+  border-bottom: 1px solid var(--border-soft);
+  grid-template-columns: 12px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.check-ins-page__schedule li:last-child {
+  border-bottom: 0;
+}
+
+.check-ins-page__schedule li.is-next {
+  background: #f8e4dd;
+}
+
+.check-ins-page__step {
+  width: 10px;
+  height: 10px;
+  border: 2px solid #c7bcb4;
+  border-radius: 50%;
+}
+
+.check-ins-page__schedule li.is-complete .check-ins-page__step {
+  border-color: var(--rose-900);
+  background: var(--rose-900);
+}
+
+.check-ins-page__schedule strong,
+.check-ins-page__schedule time {
+  display: block;
+}
+
+.check-ins-page__schedule strong {
+  font-size: 14px;
+}
+
+.check-ins-page__schedule time {
+  margin-top: 5px;
+  color: #746b66;
+  font-size: 11px;
+}
+
+.check-ins-page__status {
+  flex-shrink: 0;
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: #756965;
+  background: var(--background-sub);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.check-ins-page__schedule li.is-complete .check-ins-page__status {
+  color: #ffffff;
+  background: var(--rose-900);
+}
+
+.check-ins-page__actions {
+  margin-top: 18px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+.check-ins-page__actions .action-button,
+.check-ins-page__state .action-button {
+  min-height: 54px;
+  border-radius: 14px;
+}
+
+.check-ins-page__state {
+  display: flex;
+  min-height: 240px;
+  padding: 28px 20px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  color: #746b66;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.check-ins-page__state strong {
+  color: var(--ink-900);
+  font-size: 16px;
+}
+
+.check-ins-page__state p {
+  margin: 8px 0 20px;
+}
+
+@media (max-width: 370px) {
+  .check-ins-page {
+    padding-inline: 18px;
+  }
+
+  .check-ins-page__header h1 {
+    font-size: 23px;
+  }
+
+  .check-ins-page__schedule li {
+    padding-inline: 13px;
+    gap: 9px;
+  }
+}
