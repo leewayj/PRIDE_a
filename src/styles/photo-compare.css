@@ -18,6 +18,12 @@
 .photo-compare-page__photo-card label > span { color: #817873; font-size: 9px; font-weight: 600; }
 .photo-compare-page__photo-card select { width: 100%; min-width: 0; height: 34px; padding: 0 5px; border: 1px solid var(--border-soft); border-radius: 9px; color: var(--ink-900); background: var(--surface); font-size: 10px; }
 .photo-compare-page__versus { position: absolute; top: 42%; left: 50%; z-index: 3; display: grid; width: 34px; height: 34px; border: 3px solid var(--background-main); border-radius: 50%; transform: translate(-50%, -50%); color: #fff; background: var(--rose-900); font-size: 10px; font-weight: 800; place-items: center; }
+.photo-compare-page__date-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; padding: 18px; }
+.photo-compare-page__date-form label { display: grid; min-width: 0; gap: 6px; }
+.photo-compare-page__date-form label span { color: #746b66; font-size: 11px; font-weight: 700; }
+.photo-compare-page__date-form input { width: 100%; min-width: 0; height: 40px; padding: 0 8px; border: 1px solid var(--border-soft); border-radius: 9px; background: var(--surface); }
+.photo-compare-page__date-form > p, .photo-compare-page__date-form .action-button { grid-column: 1 / -1; }
+.photo-compare-page__date-form > p { margin: 0; color: #b5473f; font-size: 12px; }
 .photo-compare-page__metrics { margin-top: 13px; padding: 20px 18px; }
 .photo-compare-page__metrics h2 { margin: 8px 0 0; font-size: 16px; line-height: 1.5; }
 .photo-compare-page__metrics p { margin: 7px 0 0; color: #746b66; font-size: 12px; line-height: 1.6; }
