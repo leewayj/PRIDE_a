@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getFaceRegistrationStatus } from '../../api/faceApi.js'
 import ActionButton from '../../components/ui/ActionButton.jsx'
 import '../../styles/onboarding.css'
+import { getOrCreateUserId } from '../../utils/userSession.js'
 
 const FACE_STATUS = {
   LOADING: 'loading',
@@ -107,7 +109,7 @@ function FaceRegisteredState({ onRegisterAgain }) {
   )
 }
 
-function FaceErrorState() {
+function FaceErrorState({ onRetry }) {
   return (
     <section className="face-status-page" role="alert">
       <div className="face-status-page__content">
@@ -115,6 +117,10 @@ function FaceErrorState() {
         <h1>내 얼굴</h1>
         <p>얼굴 등록 상태를 확인하지 못했어요.</p>
         <small>잠시 후 다시 시도해 주세요.</small>
+      </div>
+
+      <div className="face-status-page__cta">
+        <ActionButton fullWidth onClick={onRetry}>다시 시도</ActionButton>
       </div>
     </section>
   )
@@ -137,10 +143,63 @@ const slides = [
 
 function OnboardingIntroPage() {
   const [currentSlide, setCurrentSlide] = useState(0)
-  // TODO: 얼굴 등록 상태 조회 API가 확정되면 이 상태를 서버 응답과 연결한다.
-  const [faceStatus] = useState(FACE_STATUS.UNREGISTERED)
+  const [faceStatus, setFaceStatus] = useState(FACE_STATUS.LOADING)
+  const requestIdRef = useRef(0)
+  const isRequestingRef = useRef(false)
   const navigate = useNavigate()
   const slide = slides[currentSlide]
+
+  const loadFaceStatus = useCallback(async () => {
+    if (isRequestingRef.current) return
+
+    isRequestingRef.current = true
+    const requestId = requestIdRef.current + 1
+    requestIdRef.current = requestId
+    setFaceStatus(FACE_STATUS.LOADING)
+
+    try {
+      const userId = await getOrCreateUserId()
+      const response = await getFaceRegistrationStatus(userId)
+
+      if (
+        !response ||
+        typeof response !== 'object' ||
+        typeof response.faceRegistered !== 'boolean'
+      ) {
+        throw new Error('얼굴 등록 상태 응답 형식이 올바르지 않습니다.')
+      }
+
+      if (requestIdRef.current === requestId) {
+        setFaceStatus(
+          response.faceRegistered
+            ? FACE_STATUS.REGISTERED
+            : FACE_STATUS.UNREGISTERED,
+        )
+      }
+    } catch (error) {
+      console.error('얼굴 등록 상태를 확인하지 못했습니다.', error)
+      if (requestIdRef.current === requestId) {
+        setFaceStatus(FACE_STATUS.ERROR)
+      }
+    } finally {
+      if (requestIdRef.current === requestId) {
+        isRequestingRef.current = false
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    let isActive = true
+    queueMicrotask(() => {
+      if (isActive) loadFaceStatus()
+    })
+
+    return () => {
+      isActive = false
+      requestIdRef.current += 1
+      isRequestingRef.current = false
+    }
+  }, [loadFaceStatus])
 
   const handleNext = () => {
     if (currentSlide === 0) {
@@ -156,7 +215,7 @@ function OnboardingIntroPage() {
   }
 
   if (faceStatus === FACE_STATUS.ERROR) {
-    return <FaceErrorState />
+    return <FaceErrorState onRetry={loadFaceStatus} />
   }
 
   if (faceStatus === FACE_STATUS.REGISTERED) {

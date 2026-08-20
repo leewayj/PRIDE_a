@@ -1,5 +1,14 @@
 import { apiRequest } from './client.js'
 
+export function getFaceRegistrationStatus(userId) {
+  if (typeof userId !== 'string' || !userId.trim()) {
+    throw new Error('userId is required')
+  }
+
+  const query = new URLSearchParams({ userId: userId.trim() })
+  return apiRequest(`/face/status?${query}`)
+}
+
 export function registerFace(userId, files) {
   if (typeof userId !== 'string' || !userId.trim()) {
     throw new Error('얼굴 등록 API 요청에 유효한 userId가 필요합니다.')
