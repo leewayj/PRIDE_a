@@ -14,6 +14,57 @@ function assertDate(value, parameterName) {
   }
 }
 
+function assertPhotoKey(photoKey) {
+  if (typeof photoKey !== 'string' || !photoKey.trim()) {
+    throw new Error('photoKey is required')
+  }
+}
+
+function assertFile(file) {
+  if (!(file instanceof Blob)) {
+    throw new Error('file must be a File or Blob')
+  }
+}
+
+function appendOptionalUserId(query, userId) {
+  if (userId == null) return
+
+  assertUserId(userId)
+  query.set('userId', userId.trim())
+}
+
+export function evaluatePhoto(file, photoKey, userId) {
+  assertFile(file)
+  assertPhotoKey(photoKey)
+
+  const query = new URLSearchParams({ photoKey: photoKey.trim() })
+  appendOptionalUserId(query, userId)
+
+  const formData = new FormData()
+  formData.append('file', file)
+
+  return apiRequest(`/photo/evaluate?${query}`, {
+    method: 'POST',
+    body: formData,
+  })
+}
+
+export function normalizePhoto(file, userId) {
+  assertFile(file)
+
+  const query = new URLSearchParams()
+  appendOptionalUserId(query, userId)
+  const queryString = query.toString()
+
+  const formData = new FormData()
+  formData.append('file', file)
+
+  return apiRequest(`/photo/normalize${queryString ? `?${queryString}` : ''}`, {
+    method: 'POST',
+    body: formData,
+  })
+}
+
 export function getPhotos(userId) {
   assertUserId(userId)
 

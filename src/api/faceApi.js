@@ -24,3 +24,22 @@ export function registerFace(userId, files) {
     body: formData,
   })
 }
+
+export function verifyFace(userId, file) {
+  if (typeof userId !== 'string' || !userId.trim()) {
+    throw new Error('userId is required')
+  }
+
+  if (!(file instanceof Blob)) {
+    throw new Error('file must be a File or Blob')
+  }
+
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const query = new URLSearchParams({ userId: userId.trim() })
+  return apiRequest(`/face/verify?${query}`, {
+    method: 'POST',
+    body: formData,
+  })
+}
