@@ -930,6 +930,13 @@
   font-size: 14px;
 }
 
+.photo-analyzing-page__actions { display: grid; width: 100%; gap: 9px; margin-top: 18px; }
+.photo-status-page__upload-issues { margin-top: 12px; padding: 18px; }
+.photo-status-page__upload-issues h2 { margin: 0; font-size: 16px; }
+.photo-status-page__upload-issues ul { display: grid; gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }
+.photo-status-page__upload-issues strong { font-size: 12px; overflow-wrap: anywhere; }
+.photo-status-page__upload-issues p { margin: 3px 0 0; color: #746b66; font-size: 11px; line-height: 1.55; overflow-wrap: anywhere; }
+
 @keyframes photo-analyzing-spin {
   to {
     transform: rotate(360deg);

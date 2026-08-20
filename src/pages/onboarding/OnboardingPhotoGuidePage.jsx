@@ -42,7 +42,7 @@ function OnboardingPhotoGuidePage() {
       </ul>
 
       <aside className="photo-guide-page__notice">
-        사진은 기기 안에서만 사용되며 서버로 전송되지 않아요.
+        직접 선택한 사진만 얼굴 등록을 위해 서버로 전송됩니다.
       </aside>
 
       <div className="photo-guide-page__cta">

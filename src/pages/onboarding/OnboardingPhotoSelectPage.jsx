@@ -181,7 +181,7 @@ function OnboardingPhotoSelectPage() {
 
       <aside className="photo-select-page__notice">
         <span aria-hidden="true">!</span>
-        <p><strong>사진은 기기 안에서만 사용돼요.</strong><br />선택한 사진은 지금 단계에서 업로드되지 않습니다.</p>
+        <p><strong>직접 선택한 사진만 사용해요.</strong><br />다음을 누르면 얼굴 등록을 위해 서버로 전송됩니다.</p>
       </aside>
 
       <div className="photo-select-page__cta">

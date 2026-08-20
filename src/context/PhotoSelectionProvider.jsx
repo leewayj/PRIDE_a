@@ -1,35 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import PhotoSelectionContext from './PhotoSelectionContext.js'
-import { restorePhotoModel, serializePhotoMetadata } from '../models/photo.js'
 import { createPhotoId, validatePhotoFile } from '../services/photoAnalysis.js'
-
-const STORAGE_KEY = 'retrace.photo-analysis.v1'
-
-function readStoredAnalysis() {
-  try {
-    const storedValue = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]')
-
-    if (!Array.isArray(storedValue)) return []
-
-    return storedValue
-      .filter((photo) => typeof photo?.id === 'string')
-      .map(restorePhotoModel)
-  } catch {
-    return []
-  }
-}
 
 function PhotoSelectionProvider({ children }) {
   const [selectedFiles, setSelectedFiles] = useState([])
-  const [photos, setPhotos] = useState(readStoredAnalysis)
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(photos.map(serializePhotoMetadata)))
-    } catch {
-      // The in-memory result remains usable when browser storage is unavailable.
-    }
-  }, [photos])
+  const [photos, setPhotos] = useState([])
 
   const queueSelectedPhotos = useCallback((files) => {
     const safeFiles = Array.isArray(files) ? files : []

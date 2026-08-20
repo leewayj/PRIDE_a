@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { getPhotoUploadSummary } from '../api/photoApi.js'
 import ActionButton from '../components/ui/ActionButton.jsx'
 import BaseCard from '../components/ui/BaseCard.jsx'
@@ -51,7 +51,9 @@ function buildNoticeText(minimumYear) {
 }
 
 function PhotoStatusPage() {
+  const location = useLocation()
   const navigate = useNavigate()
+  const uploadIssues = Array.isArray(location.state?.uploadIssues) ? location.state.uploadIssues : []
   const [summary, setSummary] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
@@ -153,6 +155,8 @@ function PhotoStatusPage() {
           <p>사진을 추가하면 시간에 따른 변화 기록을 시작할 수 있어요.</p>
         </BaseCard>
 
+        <UploadIssues issues={uploadIssues} />
+
         <div className="photo-status-page__cta">
           <ActionButton fullWidth onClick={() => navigate('/photos/upload')}>
             사진 추가하기
@@ -174,6 +178,8 @@ function PhotoStatusPage() {
         <strong className="photo-status-page__total-value">{succeededCount}장</strong>
         <p className="photo-status-page__total-description">판정한 사진 {totalUploaded}장 중 처리 완료</p>
       </BaseCard>
+
+      <UploadIssues issues={uploadIssues} />
 
       <BaseCard className="photo-status-page__breakdown">
         <div
@@ -246,6 +252,11 @@ function PhotoStatusPage() {
       </div>
     </section>
   )
+}
+
+function UploadIssues({ issues }) {
+  if (issues.length === 0) return null
+  return <BaseCard className="photo-status-page__upload-issues" role="status"><h2>확인이 필요한 사진</h2><ul>{issues.map(({ filename, reason }, index) => <li key={`${filename}-${index}`}><strong>{filename}</strong><p>{reason}</p></li>)}</ul></BaseCard>
 }
 
 export default PhotoStatusPage
