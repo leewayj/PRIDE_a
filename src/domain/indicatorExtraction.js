@@ -27,7 +27,6 @@ export function validateIndicatorExtraction(response) {
   result.results.forEach((item) => {
     if (!item || typeof item.filename !== 'string' || typeof item.status !== 'string') throw new Error('indicator extraction item has an unexpected structure')
   })
-  if (result.succeeded_count === 0) throw new Error('no photos were stored')
   return {
     ...result,
     issues: result.results

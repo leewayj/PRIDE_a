@@ -931,6 +931,7 @@
 }
 
 .photo-analyzing-page__actions { display: grid; width: 100%; gap: 9px; margin-top: 18px; }
+.photo-analyzing-page__result-counts { display: flex; justify-content: center; gap: 16px; color: #746b66; font-size: 12px; font-weight: 700; }
 .photo-status-page__upload-issues { margin-top: 12px; padding: 18px; }
 .photo-status-page__upload-issues h2 { margin: 0; font-size: 16px; }
 .photo-status-page__upload-issues ul { display: grid; gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }

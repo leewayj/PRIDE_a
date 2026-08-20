@@ -36,6 +36,10 @@ function PhotoSelectionProvider({ children }) {
     setSelectedFiles([])
   }, [])
 
+  const replaceSelectedPhotos = useCallback((files) => {
+    setSelectedFiles(Array.isArray(files) ? files : [])
+  }, [])
+
   const removePhoto = useCallback((photoId) => {
     setPhotos((currentPhotos) => currentPhotos.filter(({ id }) => id !== photoId))
     setSelectedFiles((files) => files.filter((file) => createPhotoId(file) !== photoId))
@@ -46,12 +50,13 @@ function PhotoSelectionProvider({ children }) {
       photos,
       clearSelectedPhotos,
       queueSelectedPhotos,
+      replaceSelectedPhotos,
       removePhoto,
       saveAnalysisResults,
       selectedFiles,
       selectedPhotoCount: selectedFiles.length,
     }),
-    [clearSelectedPhotos, photos, queueSelectedPhotos, removePhoto, saveAnalysisResults, selectedFiles],
+    [clearSelectedPhotos, photos, queueSelectedPhotos, removePhoto, replaceSelectedPhotos, saveAnalysisResults, selectedFiles],
   )
 
   return (
