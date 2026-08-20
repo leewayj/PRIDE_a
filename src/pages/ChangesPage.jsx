@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import MetricCurveChart from '../components/curve/MetricCurveChart.jsx'
 import CareMarkerBottomSheet from '../components/careMarkers/CareMarkerBottomSheet.jsx'
+import DeleteCareMarkerDialog from '../components/careMarkers/DeleteCareMarkerDialog.jsx'
 import BottomNavigation from '../components/navigation/BottomNavigation.jsx'
 import ActionButton from '../components/ui/ActionButton.jsx'
 import BaseCard from '../components/ui/BaseCard.jsx'
@@ -34,6 +35,7 @@ function ChangesPage() {
   const [hasError, setHasError] = useState(false)
   const [isAddSheetOpen, setIsAddSheetOpen] = useState(false)
   const [editingCareMarker, setEditingCareMarker] = useState(null)
+  const [deletingCareMarker, setDeletingCareMarker] = useState(null)
   const [openRecordMenuId, setOpenRecordMenuId] = useState(null)
   const [selectedPhotoId, setSelectedPhotoId] = useState(location.state?.selectedPhotoId ?? null)
 
@@ -165,6 +167,7 @@ function ChangesPage() {
                         isOpen={openRecordMenuId === marker.id}
                         onToggle={() => setOpenRecordMenuId((current) => current === marker.id ? null : marker.id)}
                         onEdit={() => { setEditingCareMarker(marker); setIsAddSheetOpen(true); setOpenRecordMenuId(null) }}
+                        onDelete={() => { setDeletingCareMarker(marker); setOpenRecordMenuId(null) }}
                       />
                       </div>
                     </li>
@@ -205,6 +208,7 @@ function ChangesPage() {
             openRecordMenuId={openRecordMenuId}
             onToggleMenu={(markerId) => setOpenRecordMenuId((current) => current === markerId ? null : markerId)}
             onEdit={(marker) => { setEditingCareMarker(marker); setIsAddSheetOpen(true); setOpenRecordMenuId(null) }}
+            onDelete={(marker) => { setDeletingCareMarker(marker); setOpenRecordMenuId(null) }}
             onAdd={() => { setEditingCareMarker(null); setIsAddSheetOpen(true) }}
             isLoading={isLoading}
           />
@@ -225,20 +229,37 @@ function ChangesPage() {
           }}
         />
       )}
+      {deletingCareMarker && (
+        <DeleteCareMarkerDialog
+          careMarker={deletingCareMarker}
+          onCancel={() => setDeletingCareMarker(null)}
+          onConfirm={() => {
+            const targetId = deletingCareMarker.id
+            setCareMarkers((current) => current.filter(({ id }) => id !== targetId))
+            setSelectedMarker((current) => current?.key === `care-${targetId}` ? null : current)
+            setDeletingCareMarker(null)
+          }}
+        />
+      )}
     </main>
   )
 }
 
-function RecordMenu({ marker, isOpen, onToggle, onEdit }) {
+function RecordMenu({ marker, isOpen, onToggle, onEdit, onDelete }) {
   return (
     <div className="changes-page__record-menu">
       <button className="changes-page__record-menu-trigger" type="button" aria-label={`${marker.kind} 메뉴`} aria-expanded={isOpen} onClick={onToggle}>⋯</button>
-      {isOpen && <div className="changes-page__record-menu-popover"><button type="button" onClick={onEdit}>수정</button></div>}
+      {isOpen && (
+        <div className="changes-page__record-menu-popover">
+          <button type="button" onClick={onEdit}>수정</button>
+          <button className="is-destructive" type="button" onClick={onDelete}>삭제</button>
+        </div>
+      )}
     </div>
   )
 }
 
-function CareRecords({ careMarkers, orderedCareMarkers, selectedMarker, onSelectMarker, openRecordMenuId, onToggleMenu, onEdit, onAdd, isLoading }) {
+function CareRecords({ careMarkers, orderedCareMarkers, selectedMarker, onSelectMarker, openRecordMenuId, onToggleMenu, onEdit, onDelete, onAdd, isLoading }) {
   return (
     <section className="changes-page__records" aria-labelledby="timeline-care-records-title">
       <div className="changes-page__section-heading"><h2 id="timeline-care-records-title">관리 기록</h2><span>{careMarkers.length}</span></div>
@@ -249,7 +270,7 @@ function CareRecords({ careMarkers, orderedCareMarkers, selectedMarker, onSelect
           <li className={selectedMarker?.key === `care-${marker.id}` ? 'is-selected' : ''} key={marker.id}>
             <div className="changes-page__record-row"><button className="changes-page__record-select" type="button" aria-pressed={selectedMarker?.key === `care-${marker.id}`} onClick={() => onSelectMarker((current) => current?.key === `care-${marker.id}` ? null : { type: 'careMarker', key: `care-${marker.id}`, item: marker })}>
               <span className="changes-page__record-dot" aria-hidden="true" /><span><strong>{marker.kind}</strong><small>{marker.rawText}</small></span><time dateTime={marker.date}>{formatPhotoDate(marker.date)}</time>
-            </button><RecordMenu marker={marker} isOpen={openRecordMenuId === marker.id} onToggle={() => onToggleMenu(marker.id)} onEdit={() => onEdit(marker)} /></div>
+            </button><RecordMenu marker={marker} isOpen={openRecordMenuId === marker.id} onToggle={() => onToggleMenu(marker.id)} onEdit={() => onEdit(marker)} onDelete={() => onDelete(marker)} /></div>
           </li>
         ))}</ul></BaseCard>
       ) : (

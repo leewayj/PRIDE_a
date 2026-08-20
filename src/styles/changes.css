@@ -51,6 +51,7 @@
 .changes-page__record-menu-popover { position: absolute; z-index: 5; top: 38px; right: 0; width: 88px; padding: 5px; border: 1px solid var(--border-soft); border-radius: 10px; background: var(--surface); box-shadow: 0 8px 22px rgb(52 39 34 / 16%); }
 .changes-page__record-list .changes-page__record-menu-popover button { display: block; width: 100%; padding: 9px 11px; border-radius: 7px; font-size: 13px; font-weight: 700; text-align: left; }
 .changes-page__record-list .changes-page__record-menu-popover button:hover { background: var(--background-sub); }
+.changes-page__record-list .changes-page__record-menu-popover button.is-destructive { color: #b5473f; }
 .changes-page__record-dot { width: 7px; height: 7px; margin-top: 6px; border-radius: 50%; background: var(--rose-900); }
 .changes-page__record-list strong, .changes-page__record-list small { display: block; }
 .changes-page__record-list strong { font-size: 14px; line-height: 1.4; }
@@ -222,6 +223,33 @@
   margin-top: 2px;
   border-radius: 14px;
 }
+
+.delete-care-marker-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  display: grid;
+  padding: 20px;
+  background: rgb(26 24 22 / 42%);
+  place-items: center;
+}
+
+.delete-care-marker-dialog {
+  width: min(100%, 350px);
+  padding: 24px 20px 20px;
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 16px 45px rgb(26 24 22 / 22%);
+}
+
+.delete-care-marker-dialog h2 { margin: 0; font-size: 19px; line-height: 1.45; text-align: center; }
+.delete-care-marker-dialog__target { display: grid; gap: 4px; margin-top: 18px; padding: 14px; border-radius: 12px; background: var(--background-sub); text-align: center; }
+.delete-care-marker-dialog__target strong { font-size: 14px; overflow-wrap: anywhere; }
+.delete-care-marker-dialog__target time { color: #817873; font-size: 11px; }
+.delete-care-marker-dialog > p { margin: 13px 0 0; color: #817873; font-size: 12px; line-height: 1.55; text-align: center; }
+.delete-care-marker-dialog__actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-top: 20px; }
+.delete-care-marker-dialog__actions .action-button { width: 100%; }
+.delete-care-marker-dialog__actions .action-button:last-child { border-color: #b5473f; background: #b5473f; }
 
 @media (max-width: 370px) {
   .changes-page { padding-inline: 16px; }
