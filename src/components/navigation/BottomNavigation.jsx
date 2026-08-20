@@ -5,6 +5,7 @@ function BottomNavigation() {
   const location = useLocation()
   const isCurveRoute = location.pathname === '/curve' || location.pathname.startsWith('/curve/')
   const isCareRoute = location.pathname.startsWith('/care-markers')
+  const isMeasurementScopeRoute = location.pathname === '/onboarding/measurement-scope'
   return (
     <nav className="bottom-navigation" aria-label="주요 메뉴">
       <NavLink
@@ -36,7 +37,7 @@ function BottomNavigation() {
 
       <NavLink
         className={({ isActive }) =>
-          `bottom-navigation__item${isActive || isCurveRoute || isCareRoute ? ' is-active' : ''}`
+          `bottom-navigation__item${isActive || isCurveRoute || isCareRoute || isMeasurementScopeRoute ? ' is-active' : ''}`
         }
         to="/changes"
       >
@@ -52,7 +53,7 @@ function BottomNavigation() {
 
       <NavLink
         className={({ isActive }) =>
-          `bottom-navigation__item${isActive ? ' is-active' : ''}`
+          `bottom-navigation__item${isActive && !isMeasurementScopeRoute ? ' is-active' : ''}`
         }
         to="/onboarding"
       >

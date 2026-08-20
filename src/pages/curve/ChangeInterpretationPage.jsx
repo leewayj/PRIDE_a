@@ -187,6 +187,15 @@ function ChangeInterpretationPage() {
             )}
           </section>
 
+          <ActionButton
+            className="change-interpretation-page__scope-cta"
+            fullWidth
+            variant="outline"
+            onClick={() => navigate('/onboarding/measurement-scope')}
+          >
+            사진 분석 범위 알아보기
+          </ActionButton>
+
         </>
       )}
 

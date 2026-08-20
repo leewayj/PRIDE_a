@@ -1,0 +1,24 @@
+.measurement-scope-page { min-width: 0; padding: max(14px, env(safe-area-inset-top)) 18px 32px; overflow-x: clip; background: var(--background-main); }
+.measurement-scope-page__header { position: relative; display: flex; min-height: 52px; align-items: center; justify-content: center; }
+.measurement-scope-page__header button { position: absolute; left: -7px; display: grid; width: 42px; height: 42px; padding: 0; border: 0; place-items: center; color: var(--ink-900); background: transparent; }
+.measurement-scope-page__header svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.measurement-scope-page__header > span { font-size: 15px; font-weight: 700; }
+.measurement-scope-page__intro { padding: 25px 2px 22px; }
+.measurement-scope-page__intro > span, .measurement-scope-page__label, .measurement-scope-page__notice section > span { color: var(--rose-900); font-size: 12px; font-weight: 700; }
+.measurement-scope-page__intro h1 { margin: 8px 0 0; font-size: 25px; line-height: 1.42; letter-spacing: -.035em; overflow-wrap: anywhere; }
+.measurement-scope-page__intro > p { margin: 10px 0 0; color: #746b66; font-size: 13px; line-height: 1.6; }
+.measurement-scope-page__card { margin-top: 12px; padding: 20px 18px; }
+.measurement-scope-page__label { margin: 0; line-height: 1.5; }
+.measurement-scope-page__card h2 { margin: 8px 0 0; font-size: 17px; line-height: 1.45; }
+.measurement-scope-page__list { display: grid; margin: 17px 0 0; padding: 0; gap: 11px; list-style: none; }
+.measurement-scope-page__list li { display: flex; min-width: 0; align-items: flex-start; gap: 10px; color: #4f4945; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.measurement-scope-page__list li > span { display: grid; width: 20px; height: 20px; flex: 0 0 auto; border-radius: 50%; color: var(--surface); background: var(--rose-900); font-size: 11px; font-weight: 800; place-items: center; }
+.measurement-scope-page__card--unsupported .measurement-scope-page__list li > span { color: var(--rose-900); background: #f1dfd8; }
+.measurement-scope-page__reason { margin: 18px 0 0; padding: 13px 14px; border-radius: 11px; color: #746b66; background: var(--background-sub); font-size: 12px; line-height: 1.6; }
+.measurement-scope-page__notice { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 13px; margin-top: 13px; padding: 19px 17px; border-radius: 15px; color: #754c42; background: #f4d8ce; }
+.measurement-scope-page__notice > div { display: grid; width: 34px; height: 34px; border-radius: 50%; background: rgb(255 255 255 / 48%); place-items: center; }
+.measurement-scope-page__notice svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+.measurement-scope-page__notice h2 { margin: 7px 0 0; font-size: 16px; line-height: 1.48; }
+.measurement-scope-page__notice p { margin: 7px 0 0; font-size: 12px; line-height: 1.6; }
+.measurement-scope-page__cta { min-height: 54px; margin-top: 18px; border-radius: 14px; }
+@media (max-width: 370px) { .measurement-scope-page { padding-inline: 16px; } .measurement-scope-page__intro h1 { font-size: 22px; } .measurement-scope-page__card { padding-inline: 16px; } }
